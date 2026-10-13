@@ -1032,6 +1032,60 @@ body.forms-off .pg .l-form .fw input, body.forms-off .pg .l-form .fw textarea, b
 .help-card b { font-size: 14.5px; } .help-card p { margin: 0; font-size: 13px; color: var(--text-2); line-height: 1.45; }
 .help-card kbd { font: 600 11px/1 ui-monospace, Menlo, monospace; padding: 2px 5px; border-radius: 5px; background: var(--fill-2); }
 .help-search { margin-bottom: 12px; }
+/* tabs */
+.ed-tabs { display: flex; align-items: flex-end; gap: 2px; padding: 4px 8px 0; background: var(--surface-2); border-bottom: .5px solid var(--line); overflow-x: auto; scrollbar-width: none; flex: none; }
+.ed-tabs::-webkit-scrollbar { display: none; }
+.ed-tab { display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 6px 0 12px; max-width: 220px; min-width: 110px; border-radius: 9px 9px 0 0; background: transparent; color: var(--text-2); font-size: 12.5px; font-weight: 600; cursor: pointer; flex: none; }
+.ed-tab:hover { background: var(--fill-2); }
+.ed-tab.on { background: var(--surface); color: var(--text); box-shadow: 0 -.5px 0 var(--line), .5px 0 0 var(--line), -.5px 0 0 var(--line); }
+.ed-tab .ell { flex: 1 1 auto; min-width: 0; }
+.ed-tab .x { width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center; color: var(--text-3); flex: none; }
+.ed-tab .x:hover { background: var(--fill-2); color: var(--text); }
+.ed-tab.add { min-width: 32px; max-width: 32px; padding: 0; justify-content: center; }
+/* split */
+.ed-body.split #ed-canvas { flex: 1 1 56%; min-width: 0; }
+.ed-split { flex: 0 0 44%; min-width: 0; display: flex; flex-direction: column; border-left: .5px solid var(--line-2); background: var(--surface-2); }
+.ed-split .sp-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: .5px solid var(--line); background: var(--surface); }
+.ed-split .sp-head select { flex: 1 1 auto; min-width: 0; width: auto; }
+.ed-split .sp-sync { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-2); white-space: nowrap; }
+.ed-split .sp-pages { flex: 1 1 auto; overflow: auto; padding: 14px; display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+.ed-split .sp-page { background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.15); width: 100%; }
+.ed-split .sp-page img { width: 100%; height: 100%; display: block; }
+.ed-split .sp-n { text-align: center; font-size: 11px; color: var(--text-3); margin-bottom: 8px; }
+@media (max-width: 760px) { .ed-split { display: none; } }
+/* key caps & hints */
+kbd.cap, .kb-keys kbd { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 6px; background: linear-gradient(#fff, #f2f2f5); color: #1d1d1f; box-shadow: 0 0 0 .5px rgba(0,0,0,.18), 0 1.5px 0 rgba(0,0,0,.18); font: 600 11.5px/1 -apple-system, 'Segoe UI', Inter, sans-serif; }
+:root[data-theme="dark"] kbd.cap { background: linear-gradient(#3a3a3c, #2c2c2e); color: #f5f5f7; box-shadow: 0 0 0 .5px rgba(255,255,255,.14), 0 1.5px 0 rgba(0,0,0,.6); }
+.kb-keys { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.kb-keys .plus { color: var(--text-3); font-size: 11px; }
+.kb-keys small { color: var(--text-3); font-size: 11.5px; margin-left: 4px; }
+.kb-group { margin-bottom: 16px; }
+.kb-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14.5px; margin-bottom: 8px; }
+.kb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 4px 18px; }
+.kb-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 10px; border-radius: 9px; background: var(--surface); font-size: 13.5px; }
+@media (hover: hover) {
+  .tbtn[data-kbd], .ed-top .ibtn[data-kbd], .ed-top .btn[data-kbd] { position: relative; }
+  .tbtn[data-kbd]:hover::after, .ed-top [data-kbd]:hover::after { content: attr(data-kbd); position: absolute; left: 50%; top: calc(100% + 4px); transform: translateX(-50%); padding: 3px 7px; border-radius: 6px; background: rgba(28,28,30,.92); color: #fff; font: 600 11px/1.2 -apple-system, 'Segoe UI', Inter, sans-serif; white-space: nowrap; pointer-events: none; z-index: 60; }
+}
+/* phones, small tablets, foldables */
+@media (max-width: 600px) {
+  .ed-top { gap: 2px; padding-left: 4px; padding-right: 6px; }
+  .ed-top .ibtn { width: 36px; height: 36px; }
+  .doc-pill { padding: 0 6px 0 8px; } .doc-pill b { font-size: 13.5px; }
+  .doc-switch [data-a="prevdoc"], .doc-switch [data-a="nextdoc"] { display: none; }
+  .ed-props { overflow-x: auto; scrollbar-width: none; flex-wrap: nowrap; }
+  .ed-props::-webkit-scrollbar { display: none; }
+  .ed-props .pgroup { flex: none; }
+  .tbtn { min-width: 52px; }
+  .sheet.xwide, .sheet.wide { width: 100vw !important; max-width: 100vw !important; }
+  .help-grid, .kb-grid { grid-template-columns: 1fr; }
+  .dlp-meta { font-size: 12px; }
+}
+@media (min-width: 601px) and (max-width: 900px) { .doc-switch { width: min(360px, 44vw); } .tbtn { min-width: 54px; } }
+/* foldables: keep content off the hinge */
+@media (horizontal-viewport-segments: 2) { .ed-body.split #ed-canvas { flex: 0 0 env(viewport-segment-width 0 0, 50%); } .ed-split { flex: 0 0 env(viewport-segment-width 1 0, 50%); margin-left: calc(env(viewport-segment-left 1 0, 50%) - env(viewport-segment-right 0 0, 50%)); } }
+@media (vertical-viewport-segments: 2) { .sheet { max-height: env(viewport-segment-height 0 0, 100%); } }
+@media (max-height: 520px) and (orientation: landscape) { .ed-tools { padding-top: 2px; padding-bottom: 2px; } .tbtn { height: 40px; font-size: 0; gap: 0; min-width: 42px; } }
 </style>
 </head>
 <body>
@@ -5063,6 +5117,17 @@ LOG(VER + ' loaded');
 })();
 
 </script>
+<script>
+/* ┌──────────────────────────────────────────────────────────────────┐
+   │  GOOGLE SYNC — off until you add your OAuth Client ID.            │
+   │  1. Google Cloud Console › APIs & Services › Credentials ›        │
+   │     Create OAuth client ID › Web application.                     │
+   │  2. Authorised JavaScript origins: your site (https://…).         │
+   │  3. Enable the "Google Drive API" for the project.                │
+   │  4. Paste the Client ID below and set enabled: true.              │
+   └──────────────────────────────────────────────────────────────────┘ */
+window.ZENPDF_CONFIG = Object.assign({ googleSync: { enabled: false, clientId: '' } }, window.ZENPDF_CONFIG || {});
+</script>
 <script id="zp-app">
 (function () {
 /* ==================================================================
@@ -5262,7 +5327,9 @@ const LIB_TEST = {
   xlsx: () => window.XLSX, jspdf: () => window.jspdf && window.jspdf.jsPDF, autotable: () => window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API && window.jspdf.jsPDF.API.autoTable,
   mammoth: () => window.mammoth, docx: () => window.docx, pptx: () => window.PptxGenJS, tesseract: () => window.Tesseract,
 };
-const LIB_NAME = { xlsx: 'spreadsheet engine', jspdf: 'layout engine', autotable: 'table engine', mammoth: 'Word reader', docx: 'Word writer', pptx: 'PowerPoint writer', tesseract: 'text recognition (OCR) engine' };
+CDN.fontkit = 'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js';
+LIB_TEST.fontkit = () => window.fontkit;
+const LIB_NAME = { fontkit: 'font engine', xlsx: 'spreadsheet engine', jspdf: 'layout engine', autotable: 'table engine', mammoth: 'Word reader', docx: 'Word writer', pptx: 'PowerPoint writer', tesseract: 'text recognition (OCR) engine' };
 async function need(...names) {
   for (const n of names) {
     if (n === 'autotable') await need('jspdf');
@@ -5545,6 +5612,7 @@ const ICONS = {
   clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
   brush: '<path d="M14.5 4.5 19.5 9.5 11 18a3 3 0 0 1-4.2 0l-.8-.8a3 3 0 0 1 0-4.2z"/><path d="M4 20c1.5 0 3-.6 3-2.5"/>',
   lift: '<path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><path d="M12 15V9m0 0-2.5 2.5M12 9l2.5 2.5"/>',
+  columns: '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M12 4.5v15"/>',
   library: '<rect x="3.5" y="4" width="6" height="16" rx="1.5"/><rect x="11.5" y="4" width="4.5" height="16" rx="1.2"/><path d="m17.5 5.2 3 .8-3.6 13.9-3-.8"/>',
 };
 function icon(name, cls) {
@@ -5792,8 +5860,8 @@ function progress(o) {
   const ring = $('.ring', el), fg = $('.fg', el), pctEl = $('.pct', el);
   $('h4', el).textContent = o.title || 'Working';
   $('.h-sub', el).textContent = o.sub || '';
-  let shown = false, doneFlag = false, t0 = performance.now(), lastPct = null;
-  const show = () => { if (shown || doneFlag) return; shown = true; layer().appendChild(scrim); layer().appendChild(el); requestAnimationFrame(() => { scrim.classList.add('in'); el.classList.add('in'); }); };
+  let shown = false, doneFlag = false, t0 = performance.now(), lastPct = null, paused = 0;
+  const show = () => { if (shown || doneFlag) return; if (paused) { setTimeout(show, 200); return; } shown = true; layer().appendChild(scrim); layer().appendChild(el); requestAnimationFrame(() => { scrim.classList.add('in'); el.classList.add('in'); }); };
   const timer = setTimeout(show, o.delay == null ? 220 : o.delay);
   const cb = $('.h-foot .btn', el);
   if (cb) cb.onclick = () => { cb.disabled = true; cb.textContent = 'Cancelling…'; job.cancel(); };
@@ -5826,7 +5894,7 @@ function progress(o) {
       el.classList.remove('in'); scrim.classList.remove('in');
       setTimeout(() => { el.remove(); scrim.remove(); }, 300);
     },
-    hideWhile: async (fn) => { const was = shown; if (was) { el.style.visibility = 'hidden'; scrim.style.visibility = 'hidden'; } try { return await fn(); } finally { if (was) { el.style.visibility = ''; scrim.style.visibility = ''; } } },
+    hideWhile: async (fn) => { paused++; const was = shown; if (was) { el.style.visibility = 'hidden'; scrim.style.visibility = 'hidden'; } try { return await job.race(Promise.resolve().then(fn)); } finally { paused--; if (shown) { el.style.visibility = ''; scrim.style.visibility = ''; } } },
   };
   return P;
 }
@@ -5992,7 +6060,7 @@ const Profiles = Z.Profiles = {
 const Sigs = Z.Sigs = {
   list() { try { const a = JSON.parse(localStorage.getItem('zenpdf-sigs') || '[]'); return Array.isArray(a) ? a.filter(s => s && s.data) : []; } catch (_) { return []; } },
   save(list) {
-    try { localStorage.setItem('zenpdf-sigs', JSON.stringify(list.slice(0, 16))); return true; }
+    try { localStorage.setItem('zenpdf-sigs', JSON.stringify(list.slice(0, 16))); try { if (Z.GSync && !Z.GSync.busy) Z.GSync.soon(); } catch (_) {} return true; }
     catch (e) { toast('Signature storage is full — delete an old signature', 'err'); return false; }
   },
   add(sig) { const l = this.list(); l.unshift(Object.assign({ when: Date.now() }, sig)); return this.save(l); },
@@ -7136,6 +7204,23 @@ async function ingest(list, o) {
           const dup = Docs.files.find(x => x._fp === fp || (x.size === u8.length && x.name === safeName(f.name, 'pdf')));
           if (dup) { toast('“' + esc(f.name) + '” is already in your files', { type: 'info', action: { label: 'Open', fn: () => Z.openEditor(dup.id) } }); added.push(dup); done++; continue; }
         }
+        if (sn.kind === 'pdf') {
+          const pt = await Portable.read(u8);
+          if (pt) {
+            const how = o.reedit || await P.hideWhile(() => choose('“' + esc(f.name) + '” was edited in ZenPDF', [
+              { label: 'Continue editing', sub: 'Signatures, text, drawings and form answers come back movable', icon: 'edit', value: 'edit', on: true },
+              { label: 'Open as a normal PDF', sub: 'Everything stays written into the pages', icon: 'file-text', value: 'flat' },
+            ]));
+            if (how == null) throw new Cancelled();
+            if (how === 'edit') {
+              const nf = await Docs.add(f.name, pt.base, { dedupe: false, quiet: true });
+              Docs.setEdits(nf, { objs: (pt.info.edits.objs || []).map(x => Object.assign({}, x)), form: Object.assign({}, pt.info.edits.form || {}), rev: 0 });
+              added.push(nf); done++;
+              toast('<b>' + esc(f.name) + '</b> — your edits are movable again', { type: 'ok', ms: 2600 });
+              continue;
+            }
+          }
+        }
         const r = await P.job.race(convertOne(f, u8, sn, P, o));
         const nf = await Docs.add(sn.kind === 'pdf' ? f.name : baseName(f.name) + '.pdf', r.bytes, { pages: r.pages });
         nf._fp = sn.kind === 'pdf' ? await fingerprintBytes(u8) : null;
@@ -7362,6 +7447,45 @@ function dedupeDoc(doc) {
 
 /* PDF watermarks: the marked "Watermark" layers PDF tools add, watermark
    annotations, and — if you name it — a repeated stamp text on every page */
+/* what looks like a watermark: layers marked as one, watermark
+   annotations, and big or slanted text that repeats on most pages */
+async function findWatermarks(bytes, P) {
+  const L = PL();
+  const found = [];
+  const d = await loadPdf(bytes);
+  const pages = d.getPages();
+  let annots = 0, artifacts = 0;
+  for (const pg of pages) {
+    const a = pg.node.Annots && pg.node.Annots();
+    if (a) for (let k = 0; k < a.size(); k++) { const o = d.context.lookup(a.get(k)); const st = o && o.get && o.get(L.PDFName.of('Subtype')); if (st && String(st) === '/Watermark') annots++; }
+    const c = pg.node.get(L.PDFName.of('Contents')); if (!c) continue;
+    const refs = c instanceof L.PDFArray ? c.asArray() : [c];
+    for (const r of refs) { const st = d.context.lookup(r); if (!st) continue; let raw; try { raw = st instanceof L.PDFRawStream ? L.decodePDFRawStream(st).decode() : st.getContents(); } catch (_) { continue; } const t = new TextDecoder('latin1').decode(raw); artifacts += (t.match(/\/Watermark\b[^B]{0,200}BDC|\/Subtype\s*\/Watermark/g) || []).length; }
+  }
+  if (annots) found.push({ id: 'annots', kind: 'annots', label: 'Watermark annotations', sub: plural(annots, 'item'), on: true });
+  if (artifacts) found.push({ id: 'artifacts', kind: 'artifacts', label: 'Watermark layer', sub: 'Marked as a watermark by the software that made it · ' + plural(artifacts, 'place'), on: true });
+  /* repeated stamp text */
+  const pdf = await openPdfjs(bytes.slice());
+  try {
+    const n = Math.min(pdf.numPages, 60), seen = new Map();
+    for (let i = 1; i <= n; i++) {
+      P && P.check();
+      const tc = await (await pdf.getPage(i)).getTextContent();
+      const onPage = new Set();
+      tc.items.forEach(it => {
+        const t = String(it.str || '').trim(); if (t.length < 3 || t.length > 60) return;
+        const [a, b, c2, dd] = it.transform; const size = Math.hypot(c2, dd); const slant = Math.abs(b) > 0.05 * Math.abs(a);
+        if (size >= 22 || (slant && size >= 12)) onPage.add(t.toUpperCase() === t ? t : t);
+      });
+      onPage.forEach(t => seen.set(t, (seen.get(t) || 0) + 1));
+    }
+    seen.forEach((cnt, t) => { if (cnt >= Math.max(1, Math.ceil(n * 0.5)) && !/^\d+$/.test(t)) found.push({ id: 'text:' + t, kind: 'text', text: t, label: '“' + t + '”', sub: 'Large or slanted text on ' + cnt + ' of ' + n + ' pages', on: true }); });
+  } finally { try { pdf.destroy(); } catch (_) {} }
+  return found;
+}
+Z.findWatermarks = (...a) => findWatermarks(...a);
+Z.mergePdfs = (...a) => merge(...a);
+Z.compressPdf = (...a) => compress(...a);
 Z.removeWatermarks = (...a) => removeWatermarks(...a);
 Z.auditForm = (...a) => auditForm(...a);
 async function removeWatermarks(bytes, o, P) {
@@ -7371,6 +7495,9 @@ async function removeWatermarks(bytes, o, P) {
   const pages = d.getPages();
   let removed = 0;
   const words = String(o.text || '').trim();
+  const texts = (o.texts || []).map(t => String(t).toLowerCase().replace(/\s+/g, '')).filter(Boolean);
+  if (words) texts.push(words.toLowerCase().replace(/\s+/g, ''));
+  const doAnnots = o.annots !== false, doArtifacts = o.artifacts !== false;
   const esc2 = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   for (let i = 0; i < pages.length; i++) {
     P && P.check(); P && P.pct(i / pages.length).sub('Page ' + (i + 1) + ' of ' + pages.length);
@@ -7379,7 +7506,7 @@ async function removeWatermarks(bytes, o, P) {
     const annots = node.Annots && node.Annots();
     if (annots) {
       const keep = [];
-      for (let k = 0; k < annots.size(); k++) { const a = d.context.lookup(annots.get(k)); const st = a && a.get && a.get(L.PDFName.of('Subtype')); if (st && String(st) === '/Watermark') removed++; else keep.push(annots.get(k)); }
+      for (let k = 0; k < annots.size(); k++) { const a = d.context.lookup(annots.get(k)); const st = a && a.get && a.get(L.PDFName.of('Subtype')); if (doAnnots && st && String(st) === '/Watermark') removed++; else keep.push(annots.get(k)); }
       if (keep.length !== annots.size()) node.set(L.PDFName.of('Annots'), d.context.obj(keep));
     }
     /* 2) marked-content watermark artifacts and named stamps in the page content */
@@ -7393,11 +7520,13 @@ async function removeWatermarks(bytes, o, P) {
       try { raw = st instanceof L.PDFRawStream ? L.decodePDFRawStream(st).decode() : st.getContents(); } catch (_) { continue; }
       let text = new TextDecoder('latin1').decode(raw);
       const before = text.length;
-      text = text.replace(/\/Artifact\s*<<[^>]*\/(Subtype|Type)\s*\/(Watermark|Pagination\s*\/Subtype\s*\/Watermark)[^>]*>>\s*BDC[\s\S]*?EMC/g, () => { removed++; return ''; });
-      text = text.replace(/\/Watermark\s*<<[^>]*>>\s*BDC[\s\S]*?EMC/g, () => { removed++; return ''; });
-      if (words) {
+      if (doArtifacts) {
+        text = text.replace(/\/Artifact\s*<<[^>]*\/(Subtype|Type)\s*\/(Watermark|Pagination\s*\/Subtype\s*\/Watermark)[^>]*>>\s*BDC[\s\S]*?EMC/g, () => { removed++; return ''; });
+        text = text.replace(/\/Watermark\s*<<[^>]*>>\s*BDC[\s\S]*?EMC/g, () => { removed++; return ''; });
+      }
+      if (texts.length) {
         /* a text block whose strings (literal or hex) spell the stamp */
-        const want = words.toLowerCase().replace(/\s+/g, '');
+
         text = text.replace(/\bBT\b[\s\S]*?\bET\b/g, (blk) => {
           let str = '';
           blk.replace(/\(((?:[^()\\]|\\.)*)\)|<([0-9A-Fa-f\s]+)>/g, (m, lit, hex) => {
@@ -7405,7 +7534,8 @@ async function removeWatermarks(bytes, o, P) {
             else { const hx = hex.replace(/\s/g, ''); for (let q = 0; q + 1 < hx.length; q += 2) str += String.fromCharCode(parseInt(hx.slice(q, q + 2), 16)); }
             return m;
           });
-          if (str && str.toLowerCase().replace(/\s+/g, '').indexOf(want) >= 0) { removed++; return ''; }
+          const norm2 = str.toLowerCase().replace(/\s+/g, '');
+          if (str && texts.some(w => norm2.indexOf(w) >= 0)) { removed++; return ''; }
           return blk;
         });
       }
@@ -8392,6 +8522,69 @@ const FONT_CSS = {
   cour: "'Courier New', Courier, 'Liberation Mono', 'Nimbus Mono PS', monospace",
 };
 const FONT_LABEL = { helv: 'Sans', times: 'Serif', cour: 'Mono' };
+/* ---------- extra fonts ----------
+   Open-source families (SIL Open Font License), downloaded once from the
+   jsDelivr CDN and kept on this device.  Arimo, Tinos and Cousine are
+   metric-compatible with Arial, Times New Roman and Courier New — the
+   fonts most forms are made with. */
+const XFONTS = {
+  arimo: ['Arial (Arimo)', 'arimo', 'Arimo', 'sans', 'Form fonts'], tinos: ['Times New Roman (Tinos)', 'tinos', 'Tinos', 'serif', 'Form fonts'], cousine: ['Courier New (Cousine)', 'cousine', 'Cousine', 'mono', 'Form fonts'],
+  roboto: ['Roboto', 'roboto', 'Roboto', 'sans', 'Sans serif'], opensans: ['Open Sans', 'open-sans', 'OpenSans', 'sans', 'Sans serif'], lato: ['Lato', 'lato', 'Lato', 'sans', 'Sans serif'],
+  montserrat: ['Montserrat', 'montserrat', 'Montserrat', 'sans', 'Sans serif'], poppins: ['Poppins', 'poppins', 'Poppins', 'sans', 'Sans serif'], notosans: ['Noto Sans', 'noto-sans', 'NotoSans', 'sans', 'Sans serif'],
+  sourcesans: ['Source Sans Pro', 'source-sans-pro', 'SourceSansPro', 'sans', 'Sans serif'], inter: ['Inter', 'inter', 'Inter', 'sans', 'Sans serif'],
+  merriweather: ['Merriweather', 'merriweather', 'Merriweather', 'serif', 'Serif'], garamond: ['EB Garamond', 'eb-garamond', 'EBGaramond', 'serif', 'Serif'], playfair: ['Playfair Display', 'playfair-display', 'PlayfairDisplay', 'serif', 'Serif'],
+  robotomono: ['Roboto Mono', 'roboto-mono', 'RobotoMono', 'mono', 'Monospace'],
+};
+const XF_VARIANT = ['400Regular', '700Bold', '400Regular_Italic', '700Bold_Italic'];
+const XF = Z.XF = {
+  bytesMem: {}, loaded: {}, loading: {},
+  urls(id, v) { const x = XFONTS[id], file = x[2] + '_' + XF_VARIANT[v] + '.ttf'; return ['https://cdn.jsdelivr.net/npm/@expo-google-fonts/' + x[1] + '@0.2.3/' + file, 'https://cdn.jsdelivr.net/npm/@expo-google-fonts/' + x[1] + '@0.4.3/' + XF_VARIANT[v] + '/' + file]; },
+  async bytes(id, v) {
+    for (const vv of Array.from(new Set([v, v & 1, 0]))) {
+      const key = 'xf:' + id + ':' + vv;
+      if (this.bytesMem[key]) return this.bytesMem[key];
+      let b = await KV.get(key).catch(() => null);
+      if (!b) {
+        for (const u of this.urls(id, vv)) { try { const r = await fetch(u); if (r.ok) { b = new Uint8Array(await r.arrayBuffer()); if (b.length > 1000) break; b = null; } } catch (_) {} }
+        if (b) KV.set(key, b);
+      }
+      if (b) { this.bytesMem[key] = b instanceof Uint8Array ? b : new Uint8Array(b); return this.bytesMem[key]; }
+    }
+    throw new Error('The font “' + (XFONTS[id] || [id])[0] + '” could not be downloaded. ' + (navigator.onLine ? 'Try again in a moment.' : 'Connect to the internet once to get it.'));
+  },
+  family(id) { return 'ZPX-' + id; },
+  async load(id) {
+    if (!XFONTS[id] || this.loaded[id]) return;
+    if (this.loading[id]) return this.loading[id];
+    this.loading[id] = (async () => {
+      const cat = XFONTS[id][3];
+      for (let v = 0; v < 4; v++) {
+        try {
+          const b = await this.bytes(id, v);
+          const face = new FontFace(this.family(id), b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength), { weight: v & 1 ? '700' : '400', style: v & 2 ? 'italic' : 'normal' });
+          await face.load(); document.fonts.add(face);
+        } catch (e) { if (v === 0) throw e; }
+      }
+      FONT_CSS[id] = "'" + this.family(id) + "', " + (cat === 'serif' ? FONT_CSS.times : cat === 'mono' ? FONT_CSS.cour : FONT_CSS.helv);
+      FONT_LABEL[id] = XFONTS[id][0];
+      this.loaded[id] = true;
+    })();
+    try { await this.loading[id]; } finally { this.loading[id] = null; }
+  },
+  /* load whatever fonts a document's edits use; true when anything new loaded */
+  async ensureFor(objs) {
+    const ids = Array.from(new Set((objs || []).filter(o => o.t === 'text' && XFONTS[o.font] && !this.loaded[o.font]).map(o => o.font)));
+    for (const id of ids) { try { await this.load(id); } catch (e) { console.warn('[ZenPDF] font', id, e); } }
+    return ids.length > 0;
+  },
+  options(cur) {
+    const groups = {};
+    Object.keys(XFONTS).forEach(id => { const g = XFONTS[id][4]; (groups[g] = groups[g] || []).push(id); });
+    return `<optgroup label="Built in"><option value="helv" ${cur === 'helv' ? 'selected' : ''}>Helvetica</option><option value="times" ${cur === 'times' ? 'selected' : ''}>Times</option><option value="cour" ${cur === 'cour' ? 'selected' : ''}>Courier</option></optgroup>`
+      + Object.keys(groups).map(g => `<optgroup label="${attr(g)}">${groups[g].map(id => `<option value="${id}" ${cur === id ? 'selected' : ''}>${esc(XFONTS[id][0])}</option>`).join('')}</optgroup>`).join('');
+  },
+};
+
 const FONT_STD = {
   helv: ['Helvetica', 'HelveticaBold', 'HelveticaOblique', 'HelveticaBoldOblique'],
   times: ['TimesRoman', 'TimesRomanBold', 'TimesRomanItalic', 'TimesRomanBoldItalic'],
@@ -8555,7 +8748,12 @@ async function bake(bytes, edits, opts) {
   const fonts = new Map();
   const getFont = async (o) => {
     const k = (o.font || 'helv') + fontVariant(o);
-    if (!fonts.has(k)) fonts.set(k, await doc.embedFont(L.StandardFonts[FONT_STD[o.font || 'helv'][fontVariant(o)]]));
+    if (!fonts.has(k)) {
+      if (XFONTS[o.font]) {
+        if (!doc._zpFk) { await need('fontkit'); doc.registerFontkit(window.fontkit); doc._zpFk = true; }
+        fonts.set(k, await doc.embedFont(await XF.bytes(o.font, fontVariant(o)), { subset: true }));
+      } else fonts.set(k, await doc.embedFont(L.StandardFonts[FONT_STD[o.font || 'helv'][fontVariant(o)]]));
+    }
     return fonts.get(k);
   };
   const imgs = new Map();
@@ -8596,7 +8794,7 @@ async function bake(bytes, edits, opts) {
           if (o.cover) { const c = o.cover; const a = at(c.x, c.y + c.h); page.drawRectangle({ x: a.x, y: a.y, width: c.w, height: c.h, color: rgbOf(c.color || '#ffffff'), rotate: R }); }
           if (o.bg) { const lay = layoutText(o); const a = at(o.x - 2, o.y + lay.height + 1); page.drawRectangle({ x: a.x, y: a.y, width: lay.width + 4, height: lay.height + 2, color: rgbOf(o.bg), rotate: R }); }
           if (!String(o.text || '').trim()) break;
-          if (!isWinAnsi(String(o.text).replace(/\n/g, ''))) {
+          if (!XFONTS[o.font] && !isWinAnsi(String(o.text).replace(/\n/g, ''))) {
             const png = await textToPng(o, 4);
             const img = await doc.embedPng(png.bytes);
             const a = at(o.x, o.y + png.h);
@@ -9209,6 +9407,40 @@ async function deliver(items, zipName, how) {
   const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
   downloadBlob(blob, safeName(zipName || 'ZenPDF files', 'zip'));
 }
+/* ---------- re-editable PDFs ----------
+   The downloaded PDF looks and prints normally everywhere. Inside it also
+   keeps the original pages and the list of things you added, so opening
+   it in ZenPDF again gives you every signature, text box and drawing back
+   as movable items.  Never used when redactions or cover-ups exist —
+   the original underneath would travel with the file. */
+const Portable = Z.Portable = {
+  KEY: 'ZenPDFEdit',
+  risky(edits) { return ((edits && edits.objs) || []).some(o => o.t === 'redact' || o.t === 'white' || (o.t === 'text' && o.cover) || (o.t === 'ink' && o.wo) || (o.t === 'image' && o.lifted)); },
+  async embed(out, base, edits, name) {
+    const L = PL(); const d = await loadPdf(out);
+    const json = new TextEncoder().encode(JSON.stringify({ v: 1, app: 'ZenPDF', name, at: Date.now(), edits: { objs: (edits && edits.objs) || [], form: (edits && edits.form) || {} } }));
+    const dict = d.context.obj({ V: 1 });
+    dict.set(L.PDFName.of('Edits'), d.context.register(d.context.flateStream(json)));
+    dict.set(L.PDFName.of('Base'), d.context.register(d.context.flateStream(base)));
+    d.catalog.set(L.PDFName.of(this.KEY), d.context.register(dict));
+    return savePdf(d);
+  },
+  async read(u8) {
+    try {
+      const L = PL(); const d = await loadPdf(u8);
+      const ref = d.catalog.get(L.PDFName.of(this.KEY)); if (!ref) return null;
+      const dict = ref instanceof L.PDFDict ? ref : d.context.lookup(ref);
+      if (!dict || typeof dict.get !== 'function') return null;
+      const get = (n) => { const v = dict.get(L.PDFName.of(n)); return v ? d.context.lookup(v) : null; };
+      const es = get('Edits'), bs = get('Base'); if (!es || !bs) return null;
+      const dec = (st) => st instanceof L.PDFRawStream ? L.decodePDFRawStream(st).decode() : st.getContents();
+      const info = JSON.parse(new TextDecoder().decode(dec(es)));
+      const base = new Uint8Array(dec(bs));
+      if (!isPdfBytes(base) || !info || !info.edits) return null;
+      return { info, base };
+    } catch (e) { console.warn('[ZenPDF] portable', e); return null; }
+  },
+};
 /* the Download sheet: name, format, pages, quality — and always a Cancel */
 function exportSheet(f, o) {
   o = o || {};
@@ -9222,8 +9454,10 @@ function exportSheet(f, o) {
       <input class="input hide" id="ex-range" placeholder="e.g. 1-3, 6, 9-12" autocomplete="off"></div>
     <div class="field hide" id="ex-q"><label>Image quality</label>${segHtml('ex-dpi', [[96, 'Screen'], [150, 'Standard'], [300, 'Print']], st.dpi)}</div>
     ${Docs.hasEdits(f) ? `<div class="note">${icon('info')}<div>Your edits are written into the download. The file in your workspace stays editable.</div></div>` : ''}
+    ${Docs.hasEdits(f) ? `<div class="cell" id="ex-keep" style="padding:0"><div class="c-main"><div class="c-title">Keep editable in ZenPDF</div><div class="c-sub">${Portable.risky(f.edits) ? 'Off: this file has redactions or cover-ups — the original would travel with it' : 'Opening this PDF here again gives you every signature and text box back to move or change'}</div></div>${switchHtml('ex-keepsw', !Portable.risky(f.edits) && Settings.get('keepEditable') !== false)}</div>` : ''}
   </div>`);
   const sync = () => {
+    const kp = $('#ex-keep', body); if (kp) kp.classList.toggle('hide', st.fmt !== 'pdf');
     $('#ex-q', body).classList.toggle('hide', !/^(jpg|png)$/.test(st.fmt));
     $('#ex-range', body).classList.toggle('hide', st.pages !== 'custom');
   };
@@ -9245,7 +9479,10 @@ function exportSheet(f, o) {
     let items = null;
     await withProgress({ title: 'Preparing ' + (fmts.find(x => x.id === st.fmt) || {}).label, sub: f.name }, async (P) => {
       try {
-        const bytes = await Docs.bytes(f, st.fmt === 'pdf-flat' ? { flatten: true } : undefined);
+        let bytes = await Docs.bytes(f, st.fmt === 'pdf-flat' ? { flatten: true } : undefined);
+        const ksw = $('#ex-keepsw', body);
+        if (st.fmt === 'pdf' && !pages && ksw && ksw.checked && Docs.hasEdits(f)) { P.sub('Keeping it editable…'); bytes = await Portable.embed(bytes, await Docs.raw(f), f.edits, f.name); }
+        if (ksw) Settings.set('keepEditable', ksw.checked || Portable.risky(f.edits) ? (ksw.checked || Settings.get('keepEditable') !== false) : false);
         items = await exportAs(bytes, st.fmt, { name: st.name, pages, total: f.pages, dpi: st.dpi }, P);
       } catch (e) { items = null; fail(e, 'Download failed'); }
     });
@@ -9642,15 +9879,32 @@ tool({ id: 'flatten', cat: 'optimize', title: 'Flatten PDF', icon: 'layers', des
     for (const f of T.files) { const r = await flatten(await Docs.bytes(f), T.opts); fields += r.fields; ann += r.annots; results.push(await pdfResult(f.name, r.bytes)); }
     return { results, headline: 'Flattened', detail: plural(fields, 'field') + ' and ' + plural(ann, 'annotation') + ' locked in', replace: T.files.length === 1 ? T.files[0].id : null };
   } });
-tool({ id: 'nowatermark', cat: 'optimize', title: 'Remove watermark', icon: 'eraser', desc: 'Take off watermarks that PDF software added to your own documents — “DRAFT”, “CONFIDENTIAL”, logos.', kw: 'watermark remove draft confidential stamp sample background',
-  input: 'pdf', opts: { text: '' }, cta: () => 'Remove watermark',
-  side: (T) => optBlock('Watermark text (optional)', `<input class="input" id="o-wt" placeholder="e.g. DRAFT, CONFIDENTIAL, SAMPLE" value="${attr(T.opts.text)}" autocomplete="off"><div class="hint" style="margin-top:6px">Watermarks marked as watermarks are found automatically. Type the words of a stamp to remove that text too.</div>`)
-    + `<div class="note" style="margin-top:10px">${icon('info')}<div>For documents you own or have the right to change. Watermarks drawn into scanned pictures can’t be removed — cover them with <b>Whiteout</b> in the editor instead.</div></div>`,
-  bind: (T, r) => { $('#o-wt', r).oninput = (e) => T.opts.text = e.target.value; },
+tool({ id: 'nowatermark', cat: 'optimize', title: 'Remove watermark', icon: 'eraser', desc: 'Find the watermarks in your own PDFs — “DRAFT”, “CONFIDENTIAL”, stamps — and choose which ones to take off.', kw: 'watermark remove draft confidential stamp sample background',
+  input: 'pdf', opts: { text: '', found: null, sel: {} }, cta: () => 'Remove selected',
+  side: (T) => optBlock('Watermarks found', `<div id="o-wl"><div class="muted" style="font-size:13px">Add a PDF, then tap <b>Find watermarks</b>.</div></div><button class="btn tinted block" id="o-scan" style="margin-top:8px">${icon('search', 'sm')} Find watermarks</button>`)
+    + optBlock('Other stamp text (optional)', `<input class="input" id="o-wt" placeholder="e.g. DRAFT, SAMPLE, COPY" value="${attr(T.opts.text)}" autocomplete="off">`)
+    + `<div class="note" style="margin-top:10px">${icon('info')}<div>For documents you own or have the right to change. A watermark that is part of a scanned picture can’t be lifted off — cover it with <b>Whiteout</b> in the editor.</div></div>`,
+  bind: (T, r) => {
+    $('#o-wt', r).oninput = (e) => T.opts.text = e.target.value;
+    const draw = () => {
+      const L = T.opts.found;
+      $('#o-wl', r).innerHTML = !L ? '' : L.length ? L.map(x => `<div class="cell" style="padding:6px 0"><div class="c-main"><div class="c-title">${esc(x.label)}</div><div class="c-sub">${esc(x.sub)}</div></div>${switchHtml('wm-' + btoa(unescape(encodeURIComponent(x.id))).replace(/=/g, ''), T.opts.sel[x.id] !== false)}</div>`).join('') : `<div class="muted" style="font-size:13px">No watermark found. If you can see one, type its words below.</div>`;
+      (L || []).forEach(x => { const sw = $('#wm-' + btoa(unescape(encodeURIComponent(x.id))).replace(/=/g, ''), r); if (sw) sw.onchange = () => { T.opts.sel[x.id] = sw.checked; }; });
+    };
+    $('#o-scan', r).onclick = async () => {
+      if (!T.files || !T.files.length) { toast('Add a PDF first', 'info'); return; }
+      try { T.opts.found = await withProgress({ title: 'Looking for watermarks', sub: T.files[0].name }, async (P) => findWatermarks(await Docs.bytes(T.files[0]), P)); T.opts.sel = {}; draw(); }
+      catch (e) { if (!isCancel(e)) fail(e, 'Couldn’t read the PDF'); }
+    };
+    draw();
+  },
   run: async (T, P) => {
+    if (!T.opts.found && !String(T.opts.text).trim()) { T.opts.found = await findWatermarks(await Docs.bytes(T.files[0]), P); }
+    const L = T.opts.found || [], on = (x) => T.opts.sel[x.id] !== false;
+    const o = { annots: L.some(x => x.kind === 'annots' && on(x)), artifacts: L.some(x => x.kind === 'artifacts' && on(x)), texts: L.filter(x => x.kind === 'text' && on(x)).map(x => x.text), text: T.opts.text };
     const results = []; let n = 0;
-    for (const f of T.files) { const r = await removeWatermarks(await Docs.bytes(f), T.opts, P); n += r.removed; results.push(await pdfResult(f.name, r.bytes)); }
-    return { results, headline: n ? 'Watermark removed' : 'No watermark found', detail: n ? plural(n, 'watermark layer') + ' removed' : 'Nothing was marked as a watermark' + (T.opts.text ? ' and “' + esc(T.opts.text) + '” wasn’t found as text' : '') + '. Try typing the watermark’s words, or cover it with Whiteout.', replace: T.files.length === 1 ? T.files[0].id : null };
+    for (const f of T.files) { const r = await removeWatermarks(await Docs.bytes(f), o, P); n += r.removed; results.push(await pdfResult(f.name, r.bytes)); }
+    return { results, headline: n ? 'Watermark removed' : 'Nothing removed', detail: n ? plural(n, 'watermark') + ' taken off' : 'None of the selected watermarks were found as removable text or layers. Cover it with Whiteout in the editor instead.', replace: T.files.length === 1 ? T.files[0].id : null };
   } });
 tool({ id: 'grayscale', cat: 'optimize', title: 'Grayscale PDF', icon: 'droplet', desc: 'Convert colour documents to black & white for printing.', kw: 'black white monochrome gray grey print ink',
   input: 'pdf', opts: { how: 'images', dpi: 200 }, cta: () => 'Convert to grayscale',
@@ -9840,16 +10094,16 @@ tool({ id: 'header', cat: 'edit', title: 'Header, footer & Bates', icon: 'text',
   } });
 tool({ id: 'watermark', cat: 'edit', title: 'Watermark', icon: 'droplet', desc: 'Stamp text or a logo across pages — once or tiled.', kw: 'watermark stamp confidential draft logo',
   input: 'pdf', opts: { kind: 'text', text: 'CONFIDENTIAL', size: 0, color: '#d70015', opacity: 0.25, angle: 45, layout: 'single', pos: 'cc', range: '', bold: true, image: null, scale: 0.4 }, cta: () => 'Add watermark',
-  side: (T) => optBlock('Type', segHtml('o-kind', [['text', 'Text', 'type'], ['image', 'Image', 'image']], T.opts.kind))
-    + `<div id="o-text" class="${T.opts.kind === 'text' ? '' : 'hide'}" style="display:flex;flex-direction:column;gap:14px">${optBlock('Text', `<input class="input" id="o-tx" value="${attr(T.opts.text)}" maxlength="80">`)}${optBlock('Colour', swatchHtml('o-col', T.opts.color))}${optBlock('Size', `<input type="range" class="slider" id="o-size" min="0" max="160" value="${T.opts.size}">`, '0 = fit the page')}</div>`
-    + `<div id="o-img" class="${T.opts.kind === 'image' ? '' : 'hide'}" style="display:flex;flex-direction:column;gap:14px"><button class="btn tinted block" id="o-pick">${icon('image', 'sm')} ${T.opts.image ? 'Change image' : 'Choose image'}</button>${optBlock('Size', `<input type="range" class="slider" id="o-scale" min="5" max="100" value="${Math.round(T.opts.scale * 100)}">`)}</div>`
+  side: (T) => optBlock('Type', segHtml('o-kind', [['text', 'Text', 'type'], ['image', 'Image', 'image'], ['both', 'Both', 'layers']], T.opts.kind))
+    + `<div id="o-text" class="${T.opts.kind !== 'image' ? '' : 'hide'}" style="display:flex;flex-direction:column;gap:14px">${optBlock('Text', `<input class="input" id="o-tx" value="${attr(T.opts.text)}" maxlength="80">`)}${optBlock('Colour', swatchHtml('o-col', T.opts.color))}${optBlock('Size', `<input type="range" class="slider" id="o-size" min="0" max="160" value="${T.opts.size}">`, '0 = fit the page')}</div>`
+    + `<div id="o-img" class="${T.opts.kind !== 'text' ? '' : 'hide'}" style="display:flex;flex-direction:column;gap:14px"><button class="btn tinted block" id="o-pick">${icon('image', 'sm')} ${T.opts.image ? 'Change image' : 'Choose image'}</button>${optBlock('Size', `<input type="range" class="slider" id="o-scale" min="5" max="100" value="${Math.round(T.opts.scale * 100)}">`)}</div>`
     + optBlock('Opacity', `<input type="range" class="slider" id="o-op" min="5" max="100" value="${Math.round(T.opts.opacity * 100)}">`)
     + optBlock('Angle', segHtml('o-ang', [[0, '0°'], [45, '45°'], [-45, '−45°'], [90, '90°']], T.opts.angle))
     + optBlock('Layout', segHtml('o-lay', [['single', 'Once'], ['tile', 'Tiled']], T.opts.layout))
     + `<div id="o-posw" class="${T.opts.layout === 'single' ? '' : 'hide'}">${optBlock('Position', posGrid('o-pos', T.opts.pos))}</div>`
     + optBlock('Pages', rangeInput('o-range', T.opts.range)),
   bind: (T, r) => {
-    wireSeg(r, 'o-kind', v => { T.opts.kind = v; $('#o-text', r).classList.toggle('hide', v !== 'text'); $('#o-img', r).classList.toggle('hide', v !== 'image'); });
+    wireSeg(r, 'o-kind', v => { T.opts.kind = v; $('#o-text', r).classList.toggle('hide', v === 'image'); $('#o-img', r).classList.toggle('hide', v === 'text'); });
     $('#o-tx', r).oninput = (e) => T.opts.text = e.target.value; wireSwatch(r, 'o-col', c => T.opts.color = c);
     const sl = (id, fn) => { const s = $(id, r); sliderFill(s); s.oninput = () => { sliderFill(s); fn(+s.value); }; };
     sl('#o-size', v => T.opts.size = v); sl('#o-op', v => T.opts.opacity = v / 100); sl('#o-scale', v => T.opts.scale = v / 100);
@@ -9862,12 +10116,15 @@ tool({ id: 'watermark', cat: 'edit', title: 'Watermark', icon: 'droplet', desc: 
       T.opts.image = b; $('#o-pick', r).innerHTML = icon('check', 'sm') + ' ' + esc(f.name);
     };
   },
-  ready: (T) => T.opts.kind === 'text' ? !!String(T.opts.text).trim() : !!T.opts.image,
+  ready: (T) => T.opts.kind === 'text' ? !!String(T.opts.text).trim() : T.opts.kind === 'image' ? !!T.opts.image : !!(T.opts.image && String(T.opts.text).trim()),
   run: async (T, P) => {
     const results = [];
     for (const f of T.files) {
-      const o = Object.assign({}, T.opts, { pages: pagesFrom(T.opts.range, f.pages), image: T.opts.kind === 'image' ? T.opts.image : null });
-      results.push(await pdfResult(f.name, await watermark(await Docs.bytes(f), o, P)));
+      const base = Object.assign({}, T.opts, { pages: pagesFrom(T.opts.range, f.pages) });
+      let b = await Docs.bytes(f);
+      if (T.opts.kind !== 'text' && T.opts.image) b = await watermark(b, Object.assign({}, base, { image: T.opts.image }), P);
+      if (T.opts.kind !== 'image' && String(T.opts.text).trim()) b = await watermark(b, Object.assign({}, base, { image: null, pos: T.opts.kind === 'both' && T.opts.layout === 'single' ? 'bc' : base.pos }), P);
+      results.push(await pdfResult(f.name, b));
     }
     return { results, headline: 'Watermark added', replace: T.files.length === 1 ? T.files[0].id : null };
   } });
@@ -10680,6 +10937,11 @@ function renderSettings(v) {
       <button class="cell tap" data-act="afimport"><div class="c-main"><div class="c-title">Restore from a backup</div><div class="c-sub">Bring profiles and learned fixes to this device or browser</div></div><span class="chev">${icon('upload', 'sm')}</span></button>
       <button class="cell tap danger" data-act="forget"><div class="c-main"><div class="c-title">Forget learned corrections</div><div class="c-sub">Autofill remembers fixes you made on each form</div></div></button>
     </div>
+    ${Z.GSync && Z.GSync.available() ? `<div class="group-title">Sync</div><div class="group" id="st-gs"></div>` : ''}
+    <div class="group-title">Editor</div><div class="group">
+      <div class="cell"><div class="c-main"><div class="c-title">Document tabs</div><div class="c-sub">Keep several PDFs open as tabs above the editor · <kbd>Alt</kbd> <kbd>⇧</kbd> <kbd>→</kbd> next tab</div></div>${switchHtml('st-tabs', !!s.get('edTabs'))}</div>
+      <div class="cell"><div class="c-main"><div class="c-title">Split screen</div><div class="c-sub">Show another PDF beside the one you’re editing · <kbd>Alt</kbd> <kbd>⇧</kbd> <kbd>S</kbd></div></div>${switchHtml('st-split', !!s.get('edSplit'))}</div>
+    </div>
     <div class="group-title">Signatures</div><div class="group">
       <button class="cell tap" data-act="sigs"><div class="c-main"><div class="c-title">Saved signatures</div><div class="c-sub">${plural(sigs.length, 'signature')}</div></div><span class="chev">${icon('chev-r', 'sm')}</span></button>
     </div>
@@ -10707,6 +10969,21 @@ function renderSettings(v) {
   };
   $('#st-keep', v).onchange = (e) => s.set('autoKeep', e.target.checked);
   $('#st-pdl', v).onchange = (e) => s.set('previewDl', e.target.checked);
+  $('#st-tabs', v).onchange = (e) => s.set('edTabs', e.target.checked);
+  $('#st-split', v).onchange = (e) => s.set('edSplit', e.target.checked);
+  const gsBox = $('#st-gs', v);
+  if (gsBox) {
+    const drawGs = () => {
+      const st = Z.GSync.state();
+      gsBox.innerHTML = st.on
+        ? `<div class="cell"><span class="tile sm" style="--c:#34a853">${icon('check')}</span><div class="c-main"><div class="c-title">Syncing as ${esc(st.email || 'your Google account')}</div><div class="c-sub">${Z.GSync.busy ? 'Syncing now…' : st.error ? 'Last attempt failed: ' + esc(st.error) : st.last ? 'Last synced ' + relTime(st.last) : 'Not synced yet'}</div></div><button class="btn sm" data-gs="now" ${Z.GSync.busy ? 'disabled' : ''}>${icon('refresh', 'sm')} Sync now</button></div><button class="cell tap danger" data-gs="out"><div class="c-main"><div class="c-title">Sign out</div><div class="c-sub">Stops syncing. Nothing is deleted here or in your Drive.</div></div></button>`
+        : `<div class="cell"><div class="c-main"><div class="c-title">Sync with Google</div><div class="c-sub">Profiles, learned fixes, signatures and saved elements on all your devices</div></div>${switchHtml('st-gsw', false)}</div>`;
+      const sw = $('#st-gsw', gsBox); if (sw) sw.onchange = async () => { if (sw.checked) { await Z.GSync.turnOn(); } drawGs(); };
+    };
+    gsBox.addEventListener('click', async (e) => { const b = e.target.closest('[data-gs]'); if (!b) return; if (b.dataset.gs === 'now') await Z.GSync.sync(); else await Z.GSync.signOut(); drawGs(); });
+    Bus.on('gsync', () => { if (gsBox.isConnected) drawGs(); });
+    drawGs();
+  }
   Store.usage().then(u => { const el = $('#st-usage', v); if (el) el.textContent = u ? fmtBytes(u.usage || 0) + ' of ' + fmtBytes(u.quota || 0) + ' available to ZenPDF' : 'Not available in this browser'; });
   if (!Z.installEvt && !/iPhone|iPad/.test(navigator.userAgent)) { const ib = $('#st-install', v); if (matchMedia('(display-mode: standalone)').matches) { ib.querySelector('.c-sub').textContent = 'Installed — you’re using the app'; ib.disabled = true; } }
   v.addEventListener('click', async (e) => {
@@ -10723,10 +11000,34 @@ function renderSettings(v) {
     else if (a === 'update') checkUpdate(true);
   });
 }
-function shortcutsSheet() {
-  const mod = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl';
-  const rows = [['Search tools & files', mod + ' K'], ['Add files', mod + ' O'], ['Download', mod + ' S'], ['Undo / Redo', mod + ' Z  /  ' + mod + ' ⇧ Z'], ['Find in document', mod + ' F'], ['Zoom in / out / fit', mod + ' +  /  ' + mod + ' −  /  ' + mod + ' 0'], ['Select · Text · Draw · Highlight', 'V · T · D · H'], ['Shapes · Whiteout · Signature', 'R · W · S'], ['Delete selection', 'Delete'], ['Nudge selection', 'Arrow keys (⇧ for 10)'], ['Next / previous page', 'Page Down / Page Up'], ['Close sheet or tool', 'Esc']];
-  sheet({ title: 'Keyboard shortcuts', size: 'wide', body: `<div class="group">${rows.map(([a, b]) => `<div class="cell"><div class="c-main"><div class="c-title" style="font-size:14px">${a}</div></div><kbd>${b}</kbd></div>`).join('')}</div>`, foot: [{ label: 'Done', kind: 'primary' }] });
+/* every shortcut, grouped where it works, with a little key picture */
+const KEYMAP = () => {
+  const M = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl';
+  const A = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌥' : 'Alt';
+  return [
+    ['Everywhere', 'grid', [
+      ['Search tools, files & actions', [M, 'K'], '/'], ['Add files', [M, 'O']], ['Go to Home', ['G', 'H']], ['Go to Files', ['G', 'F']], ['Go to All tools', ['G', 'T']], ['Go to Settings', ['G', 'S']],
+      ['Show these shortcuts', ['?']], ['Close a sheet / go back', ['Esc']], ['Move between controls', ['Tab']], ['Press the focused button', ['Enter']],
+    ]],
+    ['Editor — tools', 'edit', TOOLS_ED.map(t => [t.label, [t.key.toUpperCase()]]).concat([['Autofill the form', [A, '⇧', 'A']], ['Pages menu', [A, '⇧', 'P']]])],
+    ['Editor — actions', 'select', [
+      ['Undo', [M, 'Z']], ['Redo', [M, '⇧', 'Z'], M + ' Y'], ['Copy / cut / paste an item', [M, 'C'], M + ' X / ' + M + ' V'], ['Duplicate the selected item', [M, 'D']], ['Delete the selected item', ['Del']],
+      ['Nudge an item', ['←', '→', '↑', '↓'], '⇧ + arrows = 10×'], ['Find in document', [M, 'F']], ['Download', [M, 'S']], ['Zoom in / out', [M, '+'], M + ' −'], ['Fit page / width', [M, '0']],
+      ['Next / previous page', ['PgDn'], 'PgUp'], ['First / last page', ['Home'], 'End'], ['Next form field', ['Tab'], '⇧ Tab back'], ['Help', ['F1'], A + ' ⇧ H'],
+      ['Next / previous tab', [A, '⇧', '→'], A + ' ⇧ ←'], ['Close tab', [A, '⇧', 'W']], ['Split screen', [A, '⇧', 'S']],
+    ]],
+    ['Organize pages', 'organize', [['Select all pages', [M, 'A']], ['Rotate selected', ['R'], '⇧ R left'], ['Delete selected', ['Del']], ['Move selected', [A, '←'], A + ' →'], ['Undo / Redo', [M, 'Z'], M + ' ⇧ Z'], ['Save', [M, 'S']]]],
+    ['Tools — merge, compress, convert…', 'merge', [['Run the tool', ['Enter'], M + ' Enter while typing'], ['Add more files', [M, 'O']], ['Back to all tools', ['Esc']]]],
+  ];
+};
+function keycaps(keys) { return keys.map(k => `<kbd class="cap">${esc(k)}</kbd>`).join('<span class="plus">+</span>'); }
+function shortcutsSheet(only) {
+  const groups = KEYMAP().filter(g => !only || g[0].toLowerCase().indexOf(only) === 0 || g[0] === 'Everywhere');
+  const body = h(`<div><input class="input help-search" placeholder="Search shortcuts — e.g. undo, sign, zoom" autocomplete="off">
+    ${groups.map(([title, ic, rows]) => `<div class="kb-group"><div class="kb-title"><span class="tile sm" style="--c:var(--accent)">${icon(ic)}</span>${esc(title)}</div><div class="kb-grid">${rows.map(([what, keys, alt]) => `<div class="kb-row" data-q="${attr((title + ' ' + what).toLowerCase())}"><span>${esc(what)}</span><span class="kb-keys">${keycaps(keys)}${alt ? `<small>${esc(alt)}</small>` : ''}</span></div>`).join('')}</div></div>`).join('')}
+    <p class="muted" style="font-size:12.5px;margin-top:10px">Shortcuts use keys every browser leaves free, and are switched off while you type in a box.</p></div>`);
+  $('.help-search', body).oninput = (e) => { const q = e.target.value.trim().toLowerCase(); $$('.kb-row', body).forEach(r => { r.style.display = !q || r.dataset.q.indexOf(q) >= 0 ? '' : 'none'; }); };
+  sheet({ title: 'Keyboard shortcuts', body, size: 'xwide', foot: [{ label: 'Done', kind: 'primary', value: null }] });
 }
 
 /* ---------- command palette ---------- */
@@ -11271,6 +11572,8 @@ const Editor = Z.Editor = {
     const gen = ++this.gen;
     this.f = f; this.pages = []; this.selId = null; this.cur = 0; this.findState = null; this.gesture = null;
     this.loadStacks(f);
+    setTimeout(() => { try { this.drawTabs(); const sb = $('#ed-splitbtn', this.el); if (sb) sb.classList.toggle('hide', !Settings.get('edSplit')); if (this.split && this.split.id === f.id) this.toggleSplit(); } catch (_) {} }, 30);
+    setTimeout(() => { if (this.f === f && f.edits) XF.ensureFor(f.edits.objs).then(ch => { if (ch && this.f === f) this.renderAll(); }); }, 0);
     if (!this.opts) {
       const d = this.defaults();
       let saved = {};
@@ -11344,11 +11647,13 @@ const Editor = Z.Editor = {
           <span class="save-state hide-m" id="ed-save"><span class="dot"></span><span class="txt">Saved</span></span>
           <button class="ibtn" data-a="undo" title="Undo">${icon('undo')}</button>
           <button class="ibtn" data-a="redo" title="Redo">${icon('redo')}</button>
+          <button class="ibtn hide-m ${Settings.get('edSplit') ? '' : 'hide'}" data-a="split" id="ed-splitbtn" title="Split screen (Alt+Shift+S)">${icon('columns')}</button>
           <button class="ibtn" data-a="find" title="Find">${icon('search')}</button>
           <button class="ibtn hide-m" data-a="help" title="Help">${icon('info')}</button>
           <button class="ibtn" data-a="more" title="More">${icon('more')}</button>
           <button class="btn primary sm" data-a="download" style="margin-left:4px">${icon('download', 'sm')}<span class="hide-m">Download</span></button>
         </div>
+        <div class="ed-tabs hide" id="ed-tabs" role="tablist"></div>
         <div class="ed-tools" id="ed-tools">${TOOLS_ED.map(t => `<button class="tbtn" data-tool="${t.id}" title="${t.label} (${t.key.toUpperCase()})">${icon(t.icon)}${t.label}</button>`).join('')}<div class="tsep"></div><button class="tbtn" data-a="autofill" style="color:var(--c-smart)">${icon('wand')}Autofill</button><button class="tbtn" data-a="organize">${icon('organize')}Pages</button></div>
         <div class="ed-props" id="ed-props"></div>
         <div class="ed-body"><aside class="ed-thumbs ${innerWidth < 1100 ? 'closed' : ''}" id="ed-thumbs"></aside>
@@ -11358,6 +11663,9 @@ const Editor = Z.Editor = {
         </div></section>`);
       $('#app').appendChild(el);
       el.classList.toggle('compact', !!Settings.get('edCompact'));
+      const M = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl+';
+      [['undo', M + 'Z'], ['redo', M + '⇧Z'], ['find', M + 'F'], ['download', M + 'S'], ['autofill', 'Alt+⇧+A'], ['organize', 'Alt+⇧+P'], ['help', 'F1']].forEach(([a, k]) => { const b = $('[data-a="' + a + '"]', el); if (b) { b.setAttribute('aria-keyshortcuts', k); b.dataset.kbd = k; } });
+      $$('.tbtn[data-tool]', el).forEach(b => { const t = TOOLS_ED.find(x => x.id === b.dataset.tool); if (t) { b.dataset.kbd = t.key.toUpperCase(); b.setAttribute('aria-keyshortcuts', t.key); } });
       el.addEventListener('click', (e) => {
         const t = e.target.closest('[data-tool]'); if (t) { this.setTool(t.dataset.tool); return; }
         const b = e.target.closest('[data-a]'); if (b && !b.disabled) this.act(b.dataset.a, b);
@@ -11783,7 +12091,7 @@ const Editor = Z.Editor = {
     const colorSw = (name, val, list) => `<div class="pgroup">${swatchHtml(name, val || '#000000', list)}</div>`;
     if (kind === 'text' || kind === 'edittext') {
       const t = P('text');
-      html = `<div class="pgroup">${segHtml('p-font', [['helv', 'Sans'], ['times', 'Serif'], ['cour', 'Mono']], t.font || 'helv').replace('seg block', 'seg')}</div>${sep}
+      html = `<div class="pgroup"><select class="input sm sel" id="p-xfont" aria-label="Font" title="Font" style="max-width:190px;font-family:${attr(FONT_CSS[t.font || 'helv'] || FONT_CSS.helv)}">${XF.options(t.font || 'helv')}</select></div>${sep}
         <div class="pgroup"><button class="ibtn" data-p="size-">${icon('minus', 'sm')}</button><input class="input sm num" id="p-size" value="${t.size}" style="width:54px"><button class="ibtn" data-p="size+">${icon('plus', 'sm')}</button></div>${sep}
         <div class="pgroup"><button class="ibtn ${t.bold ? 'on' : ''}" data-p="bold" title="Bold">${icon('bold')}</button><button class="ibtn ${t.italic ? 'on' : ''}" data-p="italic" title="Italic">${icon('italic')}</button><button class="ibtn ${t.underline ? 'on' : ''}" data-p="underline" title="Underline">${icon('underline')}</button></div>${sep}
         <div class="pgroup"><button class="ibtn ${t.align === 'l' || !t.align ? 'on' : ''}" data-p="al-l" title="Align left">${icon('align-l')}</button><button class="ibtn ${t.align === 'c' ? 'on' : ''}" data-p="al-c" title="Align centre">${icon('align-c')}</button><button class="ibtn ${t.align === 'r' ? 'on' : ''}" data-p="al-r" title="Align right">${icon('align-r')}</button></div>${sep}
@@ -11860,6 +12168,12 @@ const Editor = Z.Editor = {
     const es = $('#p-esize', bar); if (es) { es.oninput = () => sliderFill(es); es.onchange = () => { this.opts.draw.eraser = +es.value; this.saveOpts(); }; }
     const ws = $('#p-wsize', bar); if (ws) { ws.oninput = () => sliderFill(ws); ws.onchange = () => { if (o && o.t === 'ink') upd(t => { t.width = +ws.value; }); else { this.opts.white.brush = +ws.value; this.saveOpts(); } }; }
     const df = $('#p-dfmt', bar); if (df) df.onchange = () => { this.opts.mark.dfmt = df.value; this.saveOpts(); };
+    const xf = $('#p-xfont', bar);
+    if (xf) xf.onchange = async () => {
+      const id = xf.value;
+      if (XFONTS[id] && !XF.loaded[id]) { try { await withProgress({ title: 'Getting the font', sub: XFONTS[id][0] }, () => XF.load(id)); } catch (e) { if (!isCancel(e)) fail(e, 'Font unavailable'); this.showProps(); return; } }
+      upd(t => { t.font = id; }); this.showProps();
+    };
     wireSwatch(bar, 'p-fill', (c) => upd(t => { t.fill = c === 'none' ? '' : c; }));
     wireSeg(bar, 'p-shape', v => { if (o) { this.select(null); } this.opts.shape.kind = v; this.saveOpts(); this.showProps(); });
     wireSeg(bar, 'p-mark', v => { this.opts.mark.kind = v; this.saveOpts(); if (o && v !== 'date') upd(t => { t.kind = v; }); });
@@ -12731,6 +13045,79 @@ const Editor = Z.Editor = {
     this.pages.forEach(P => $$('.l-form [data-f]', P.el).forEach(n => { if (set.has(n.dataset.f)) n.classList.add('auto'); }));
   },
 
+  /* ---------------- tabs & split screen ---------------- */
+  tabs() { const t = Settings.get('openTabs'); return Array.isArray(t) ? t.filter(id => Docs.get(id)) : []; },
+  drawTabs() {
+    const bar = $('#ed-tabs', this.el); if (!bar) return;
+    const on = !!Settings.get('edTabs');
+    bar.classList.toggle('hide', !on);
+    if (!on) return;
+    let t = this.tabs();
+    if (this.f && t.indexOf(this.f.id) < 0) { t.push(this.f.id); t = t.slice(-12); Settings.set('openTabs', t); }
+    bar.innerHTML = t.map(id => { const f = Docs.get(id); return `<div class="ed-tab ${this.f && f.id === this.f.id ? 'on' : ''}" role="tab" data-tab="${attr(id)}" title="${attr(f.name)}" tabindex="0"><span class="ell">${esc(f.name.replace(/\.pdf$/i, ''))}</span><button class="x" data-tabx="${attr(id)}" aria-label="Close tab">${icon('x', 'xs')}</button></div>`; }).join('') + `<button class="ed-tab add" data-tabadd title="Open another PDF in a tab">${icon('plus', 'xs')}</button>`;
+    if (!bar._wired) {
+      bar._wired = true;
+      bar.addEventListener('click', async (e) => {
+        const x = e.target.closest('[data-tabx]');
+        if (x) { e.stopPropagation(); this.closeTab(x.dataset.tabx); return; }
+        if (e.target.closest('[data-tabadd]')) { this.docMenu(e.target.closest('[data-tabadd]')); return; }
+        const tb = e.target.closest('[data-tab]'); if (tb && tb.dataset.tab !== this.f.id) this.switchTo(tb.dataset.tab);
+      });
+      bar.addEventListener('auxclick', (e) => { const tb = e.target.closest('[data-tab]'); if (tb && e.button === 1) { e.preventDefault(); this.closeTab(tb.dataset.tab); } });
+      bar.addEventListener('keydown', (e) => { const tb = e.target.closest('[data-tab]'); if (tb && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); tb.click(); } });
+    }
+    const cur = $('.ed-tab.on', bar); if (cur) cur.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  },
+  closeTab(id) {
+    let t = this.tabs(); const i = t.indexOf(id); if (i < 0) return;
+    t.splice(i, 1); Settings.set('openTabs', t);
+    if (this.f && id === this.f.id) { const next = t[Math.min(i, t.length - 1)]; if (next) this.switchTo(next); else Z.back(); }
+    else this.drawTabs();
+  },
+  stepTab(d) { const t = this.tabs(); if (t.length < 2) return; const i = t.indexOf(this.f.id); this.switchTo(t[(i + d + t.length) % t.length]); },
+  async toggleSplit(id) {
+    const body = $('.ed-body', this.el);
+    let pane = $('.ed-split', body);
+    if (pane && !id) { pane.remove(); body.classList.remove('split'); this.split = null; return; }
+    if (innerWidth < 760) { toast('Split screen needs a wider screen — turn the device sideways or open it on a larger display', { type: 'info' }); return; }
+    const others = Docs.sorted().filter(f => f.id !== this.f.id);
+    if (!others.length) { toast('Open or add another PDF to compare side by side', { type: 'info' }); return; }
+    const pick = id || (this.split && this.split.id) || others[0].id;
+    if (!pane) {
+      pane = h(`<div class="ed-split"><div class="sp-head"><select class="input sm sel" aria-label="Document beside">${others.map(f => `<option value="${attr(f.id)}">${esc(f.name)}</option>`).join('')}</select><label class="sp-sync"><input type="checkbox" checked> Scroll together</label><button class="ibtn" data-spx title="Close split (Alt+Shift+S)">${icon('x', 'sm')}</button></div><div class="sp-pages"></div></div>`);
+      body.appendChild(pane); body.classList.add('split');
+      $('select', pane).onchange = (e) => this.toggleSplit(e.target.value);
+      $('[data-spx]', pane).onclick = () => this.toggleSplit();
+      const canvas = $('#ed-canvas', this.el), sp = $('.sp-pages', pane);
+      let lock = false;
+      const syncScroll = (a, b) => () => { if (lock || !$('.sp-sync input', pane).checked) return; lock = true; const r = a.scrollTop / Math.max(1, a.scrollHeight - a.clientHeight); b.scrollTop = r * (b.scrollHeight - b.clientHeight); requestAnimationFrame(() => { lock = false; }); };
+      canvas.addEventListener('scroll', syncScroll(canvas, sp), { passive: true });
+      sp.addEventListener('scroll', syncScroll(sp, canvas), { passive: true });
+    }
+    $('select', pane).value = pick;
+    this.split = { id: pick };
+    const sp = $('.sp-pages', pane);
+    sp.innerHTML = '<div class="dlp-spin"></div>';
+    const f = Docs.get(pick);
+    let pdf;
+    try { pdf = await openPdfjs((await Docs.bytes(f)).slice()); } catch (e) { sp.innerHTML = '<div class="muted" style="padding:20px">That PDF can’t be shown</div>'; return; }
+    if (!this.split || this.split.id !== pick) { pdf.destroy(); return; }
+    sp.innerHTML = '';
+    const W = Math.max(200, sp.clientWidth - 28);
+    const io = new IntersectionObserver(async (ents) => {
+      for (const en of ents) {
+        if (!en.isIntersecting || en.target.dataset.done) continue;
+        en.target.dataset.done = '1';
+        try { const page = await pdf.getPage(+en.target.dataset.p); const v = page.getViewport({ scale: 1 }); const cv = await renderPage(page, Math.min(2.5, W * Math.min(2, devicePixelRatio || 1) / v.width)); const img = new Image(); img.src = cv.toDataURL('image/jpeg', 0.86); freeCanvas(cv); img.alt = 'Page ' + en.target.dataset.p; en.target.innerHTML = ''; en.target.appendChild(img); } catch (_) {}
+      }
+    }, { root: sp, rootMargin: '600px' });
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const pg = await pdf.getPage(i).catch(() => null); const v = pg ? pg.getViewport({ scale: 1 }) : { width: 612, height: 792 };
+      const box = h(`<div class="sp-page" data-p="${i}" style="aspect-ratio:${v.width}/${v.height}"></div>`);
+      sp.appendChild(box); sp.appendChild(h(`<div class="sp-n">${i} / ${pdf.numPages}</div>`)); io.observe(box);
+      if (i % 50 === 0) await yieldUi();
+    }
+  },
   /* ---------------- help ---------------- */
   help() {
     const A = (inner) => `<svg viewBox="0 0 240 92" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="240" height="92" fill="none"/><rect x="62" y="8" width="116" height="76" rx="4" fill="#fff" stroke="#d2d2d7"/>${inner}</svg>`;
@@ -12873,6 +13260,7 @@ const Editor = Z.Editor = {
       case 'redo': this.redo(); break;
       case 'find': this.openFind(); break;
       case 'help': this.help(); break;
+      case 'split': this.toggleSplit(); break;
       case 'download': if (this.textEdit) this.commitText(); exportSheet(this.f, { current: this.cur }); break;
       case 'autofill': Z.Autofill.start(this); break;
       case 'organize': await this.pageOps(btn); break;
@@ -13005,6 +13393,13 @@ const Editor = Z.Editor = {
     if (mod && k === 'y') { e.preventDefault(); this.redo(); return; }
     const o = this.selId && this.obj(this.selId);
     if (mod && (k === 'c' || k === 'x') && o) { e.preventDefault(); this.clip = { f: this.f.id, p: o.p, objs: JSON.parse(JSON.stringify([o].concat(this.kidsOf(o)))) }; if (k === 'x') this.removeObj(o.id); else toast('Copied — paste it on any page, in any document', { type: 'info', ms: 1500 }); return; }
+    if (e.key === 'F1' || (e.altKey && e.shiftKey && k === 'h')) { e.preventDefault(); this.help(); return; }
+    if (e.altKey && e.shiftKey && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { e.preventDefault(); this.stepTab(e.key === 'ArrowRight' ? 1 : -1); return; }
+    if (e.altKey && e.shiftKey && k === 'w') { e.preventDefault(); if (Settings.get('edTabs')) this.closeTab(this.f.id); return; }
+    if (e.altKey && e.shiftKey && k === 's') { e.preventDefault(); if (Settings.get('edSplit')) this.toggleSplit(); else toast('Turn on Split screen in Settings › Editor', { type: 'info' }); return; }
+    if (e.altKey && e.shiftKey && k === 'a') { e.preventDefault(); Z.Autofill.start(this); return; }
+    if (e.altKey && e.shiftKey && k === 'p') { e.preventDefault(); this.pageOps($('[data-a="organize"]', this.el)); return; }
+    if (mod && k === 'd' && o) { e.preventDefault(); this.duplicate(o); return; }
     if (mod && k === 'v' && this.clip) { e.preventDefault(); const same = this.clip.f === this.f.id && this.clip.p === this.cur; this.insertGroup(this.clip.objs, this.cur, same ? 'offset' : 'same'); return; }
     if (mod && k === 'd' && o) { e.preventDefault(); this.duplicate(o); return; }
     if ((e.key === 'Delete' || e.key === 'Backspace') && o) { e.preventDefault(); this.removeObj(o.id); return; }
@@ -13839,6 +14234,7 @@ const AFMem = Z.AFMem = {
     await KV.set('mem:index', idx);
     try { const b = JSON.parse(localStorage.getItem(this.BACKUP) || '{}'); b[fp] = m; localStorage.setItem(this.BACKUP, JSON.stringify(b)); } catch (_) {}
     Store.persist();
+    try { if (window.Z && Z.GSync && !Z.GSync.busy) Z.GSync.soon(); } catch (_) {}
   },
   async all() {
     const out = {};
@@ -13901,6 +14297,121 @@ const AFMem = Z.AFMem = {
       await this.set(fp, cur); nm++;
     }
     return { profiles: np, forms: nm };
+  },
+};
+
+/* ---------- Google sync ----------
+   Keeps profiles, the fixes Autofill learned, signatures, saved elements
+   and preferences in the user's own Google Drive (a private app folder
+   only ZenPDF can see).  Syncing only ever adds and updates — nothing is
+   deleted on either side.  Turned on in window.ZENPDF_CONFIG. */
+const GSync = Z.GSync = {
+  token: null,
+  cfg() { return (window.ZENPDF_CONFIG && window.ZENPDF_CONFIG.googleSync) || {}; },
+  available() { const c = this.cfg(); return !!(c.enabled && c.clientId); },
+  state() { const v = Settings.get('gsync'); return v && typeof v === 'object' ? v : {}; },
+  setState(v) { Settings.set('gsync', Object.assign(this.state(), v)); Bus.emit('gsync', this.state()); },
+  async gis() { if (window.google && google.accounts && google.accounts.oauth2) return; await withTimeout(loadScript('https://accounts.google.com/gsi/client'), 20000, 'Google sign-in'); },
+  async signIn(prompt) {
+    await this.gis();
+    return new Promise((res, rej) => {
+      const tc = google.accounts.oauth2.initTokenClient({
+        client_id: this.cfg().clientId,
+        scope: 'https://www.googleapis.com/auth/drive.appdata openid email profile',
+        prompt: prompt == null ? 'select_account' : prompt,
+        hint: this.state().email || undefined,
+        callback: (r) => { if (!r || r.error) return rej(new Error((r && (r.error_description || r.error)) || 'Sign-in failed')); this.token = { v: r.access_token, exp: Date.now() + Math.max(60, (r.expires_in || 3600) - 120) * 1000 }; res(this.token.v); },
+        error_callback: (e) => rej(new Error(e && e.type === 'popup_closed' ? 'Sign-in window was closed' : (e && e.message) || 'Sign-in failed')),
+      });
+      tc.requestAccessToken();
+    });
+  },
+  async tokenV() { if (this.token && this.token.exp > Date.now()) return this.token.v; return this.signIn(''); },
+  async api(url, opts, again) {
+    const t = await this.tokenV();
+    const r = await fetch(url, Object.assign({}, opts, { headers: Object.assign({ Authorization: 'Bearer ' + t }, (opts && opts.headers) || {}) }));
+    if (r.status === 401 && !again) { this.token = null; return this.api(url, opts, true); }
+    if (!r.ok) throw new Error('Google Drive answered ' + r.status);
+    return r;
+  },
+  async snapshot() {
+    let edopts = null; try { edopts = JSON.parse(localStorage.getItem('zp8-edopts') || 'null'); } catch (_) {}
+    return { v: 1, at: Date.now(), profiles: await Profiles.list(), memory: await AFMem.all(), sigs: Sigs.list(), library: Lib.list(), settings: { sigStamp: Settings.get('sigStamp'), region: Settings.get('region'), edopts } };
+  },
+  merge(a, b) {
+    if (!b) return a;
+    const out = { v: 1, at: Date.now() };
+    const prof = new Map();
+    [].concat(b.profiles || [], a.profiles || []).forEach(p => { if (!p || !p.name) return; const k = p.name.toLowerCase(); const cur = prof.get(k); if (!cur) prof.set(k, JSON.parse(JSON.stringify(p))); else { const newer = (p.updated || 0) >= (cur.updated || 0); cur.facts = newer ? Object.assign({}, cur.facts, p.facts) : Object.assign({}, p.facts, cur.facts); cur.updated = Math.max(cur.updated || 0, p.updated || 0); } });
+    out.profiles = Array.from(prof.values());
+    out.memory = {};
+    [b.memory || {}, a.memory || {}].forEach(M => Object.keys(M).forEach(fp => {
+      const m = AFMem.norm(M[fp]), cur = out.memory[fp];
+      if (!cur) { out.memory[fp] = JSON.parse(JSON.stringify(m)); return; }
+      const newer = (m.updated || 0) >= (cur.updated || 0);
+      ['fields', 'constants'].forEach(k => { cur[k] = newer ? Object.assign({}, cur[k], m[k]) : Object.assign({}, m[k], cur[k]); });
+      Object.keys(m.values).forEach(pk => { cur.values[pk] = newer ? Object.assign({}, cur.values[pk], m.values[pk]) : Object.assign({}, m.values[pk], cur.values[pk]); });
+      cur.updated = Math.max(cur.updated || 0, m.updated || 0); cur.name = cur.name || m.name;
+    }));
+    const sig = new Map(); [].concat(a.sigs || [], b.sigs || []).forEach(x => { if (x && x.data && !sig.has(x.data)) sig.set(x.data, x); }); out.sigs = Array.from(sig.values()).slice(0, 16);
+    const lib = new Map(); [].concat(a.library || [], b.library || []).forEach(x => { if (x && x.id && !lib.has(x.id)) lib.set(x.id, x); }); out.library = Array.from(lib.values()).slice(0, 40);
+    out.settings = Object.assign({}, b.settings || {}, a.settings || {});
+    return out;
+  },
+  async apply(m) {
+    for (const p of m.profiles || []) { const list = await Profiles.list(); const ex = list.find(x => x.name.toLowerCase() === p.name.toLowerCase()); await Profiles.save(Object.assign(ex || {}, { name: p.name, facts: Object.assign({}, ex ? ex.facts : {}, p.facts) })); }
+    for (const fp of Object.keys(m.memory || {})) await AFMem.set(fp, AFMem.norm(m.memory[fp]));
+    if (m.sigs) Sigs.save(m.sigs);
+    if (m.library) Lib.save(m.library);
+    if (m.settings) { if (m.settings.sigStamp && !Settings.get('sigStamp')) Settings.set('sigStamp', m.settings.sigStamp); }
+  },
+  async findFile() { const r = await this.api('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=' + encodeURIComponent("name='zenpdf-sync.json' and trashed=false") + '&fields=files(id,modifiedTime)&orderBy=modifiedTime desc'); const j = await r.json(); return (j.files || [])[0] || null; },
+  async upload(data, id) {
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    if (id) { await this.api('https://www.googleapis.com/upload/drive/v3/files/' + id + '?uploadType=media', { method: 'PATCH', body: blob }); return id; }
+    const fd = new FormData();
+    fd.append('metadata', new Blob([JSON.stringify({ name: 'zenpdf-sync.json', parents: ['appDataFolder'] })], { type: 'application/json' }));
+    fd.append('file', blob);
+    const r = await this.api('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', { method: 'POST', body: fd });
+    return (await r.json()).id;
+  },
+  busy: false,
+  async sync(quiet) {
+    if (!this.available() || !this.state().on || this.busy) return false;
+    this.busy = true; Bus.emit('gsync', Object.assign({}, this.state(), { busy: true }));
+    try {
+      const f = await this.findFile();
+      const remote = f ? await (await this.api('https://www.googleapis.com/drive/v3/files/' + f.id + '?alt=media')).json() : null;
+      const merged = this.merge(await this.snapshot(), remote);
+      await this.apply(merged);
+      await this.upload(merged, f && f.id);
+      this.setState({ last: Date.now(), error: '' });
+      if (!quiet) toast('Synced with ' + esc(this.state().email || 'Google'), { type: 'ok', ms: 1800 });
+      return true;
+    } catch (e) { this.setState({ error: errMsg(e) }); if (!quiet) fail(e, 'Sync failed'); return false; }
+    finally { this.busy = false; Bus.emit('gsync', this.state()); }
+  },
+  soon: debounce(function () { GSync.sync(true); }, 4000),
+  async turnOn() {
+    const body = h(`<div class="col" style="gap:12px"><p style="margin:0;line-height:1.5">Sign in with Google to keep your <b>profiles, learned Autofill fixes, signatures and saved elements</b> on every device and browser you use.</p>
+      <div class="note">${icon('lock')}<div>Stored in a private ZenPDF folder in your own Google Drive — not visible in your files, and not on any ZenPDF server. Syncing never deletes anything.</div></div></div>`);
+    const go = await sheet({ title: 'Sync with Google', body, foot: [{ label: 'Not now', value: null }, { label: 'Sign in with Google', kind: 'primary', value: 'go' }] }).result;
+    if (go !== 'go') return false;
+    try {
+      await withProgress({ title: 'Signing in', sub: 'A Google window opens' }, async () => {
+        await this.signIn('select_account');
+        const me = await (await this.api('https://www.googleapis.com/oauth2/v3/userinfo')).json();
+        this.setState({ on: true, email: me.email || '', name: me.name || '', pic: me.picture || '' });
+      });
+      await this.sync();
+      return true;
+    } catch (e) { if (!isCancel(e)) fail(e, 'Couldn’t sign in'); this.setState({ on: false }); return false; }
+  },
+  async signOut() {
+    try { if (this.token && window.google && google.accounts) google.accounts.oauth2.revoke(this.token.v, () => {}); } catch (_) {}
+    this.token = null;
+    this.setState({ on: false });
+    toast('Signed out — everything stays on this device', { type: 'info' });
   },
 };
 
@@ -14591,7 +15102,12 @@ function wireKeys() {
     if (anySheet() || $('.palette')) return;
     if (mod && k === 'o') { e.preventDefault(); addFlow(); return; }
     if (!typing && !mod && e.key === '/' && !(curRoute && (curRoute.name === 'edit' || curRoute.name === 'organize'))) { e.preventDefault(); palette(); return; }
-    if (!typing && e.key === '?' ) { shortcutsSheet(); return; }
+    if (!typing && e.key === '?') { shortcutsSheet(curRoute && curRoute.name === 'edit' ? 'editor' : null); return; }
+    if (!typing && !mod && !e.altKey && curRoute && curRoute.name !== 'edit' && curRoute.name !== 'organize') {
+      if (k === 'g') { wireKeys.g = Date.now(); return; }
+      if (wireKeys.g && Date.now() - wireKeys.g < 1200) { const dest = { h: 'home', f: 'files', t: 'tools', s: 'settings' }[k]; wireKeys.g = 0; if (dest) { e.preventDefault(); Z.go(dest); return; } }
+    }
+    if (curRoute && curRoute.name === 'tool' && mod && e.key === 'Enter') { const go2 = $('#t-go'); if (go2 && !go2.disabled) { e.preventDefault(); go2.click(); } return; }
     if (curRoute && curRoute.name === 'tool' && !typing && e.key === 'Enter') { const go = $('#t-go'); if (go && !go.disabled) { e.preventDefault(); go.click(); } return; }
     if (e.key === 'Escape' && curRoute && curRoute.name === 'tool' && !typing) { back(); }
   });
