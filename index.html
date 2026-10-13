@@ -960,6 +960,31 @@ body.full #tabbar { display: none !important; }
 .lib-item .tx { font-size: 13px; line-height: 1.3; max-height: 52px; overflow: hidden; text-align: center; word-break: break-word; }
 .lib-item .nm { position: absolute; left: 8px; right: 30px; bottom: 5px; font-size: 11px; font-weight: 600; color: #6e6e73; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
 .lib-item .del { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: var(--fill); display: grid; place-items: center; color: var(--text-2); }
+.af-mlist { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.af-mrow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 10px; align-items: center; font-size: 13px; }
+.af-mrow input[type=checkbox] { justify-self: start; width: 18px; height: 18px; }
+/* chip icons sit fully inside their colour square; focus rings never clipped */
+.chip .tile { width: 20px !important; height: 20px !important; border-radius: 6px !important; flex: none; }
+.chip .tile svg.i { width: 12px; height: 12px; stroke-width: 2.2; }
+.nav-item:focus-visible, .chip:focus-visible, .tool-card:focus-visible, .cell.tap:focus-visible, .choice:focus-visible { outline-offset: -2px; }
+.tile svg.i.xs { width: 13px; height: 13px; }
+/* download preview */
+.dlp { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 14px; min-height: 52vh; }
+.dlp-list { display: flex; flex-direction: column; gap: 6px; max-height: 60vh; overflow: auto; }
+.dlp-list button { text-align: left; padding: 8px 10px; border-radius: 10px; font-size: 13px; background: var(--fill); }
+.dlp-list button.on { background: var(--accent-tint); color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.dlp-list button small { display: block; color: var(--text-3); font-size: 11.5px; margin-top: 2px; }
+.dlp-view { background: var(--surface-2); border-radius: 14px; box-shadow: inset 0 0 0 .5px var(--line-2); max-height: 62vh; overflow: auto; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.dlp-view img.pg { max-width: 100%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.18); border-radius: 2px; }
+.dlp-view .pgn { font-size: 11.5px; color: var(--text-3); margin-top: -6px; }
+.dlp-view pre { white-space: pre-wrap; word-break: break-word; font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; width: 100%; margin: 0; color: var(--text); }
+.dlp-view .doc { background: #fff; color: #111; width: 100%; max-width: 760px; padding: 28px 32px; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,.15); font: 14px/1.5 Georgia, 'Times New Roman', serif; overflow-wrap: anywhere; }
+.dlp-view .doc table { border-collapse: collapse; } .dlp-view .doc td, .dlp-view .doc th { border: 1px solid #ccc; padding: 3px 6px; font: 12px/1.35 Arial, sans-serif; }
+.dlp-view .slide { background: #fff; color: #111; width: 100%; max-width: 640px; aspect-ratio: 16/9; padding: 18px 22px; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,.15); font: 13px/1.4 Arial, sans-serif; overflow: hidden; }
+.dlp-view .slide b { display: block; font-size: 16px; margin-bottom: 6px; }
+.dlp-spin { width: 26px; height: 26px; margin: 40px auto; border-radius: 50%; border: 2.5px solid var(--line-2); border-top-color: var(--accent); animation: spin .8s linear infinite; }
+.dlp-meta { font-size: 12.5px; color: var(--text-2); margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+@media (max-width: 720px) { .dlp { grid-template-columns: 1fr; } .dlp-list { flex-direction: row; overflow-x: auto; max-height: none; } .dlp-list button { flex: none; max-width: 180px; } }
 </style>
 </head>
 <body>
@@ -1130,7 +1155,7 @@ form_place|text|Place;Place of Signing;Signed At;Place of Declaration;Place (Cit
 
 /* ZenPDF Smart Match — medical, general & banking form vocabulary + matching engine */
 /* medical credentialing & enrollment vocabulary — labels only, no personal data */
-const ZP_KB_RAW = "provider_first_name|text|First Name;Given Name;Provider First Name;Practitioner First Name;Legal First Name;Legal First name of practitioner;Legal First name of the applicant;Applicant First Name;FName;First;first_name;firstName;first_nm;Provider.FirstName;practitioner.firstName;providertable.firstname;Name (First);First Name of Provider;Given\nprovider_middle_name|text|Middle Name;Provider Middle Name;Legal Middle Name;MName;middle_name;middleName;middle_nm;Name (Middle);Middle\nprovider_middle_initial|text|Middle Initial;MI;M.I.;Legal MI name of practitioner;Middle Init;middle_initial;middleInitial;M I;Initial\nprovider_last_name|text|Last Name;Surname;Family Name;Provider Last Name;Practitioner Last Name;Legal Last Name;Legal Last name of practitioner;Legal Last name of the applicant;LName;Last;last_name;lastName;last_nm;providertable.Lastname;Name (Last)\nprovider_suffix|text|Suffix;Name Suffix;Jr/Sr/III;Generation;Jr., Sr., etc.;name_suffix\nprovider_full_name|text|Full Name;Provider Name;Practitioner Name;Name of Practitioner;Applicant Name;Applicant (provider) name;Name of Applicant;Printed Name;Printed Legal Name;Printed Legal Name of Practitioner;Printed Legal Name of Applicant;Legal Name of Practitioner;Physician Name;Clinician Name;Provider Full Name;Name (Last, First, Middle);Last, First, Middle;Re: Provider name;Provider name and degree;Signing Provider Name;Practitioner.Name;full_name;fullName;provider_name;providerName;Individual Name;Name;Your Name;Name of Provider;Provider Printed Name;Print Name;Printed Name of Provider;Name of Individual;Practitioner\nprovider_maiden_name|text|Maiden Name;Birth Name;Name at Birth;maiden_name;maidenName\nprovider_other_name|text|Other Name;Other Names;Former Name;Previous Name;Alias;AKA;Also Known As;Other Names Used;Any Other Name Used;Prior Name;other_names;otherNames;Other Name 2\nprovider_other_name_years|text|Years Associated;Years Associated 2;Dates Used;Date Range Used;From/To (Other Name)\nprovider_degree|choice|Degree;Professional Degree;Credentials;Credential;Title;Professional Title;Degree/Title;Clinical Degree;Professional Designation;Credentials (MD, DO, NP, PA);Type of Degree;provider_credentials\nprovider_type|choice|Provider Type;Practitioner Type;Type of Professional;Type of Practitioner;Professional Type;Provider Category;Healthcare Services Rendered;Applicant Type;provider_type;providerType;Discipline\nprovider_initials|text|Initials;Applicant Initials;Provider Initials;Initial Here\nprovider_gender|choice|Gender;Sex;Gender (M/F);Male/Female;Provider Gender;Practitioner Gender;gender_cd;Sex (M/F)\nprovider_dob|date|Date of Birth;DOB;Birth Date;Birthdate;Date Of Birth (MM/DD/YYYY);D.O.B.;birth_date;dateOfBirth;DOB_1.2_A;Applicant DOB;Birth;Born;Date of birth (mm/dd/yyyy)\nprovider_birth_city|text|Birth City;City of Birth;birth_city;birthCity\nprovider_birth_state|state|Birth State;State of Birth;birth_state;birthState\nprovider_birth_country|text|Birth Country;Country of Birth;birth_country;birthCountry\nprovider_place_of_birth|text|Place of Birth;Birthplace;Birth Place;City/State of Birth;City, State, Country of Birth;place_of_birth\nprovider_ssn|ssn|Social Security Number;SSN;Social Security #;Social Security No.;Soc Sec No;SS#;SSN #;Individual SSN;Practitioner Social Security Number;Provider SSN;Tax ID/SSN;ssnNum;social_security_number;socialSecurityNumber;Social Security;SS Number\nprovider_ssn_last4|ssn|Last 4 of SSN;Last 4 SSN;SSN Last 4;Last Four of SSN;Last 4 of SSN or NPI;ssn_last4\nprovider_citizenship|text|Citizenship;Country of Citizenship;Citizenship Country;citizenship_country;citizenshipCountry;Nationality\nprovider_us_citizen|yesno|US Citizen;U.S. Citizen;Are you a US citizen?;Citizen of the United States;us_citizen;usCitizen\nprovider_visa_number|text|Visa Number;Visa #;Visa No;visa_number\nprovider_visa_status|text|Visa Status;Visa Type;Immigration Status;visa_status\nprovider_work_eligible|yesno|Eligible to Work in United States;Eligible to work in the US;Work Authorization;Authorized to Work in US;work_eligibility\nprovider_race|choice|Race;Race/Ethnicity;Provider Race;Racial Background\nprovider_ethnicity|choice|Ethnicity;Hispanic or Latino;Not Hispanic or Latino;Hispanic/Latino Origin\nprovider_languages|text|Languages;Languages Spoken;Language(s) Spoken;Non-English Languages;Other Languages;Languages Other Than English;Foreign Languages;Languages Spoken Other Specify;Practitioner Languages;languages_spoken;languagesSpoken\nprovider_military_service|yesno|US Military Service or Public Health;Military Service;Have you served in the military?;Military Experience;military_service\nprovider_military_active|yesno|Currently on Active or Reserve Military Duty;Active Duty;Reserve Duty;Active Military Duty\nprovider_military_branch|text|Branch of Service;Military Branch;Branch\nprovider_military_dates|text|Dates of Service;Military Dates of Service;Service Dates\nprovider_military_last_location|text|Last Location;Last Duty Station;Last Military Location\nprovider_status_active|yesno|Is Active;Status;Provider Status;is_active;Active/Inactive\nprovider_email|email|Email;E-mail;Email Address;E-mail Address;Primary Email;Primary Email Address;Provider Email;Practitioner Email;Personal Email;Preferred Contact E-mail;Email_1.2;primary_email_address;primaryEmailId;emailAddress\nprovider_other_email|email|Other Emails;Additional Emails;Alternate Email;Secondary Email;other_emails;additionalEmails\nprovider_home_phone|phone|Home Phone;Home Phone Number;Home Telephone;Residence Phone;home_number;homeNumber;Tel_1.2;Phone;Telephone;Phone Number;Telephone Number\nprovider_mobile_phone|phone|Mobile Phone;Cell Phone;Cell;Mobile;Cell Number;Mobile Number;Primary Phone;Provider Phone;Personal Phone;Phone Number (Provider);primary_phone;mobileNumber;cellPhone\nprovider_fax|phone|Provider Fax;Home Fax;Fax_1.2;provider_fax_number;Fax;Fax Number\nprovider_pager|phone|Pager;Pager Number;Beeper\nprovider_preferred_contact_name|text|Preferred Contact Name;Preferred Contact;Name_intro;Contact Person Completing Application\nhome_address_line1|text|Home Address;Home Address Line 1;Home Street Address;Home Street Address 1;Home Street;Home Address 1;Home Addr1;Home Street 1;Home Mailing Address;Residential Address;Residence Address;Legal Home Address;LegalHome Address_1.2;Home adress;Home Address Street;Licensee Address;home_street_address_1;home;homeStreetAddress1;Street (Home)\nhome_address_line2|text|Home Address Line 2;Home Street Address 2;Home Address 2;Home Suite;Home Suite/Apt;Home Addr2;Home Street 2;Home Building/Suite;home_street_address_2;home1;homeStreetAddress2\nhome_city|text|Home City;Home Town;City_1.2;home_city;homeCity;Residence City\nhome_state|state|Home State;Home State Code;Home ST;State_1.2;home_state;homeState;Home State or Country\nhome_zip|zip|Home Zip;Home Zip Code;Home Postal Code;Home Zipcode;Home Zip+4;Zip_1.2;home_zip_code;zipcode;homeZipCode\nhome_county|text|Home County;Home Parish;home_county\nhome_country|text|Home Country;home_country\nmailing_address_line1|text|Correspondence Address;Correspondence Address Line 1;Correspondence Street Address;Correspondence Street Address 1;Correspondence Street;Correspondence Address 1;Correspondence Addr1;Correspondence Street 1;Mailing Address (Provider);Provider Mailing Address;Credentialing Correspondence Address 1;Practice Correspondence Address 1;Address for Correspondence;Mailing Address;Mailing Address Line 1;Mailing Street Address;Mailing Street Address 1;Mailing Street;Mailing Address 1;Mailing Addr1;Mailing Street 1;Correspondence Address (Group);Group Address;Group Practice Organization Address;Address (number, street, and apt. or suite no.);mailing_street_address_1;mailingStreetAddress1 (tax entity)\nmailing_address_line2|text|Correspondence Address Line 2;Correspondence Street Address 2;Correspondence Address 2;Correspondence Suite;Correspondence Suite/Apt;Correspondence Addr2;Correspondence Street 2;Correspondence Building/Suite;Credentialing Correspondence Address 2;Practice Correspondence Address 2;Mailing Address Line 2;Mailing Street Address 2;Mailing Address 2;Mailing Suite;Mailing Suite/Apt;Mailing Addr2;Mailing Street 2;Mailing Building/Suite\nmailing_city|text|Correspondence City;Correspondence Town;Credentialing Correspondence City;Practice Correspondence City;Mailing City;Mailing Town;City, state, and ZIP code;City_9\nmailing_state|state|Correspondence State;Correspondence State Code;Correspondence ST;Credentialing Correspondence State;Practice Correspondence State;Mailing State;Mailing State Code;Mailing ST;State_9\nmailing_zip|zip|Correspondence Zip;Correspondence Zip Code;Correspondence Postal Code;Correspondence Zipcode;Correspondence Zip+4;Credentialing Correspondence Zip;Practice Correspondence Zip;Mailing Zip;Mailing Zip Code;Mailing Postal Code;Mailing Zipcode;Mailing Zip+4;Zip_9\nmailing_county|text|Correspondence County;Correspondence Parish;Mailing County;Mailing Parish\nmailing_country|text|Correspondence Country;Mailing Country\nprovider_npi|npi|NPI;Individual NPI;NPI Number;NPI #;Type 1 NPI;NPI Type 1;NPI-1;Provider NPI;Practitioner NPI;Rendering NPI;National Provider Identifier;National Provider Identifier Number NPI;National Provider ID;Applicants National Provider Identification;NPI Number.Individual;Practitioner.NPI Number;Disclosure.Practitioner NPI;Signing Provider.NPI;Personal NPI;NATIONAL PROVIDER IDENTIFIER WHEN AVAILABLE;individual_npi;individualNpi;npiNumber;npi_1;npi1;NPI Type I;Individual NPI Number\nprovider_caqh_id|number|CAQH ID;CAQH #;CAQH Number;CAQH Provider ID;CAQH Provider Number;CAQH ProView ID;CAQH Provider #;ProView ID;CAQH;caqh_id;caqhId;caqhNumber\nprovider_caqh_username|text|CAQH Username;CAQH Login;CAQH User ID;Username;Portal Username;Login ID\nprovider_caqh_password|text|CAQH Password;Password;Portal Password\nprovider_caqh_attestation_date|date|Last CAQH Attestation Date;CAQH Attestation Date;Last Attestation Date;Attestation Date;last_caqh_attestation_date\nprovider_upin|text|UPIN;UPIN Number;Unique Physician Identification Number\nprovider_medicare_ptan|text|Medicare Number;Medicare #;Medicare Provider Number;Medicare ID;PTAN;Medicare PTAN;Individual PTAN;Provider Transaction Access Number;Medicare Provider ID;Medicare/PTAN;professional_id_medicare.number;medicareNumber;medicare_number\nprovider_medicare_state|state|Medicare State;professional_id_medicare.state\nprovider_medicare_enrolled|yesno|Is the applicant enrolled in Medicare as a provider?;Participating Medicare Provider;ARE YOU A PARTICIPATING MEDICARE PROVIDER?;Does the provider participate in Medicare;Medicare Participating;Enrolled in Medicare;Medicare Enrollment Status\nprovider_medicaid_number|text|Medicaid Number;Medicaid #;Medicaid ID;Medicaid Provider Number;Medicaid Provider ID;State Medicaid Number;AHCCCS ID;Medi-Cal Number;MassHealth PID/SL;MHPIDSL;PROMISe ID;professional_id_medicaid.number;medicaidNumber;medicaid_number;medicaid_id\nprovider_medicaid_state|state|Medicaid State;State of Medicaid;professional_id_medicaid.state;medicaid_state\nprovider_medicaid_pending|yesno|Medicaid Number Pending;Medicaid Pending;Applied for Medicaid\nprovider_medicaid_prior_participation|yesno|Other State Medicaid;Prior Medicaid Participation\nprovider_ecfmg_number|text|ECFMG Number;ECFMG #;ECFMG Certificate Number;ECFMG;ecfmg_number;ecfmgNumber\nprovider_ecfmg_issue_date|date|ECFMG Issue Date;ECFMG Date Issued;ECFMG Certification Date;ecfmg_issue_date\nprovider_ecfmg_expiration_date|date|ECFMG Expiration Date;ECFMG Valid Through\nprovider_taxonomy_primary|text|Taxonomy;Taxonomy Code;Primary Taxonomy;Primary Taxonomy Code;NUCC Taxonomy;Provider Taxonomy;Healthcare Provider Taxonomy Code;nuccTaxonomyCode;taxonomy_code;taxonomyCode;primary_taxonomy\nprovider_taxonomy_secondary|text|Secondary Taxonomy;Secondary Taxonomy Code;Additional Taxonomy;secondary_taxonomy\nprovider_nucc_grouping|text|NUCC Grouping;Provider Grouping;nucc_grouping;nuccGrouping\nprovider_primary_practice_state|state|Primary Practice State;Primary State of Practice;primary_practice_state;primaryPracticeState\nprovider_additional_practice_states|text|Additional Practice States;Other Practice States;Additional States;additional_practice_states;additionalPracticeState\nprovider_practice_setting|choice|Practice Setting;practice_setting;practiceSetting\nprovider_clia_number|text|CLIA Number;CLIA #;CLIA ID;CLIA Certificate Number;clia_number\nprovider_clia_expiration|date|CLIA Expiration;CLIA Expiration Date;CLIA Exp Date\nlicense_number|text|License Number;License #;License No;State License Number;State License No.;Medical License Number;Professional License Number;Applicants Professional License Number;State/License number;Practitioner.License Number;Lic #;Lic No;License ID;State License #;RN License;APRN License;licenseNumber;license_number;professional_id_licenses.number\nlicense_state|state|License State;State of License;Issuing State;State Issued;License Issuing State;Licensing State;State Licensed;licenseState;license_state;professional_id_licenses.state\nlicense_type|choice|License Type;Type of License;Licensure Type;license_type;licensetype;professional_id_type\nlicense_issue_date|date|License Issue Date;Issue Date;Date Issued;Original Issue Date;License Effective Date;Effective Date (License);issueDate;issue_date\nlicense_expiration_date|date|License Expiration Date;Expiration Date;Exp Date;Expiration;Expires;Expiry Date;License Exp;Renewal Date;State License Expiration;expireDate;expiration_date\nlicense_status|choice|License Status;Status (License);licenseStatus;override_licenses_status\nlicense_unlimited|yesno|License Unlimited;Unlimited;Not Unlimited;license_unlimited\nlicense_currently_practicing|yesno|Currently Practicing in State;Currently Practicing;is_currently_practicing_in_state\nlicense_compact|yesno|Compact License;Multistate License;Interstate Compact;IMLC\ndea_number|text|DEA Number;DEA #;DEA No;DEA Registration Number;DEA Registration #;DEA Certificate Number;Federal DEA;DEA;DEA number or certificate;DEA ID;professional_id_dea.number;dea_number;deaNumber\ndea_state|state|DEA State;DEA Registration State;State of DEA;professional_id_dea.state;dea_state\ndea_issue_date|date|DEA Issue Date;DEA Date Issued;DEA Effective Date;dea_issue_date\ndea_expiration_date|date|DEA Expiration Date;DEA Exp Date;DEA Expiration;DEA Expires;dea_expiration_date\ndea_schedules|choice|Drug Schedules;DEA Schedules;Schedules;Controlled Substance Schedules;Schedule 2, 2N, 3, 3N, 4, 5\ndea_pending|yesno|DEA Number Pending;DEA Pending;Applied for DEA\ndea_none|yesno|Do not have a DEA in practice state;No DEA;DEA Not Applicable;DEA N/A\ndea_waiver_xdea|text|XDEA;X-DEA;DEA X Number;DATA Waiver;DEA Waiver;Buprenorphine Waiver\ncds_number|text|CDS Number;CDS #;CDS License Number;CDS Registration Number;CDS Certificate Number;State Controlled Substance Number;State Controlled License No.;Controlled Dangerous Substance Number;CSR Number;Controlled Substance Registration;State CSR;professional_id_cds.number;cds_number\ncds_state|state|CDS State;CDS Issue State;CDS Issuing State;professional_id_cds.state;cds_state\ncds_issue_date|date|CDS Issue Date;CDS Date Issued;cds_issue_date\ncds_expiration_date|date|CDS Expiration Date;CDS Exp Date;State Controlled License Expiration;cds_expiration_date\nspecialty_primary|choice|Primary Specialty;Specialty;Provider Specialty;Practice Specialty;Area of Specialty;Specialty Description;Field of Practice;Primary Medicare Services Rendered;Physician Specialty;primarySpecialty;primary_specialty;speciality\nspecialty_secondary|choice|Secondary Specialty;Additional Specialty;Other Specialty;Sub-Specialties;Subspecialty;Sub Specialty;secondary_specialty\nspecialty_pcp|yesno|PCP;Primary Care Provider;Is the provider a PCP;PCP Designation;Primary Care Physician;Practitioner type: PCP;PCP/Specialist\nboard_certified|yesno|Board Certified;Board Certification;Are you board certified?;Is Board Certified;Board Certified (Y/N);Board Status;is_board_certified\nboard_name|text|Certifying Board;Certifying Board Name;Board Name;Name of Certifying Board;Board;Specialty Board;certifying_board_name\nboard_specialty|text|Board Specialty;Specialty Certified;Area of Certification;Area of Certifications;Other Area of Certifications;Certification Name;Certified Specialty\nboard_certificate_number|text|Certification Number;Board Certificate Number;Certificate #;Certificate Number;certifications.number\nboard_initial_date|date|Initial Certification Date;Certification Date;Date Certified;Original Certification Date;Initial Date;initial_date\nboard_recert_date|date|Recertification Date;Re-certification Date;Recert Date;Last Recertification Date;recertification_date\nboard_expiration_date|date|Certification Expiration Date;Board Expiration Date;Certification Expires;Board Exp Date\nboard_exam_date|date|Board Exam Date;Date of Exam;Exam Date;Examination Date;Date Sat for Exam;board_exam_date\nboard_not_certified_reason|text|Not Board Certified Reason;If not certified, explain;Reason Not Certified;Board Eligible\nboard_moc|yesno|Maintenance of Certification;MOC;Participating in MOC\nboard_directory_listing|yesno|List in HMO Directory;List in PPO Directory;List in POS Directory;Board Directory Listing\neducation_school_name|text|Medical School;Professional School;Medical/Professional School;School Name;Institution Name;Name of Institution;Name of School;University;College;Graduate School;Undergraduate School;Professional Degree School;Institution;nameOfInstitution;educations.name;institution_name;school_name\neducation_degree|choice|Degree Earned;Degree Received;Degree Awarded;Education Degree;Degree (Education);educations.degree;providerEducation.degree\neducation_start_date|date|Education Start Date;Attended From;From Date;Start Date (Education);startDate;educations.start_date\neducation_end_date|date|Graduation Date;Date of Graduation;Completion Date;Attended To;To Date;End Date (Education);Date Graduated;endDate;educations.end_date\neducation_graduation_year|number|Graduation Year;Year of Graduation;Year Graduated;Grad Year\neducation_city|text|School City;Institution City;educations.city\neducation_state|state|School State;Institution State;educations.state\neducation_country|text|School Country;Institution Country;educations.country\neducation_address|text|School Address;Institution Address;educations.address_street_1\neducation_zip|zip|School Zip;Institution Zip;educations.postal_code\neducation_type|choice|Education Type;Undergraduate;Graduate;Other Graduate-Level Education;Other Professional Degrees\ntraining_institution|text|Residency Program;Residency Institution;Internship Institution;Fellowship Institution;Training Institution;Hospital/Program Name;Program Name;Post-Graduate Education;Post Graduate Training;Postgraduate Institution;Internship;Residency;Fellowship;training_institution_name;professional_training\ntraining_type|choice|Training Type;Type of Training;Internship/Residency/Fellowship;Program Type;training;training_type\ntraining_specialty|text|Training Specialty;Residency Specialty;Fellowship Specialty;Program Specialty;Specialty (Training)\ntraining_start_date|date|Training Start Date;Residency Start Date;Fellowship Start Date;Internship Start Date;From (Training)\ntraining_end_date|date|Training End Date;Residency End Date;Fellowship End Date;Internship End Date;Completion Date (Training);To (Training)\ntraining_program_director|text|Program Director;Director Name;Residency Director\ntraining_completed|yesno|Completed Program;Program Completed;Did you complete the program?\ntraining_address|text|Training Address;Program Address;Residency Address\nhospital_name|text|Hospital Name;Primary Hospital;Primary Hospital Affiliation;Hospital Affiliation;Admitting Hospital;Hospital Where You Have Privileges;Facility Name (Hospital);Other Hospital;Current Hospital;Previous Hospital;Hospital Name for Admitting Physician;hospital_with_admitting_privileges.name;hospital_name\nhospital_city|text|Hospital City;Hospital City State\nhospital_state|state|Hospital State\nhospital_address|text|Hospital Address;Hospital Street\nhospital_zip|zip|Hospital Zip;Hospital Postal Code\nhospital_phone|phone|Hospital Phone;Medical Staff Office Phone\nhospital_tax_id|tin|Hospital Tax ID;hospital_with_admitting_privileges.tax_id\nhospital_privilege_status|choice|Privilege Status;Staff Category;Type of Privileges;Privileges;Admitting Privileges;Staff Status;Full/Provisional/Courtesy\nhospital_start_date|date|Affiliation Start Date;Privileges Start Date;Appointment Date;Date Privileges Granted\nhospital_end_date|date|Affiliation End Date;Privileges End Date\nhospital_no_privileges|yesno|No Hospital Privileges;No Admitting Privileges;N/A Hospital Privileges;Do you have hospital privileges?\nhospital_admitting_arrangement|text|Admitting Arrangement;Covering Arrangements;Admitting Arrangements;Admitting Physician;Hospitalist Arrangement;Arrangement.Choice;If no privileges, describe admitting arrangements;hospital_with_admitting_arrangements\ncovering_provider_name|text|Covering Provider Name;Covering Physician;Covering Colleague;Call Coverage Partner;call_coverage_partners;call_coverage_colleagues\ncovering_provider_npi|npi|Covering Provider NPI;Covering Physician NPI\nmalpractice_carrier|text|Malpractice Carrier;Insurance Carrier;Carrier Name;Liability Carrier;Professional Liability Carrier;Insurance Company;Name of Carrier;Carrier or Self-Insured Name;Malpractice Insurance Company;Insurer;professional_liability_insurances.name;carrier_name\nmalpractice_policy_number|text|Policy Number;Policy #;Policy No;Malpractice Policy Number;Insurance Policy Number;Liability Policy Number;policy_number\nmalpractice_effective_date|date|Policy Effective Date;Coverage Start Date;Policy Start Date;Insurance Effective Date;Original Effective Date;current_effective_date\nmalpractice_expiration_date|date|Policy Expiration Date;Expiration Date (Policy);Coverage End Date;Policy End Date;Insurance Expiration Date;current_expiration_date\nmalpractice_per_occurrence|money|Per Occurrence;Per Occurrence Limit;Coverage Per Occurrence;Each Claim;Per Claim;Occurrence Limit;Amount Per Occurrence;per_occurrence_limit;per_occurence_limit;CoveragePerOccurrence\nmalpractice_aggregate|money|Aggregate;Aggregate Limit;Aggregate Coverage;Coverage Aggregate;Annual Aggregate;Aggregate Coverage Limit;aggregate_limit;CoverageAggregate\nmalpractice_coverage_type|choice|Coverage Type;Claims Made/Occurrence;Type of Coverage;Individual Coverage;Group Coverage;coverage_type\nmalpractice_self_insured|yesno|Self-Insured;Self Insured;Self-Insured Flag;is_self_insured\nmalpractice_unlimited|yesno|Unlimited Coverage\nmalpractice_tail|yesno|Tail Coverage;Prior Acts Coverage;Nose Coverage\nmalpractice_carrier_address|text|Carrier Address;Insurance Company Address;professional_liability_insurances.address_street_1\nmalpractice_carrier_city|text|Carrier City\nmalpractice_carrier_state|state|Carrier State\nmalpractice_carrier_zip|zip|Carrier Zip\nmalpractice_carrier_phone|phone|Carrier Phone;Insurance Company Phone\nmalpractice_time_with_carrier|text|Time with Carrier;Length of Time with Carrier;Years with Carrier;length_of_time_with_carrier\nmalpractice_covered_location|text|Covered Practice Location;Institution Affiliation;Covered Location\nmalpractice_attached|yesno|Professional Liability Attached;COI Attached;Certificate of Insurance Attached\nclaim_incident_date|date|Incident Date;Date of Incident;Date of Occurrence;incident_date\nclaim_filed_date|date|Claim Filed Date;Date Claim Filed;Date of Claim\nclaim_carrier|text|Carrier Involved;Professional Liability Carrier Involved;Claim Carrier\nclaim_status|choice|Claim Status;Disposition;Is Pending;Open/Closed;is_pending\nclaim_settlement_amount|money|Settlement Amount;Amount Paid;Amount of Settlement;settlement_amount\nclaim_court|text|Court Name;Court;Court/State;court_name\nclaim_description|text|Claim Description;Description of Allegation;Allegation;description\nemployer_name|text|Employer Name;Employer;Practice Name (Work History);Name of Employer;Previous Practice;Work History;employer_name;employerName\nemployer_address|text|Employer Address;Employer Street;employment_histories.address\nemployer_city|text|Employer City\nemployer_state|state|Employer State\nemployer_zip|zip|Employer Zip\nemployer_country|text|Employer Country\nemployer_phone|phone|Employer Phone;Employer Telephone\nemployer_fax|phone|Employer Fax\nemployer_email|email|Employer Email\nemployer_contact|text|Employer Contact;Contact Information;Supervisor Name;Contact Name (Employer)\nemployment_start_date|date|Employment Start Date;Start Date;Date Started;From (MM/YYYY);Employed From;Effective Date of Employment;Practitioner.Effective Date of Employment;Practitioner effective date with practice;Provider Start Date;start_date\nemployment_end_date|date|Employment End Date;End Date;To (MM/YYYY);Employed To;Date Left;end_date\nemployment_current|yesno|Currently Employed;Current Employer;Is this your current employer?;Present;currently_employed\nemployment_leave_reason|text|Reason for Leaving;Reason for Discontinuance;Reason for Departure;reason_for_discontinuance\ngap_start_date|date|Gap Start Date;Gap From\ngap_end_date|date|Gap End Date;Gap To\ngap_explanation|text|Gap Explanation;Explanation of Gap;Reason for Gap;Gaps in Work History;gap_explanation\nreference_name|text|Reference Name;Professional Reference;Name of Reference;Peer Reference;professional_references.name\nreference_title|text|Reference Title;Reference Degree;Reference Specialty\nreference_organization|text|Reference Organization;Reference Practice Name\nreference_address|text|Reference Address;Reference Street\nreference_city|text|Reference City\nreference_state|state|Reference State\nreference_zip|zip|Reference Zip\nreference_phone|phone|Reference Phone;Reference Telephone\nreference_fax|phone|Reference Fax\nreference_email|email|Reference Email;Reference E-mail\nreference_relationship|text|Relationship;Relationship to Applicant;Professional Relationship\nreference_years_known|number|Years Known;Length of Acquaintance;How Long Known\ndisclosure_answer|yesno|Disclosure Question;Attestation Question;Have you ever been convicted;Has your license ever been;Has the applicant ever been subject to any disciplinary action;Final Adverse Legal Actions;Has legal action been imposed against an applicant?;Program Exclusion;Administrative Sanction;Suspension of Payment;Program Debarment;Pending Criminal Judgment;Civil Monetary Penalty;Health Related Conviction;Abuse Conviction\ndisclosure_explanation|text|Explanation;Please Explain;Disclosure Explanation;If yes, explain;Disclosure Detail;Disclosure.Explanation\nownership_percent|number|% of Ownership;Ownership Percentage;Percent Ownership\nownership_owner_name|text|Name of Individual or Entity (Owner);Owner Name;Managing Employee;Managing Control;Entity Owner\nsupervising_physician_name|text|Supervising Physician;Supervising Physician Name;Collaborating Physician;Collaborative Physician;Supervisor;supervising_or_collaborative_physician_name;supervisingPhysician\nsupervising_physician_npi|npi|Supervising Physician NPI;Collaborating Physician NPI;Supervising NPI\nsupervising_physician_specialty|text|Supervising Physician Specialty;Supervising Specialty\nsupervising_physician_caqh|number|Supervising Physician CAQH ID\nsupervising_physician_na|yesno|Supervising Physician NA;Supervising Physician N/A\npractice_name|text|Practice Name;Location Name;Practice Location Name;Site Name;Clinic Name;Facility Name;Office Name;Service Location Name;Facility.Name;Group name dba;location_name;locationName;practiceName\npractice_location_type|choice|Location Type;Type of Practice;Facility Type;Practice Type;Address Type;Site Type;location_type\npractice_address_line1|text|Practice Address;Practice Address Line 1;Practice Street Address;Practice Street Address 1;Practice Street;Practice Address 1;Practice Addr1;Practice Street 1;Service Address;Service Location Address;Primary Service Location;Physical Address;Physical Address of Practice;Location Address;Office Address;Site Address;PSL Street Address;Primary Practice Location;Primary Address;Employing Group.Service Location Address;License Address;Street Address 1;Address 1;Number/Street;mailingStreetAddress1;street_address_1;streetAddress1\npractice_address_line2|text|Practice Address Line 2;Practice Street Address 2;Practice Address 2;Practice Suite;Practice Suite/Apt;Practice Addr2;Practice Street 2;Practice Building/Suite;Street Address 2;Address 2;Building or Suite;mailingStreetAddress2;street_address_2\npractice_city|text|Practice City;Practice Town;Service City;Location City;Office City;Employing Group.City;mailingCity;City\npractice_state|state|Practice State;Practice State Code;Practice ST;Service State;Location State;Office State;Employing Group.State;mailingState;State\npractice_zip|zip|Practice Zip;Practice Zip Code;Practice Postal Code;Practice Zipcode;Practice Zip+4;Service Zip;Location Zip;Office Zip;Employing Group.Zip Code;City State Zip;mailingZipCode;Zip Code;Zip\npractice_county|text|Practice County;Practice Parish;Location County;County\npractice_country|text|Practice Country\npractice_phone|phone|Practice Phone;Office Phone;Phone Number;Phone;Telephone;Business Phone;Appointment Phone;Location Phone;Practice Telephone;Billing Phone Number;Practice Contact Phone;phoneNumber;phone_number;Tel\npractice_fax|phone|Practice Fax;Office Fax;Fax Number;Fax;Location Fax;Practice Contact Fax;faxNumber;fax_number\npractice_email|email|Practice Email;Practice Email Address;Office Email;Location Email;Business Email;Current Business Email Address;practiceEmail;practice_email\npractice_website|text|Website;Practice Website;Practice Website Address;Web Address;URL\npractice_contact_name|text|Contact Name;Contact Person;Office Contact;Office Manager;Practice Contact Name;Office Contact Name;Practice Manager;contactPerson;contact_name\npractice_contact_title|text|Contact Title;Office Contact Title;Contact Position\npractice_contact_phone|phone|Contact Phone;Office Contact Phone\npractice_contact_email|email|Contact Email;Contact Email ID;Office Contact Email;Practice Contact Email;contactEmail\npractice_medicaid_number|text|Site Medicaid Number;Location Medicaid ID;Site-Specific Medicaid Number;Medicaid Number (Location)\npractice_department|text|Department Name;Department;Clinic/Department Number\npractice_mbe|yesno|Minority Business Enterprise;Minority or Female Owned Business;MBE;Minority Owned\npractice_start_date|date|Start Date at Location;Location Start Date;Start Effective Date;Date Started at Practice;Provider Effective Date;Effective Date at Location\npractice_is_primary|yesno|Primary Location;Primary Practice;Primary Place of Service;Is Primary;Primary Office\npractice_office_hours|text|Office Hours;Hours of Operation;Office Business Hours;Business Hours;Hours;Open;Closed;Office Hours and Coverage\npractice_hours_monday|text|Monday Hours;Office Hours.Monday;OPEN_Monday;CLOSED_Monday;Mon Open;Mon Close;Mon;Monday Open;Monday Closed\npractice_hours_tuesday|text|Tuesday Hours;Office Hours.Tuesday;OPEN_Tuesday;CLOSED_Tuesday;Tue Open;Tue Close;Tue;Tuesday Open;Tuesday Closed\npractice_hours_wednesday|text|Wednesday Hours;Office Hours.Wednesday;OPEN_Wednesday;CLOSED_Wednesday;Wed Open;Wed Close;Wed;Wednesday Open;Wednesday Closed\npractice_hours_thursday|text|Thursday Hours;Office Hours.Thursday;OPEN_Thursday;CLOSED_Thursday;Thu Open;Thu Close;Thu;Thursday Open;Thursday Closed\npractice_hours_friday|text|Friday Hours;Office Hours.Friday;OPEN_Friday;CLOSED_Friday;Fri Open;Fri Close;Fri;Friday Open;Friday Closed\npractice_hours_saturday|text|Saturday Hours;Office Hours.Saturday;OPEN_Saturday;CLOSED_Saturday;Sat Open;Sat Close;Sat;Saturday Open;Saturday Closed\npractice_hours_sunday|text|Sunday Hours;Office Hours.Sunday;OPEN_Sunday;CLOSED_Sunday;Sun Open;Sun Close;Sun;Sunday Open;Sunday Closed\npractice_accepting_new_patients|yesno|Accepting New Patients;Is the provider accepting new patients?;Accept New Patients;Are you accepting new Medicare patients?;New Patients\npractice_age_limits|text|Age Limitations;Age Limits;Age Limit;Patient Age Range;Lower Age Limit;Upper Age Limit;Ages Seen;accessibility.ageLimitation\npractice_gender_limits|choice|Gender Limitations;Gender Limit;Patient Gender;Practice Limitations\npractice_telehealth|yesno|Telehealth;Offers Telehealth;Does the provider offer telehealth services?;Type of Care;Care Delivery Modality;Telehealth/In Person\npractice_handicap_access|yesno|Handicap Accessible;ADA Accessible;Wheelchair Accessible;Accessibility\npractice_public_transport|choice|Public Transportation;Accessible by Public Transportation\npractice_office_languages|text|Office Staff Languages;Languages Spoken by Staff;Interpreter Services;Interpreter Available\npractice_lab_services|yesno|Lab Services at Site;On-site Lab;Laboratory Services;X-ray On Site\npractice_emr|yesno|EMR;Electronic Medical Records;Medical Record Keeping;EHR\npractice_eprescribe|yesno|E-Prescribe;Electronic Prescribing;e-prescribing\npractice_directory_listing|yesno|Directory Listing;Directory Opt-Out;List in Directory;I wish to list this site in the directory\npractice_group_type|choice|Group Type;Practice Type (Single/Multi Specialty);Multi Specialty;Single Specialty Group;FQHC/RHC\nbilling_address_line1|text|Billing Address;Billing Address Line 1;Billing Street Address;Billing Street Address 1;Billing Street;Billing Address 1;Billing Addr1;Billing Street 1;Billing Address of Practice;Billing Vendor Information.Billing Address;Pay To Address;Pay-to Address;Remit Address;Remittance Address;Payment Address;billingStreetAddress1;billing_street_address_1;NumberStreet_2.3\nbilling_address_line2|text|Billing Address Line 2;Billing Street Address 2;Billing Address 2;Billing Suite;Billing Suite/Apt;Billing Addr2;Billing Street 2;Billing Building/Suite;billingStreetAddress2;Building or Suite_2.3\nbilling_city|text|Billing City;Billing Town;Pay To City;Remit City;billingCity;City_2.3\nbilling_state|state|Billing State;Billing State Code;Billing ST;Pay To State;Remit State;billingState;State_2.3\nbilling_zip|zip|Billing Zip;Billing Zip Code;Billing Postal Code;Billing Zipcode;Billing Zip+4;Pay To Zip;Remit Zip;Zip+4;billingZipCode;Zip_2.3\nbilling_county|text|Billing County;Billing Parish\nbilling_country|text|Billing Country\nbilling_po_box|text|PO Box;P.O. Box;Billing PO Box;Lockbox\nbilling_phone|phone|Billing Phone;Billing Office Telephone;Billing Office Phone;Billing Telephone;Tel_2.3\nbilling_fax|phone|Billing Fax;Billing Office Fax;Fax_2.3\nbilling_email|email|Billing Email;Billing Office Email;Email_2.3\nbilling_contact_name|text|Billing Contact;Billing Contact Name;Billing Representative;Billing Manager\nbilling_same_as_mailing|yesno|Billing Same as Mailing;Same as Mailing Address;Is the billing address the same as the legal address?;billingAddressSameAsMailing;Same as Practice\ngroup_legal_name|text|Legal Business Name;Legal Name;Legal Entity Name;Group Name;Practice Name (Legal);Organization Name;Entity Name;Business Name;Name (as shown on your income tax return);Name of Entity;Legal Name of Provider;Payable Name;Payee Name;1099 Name;Name on W-9;Contracting Group Name;Group Practice Organization Name;Employing Group.Name;Payment Group Name;Corporation Name;Billing Group Name;legalName;legal_name;group_name;Name as shown on your income tax return;Name as shown on income tax return;Legal Name of Entity;Organization Legal Name\ngroup_dba|text|DBA;Doing Business As;DBA Name;Doing Business As DBA Name of Entity;Trade Name;Fictitious Name;Business name/disregarded entity name;Business name/disregarded entity name, if different from above\ngroup_tin|tin|Tax ID;TIN;Tax ID Number;Tax Identification Number;Federal Tax ID;Federal Tax ID Number;FEIN;EIN;Employer Identification Number;Group Tax ID;Group TIN;IRS Number;Taxpayer Identification Number;TIN/EIN;SSN or EIN;Billing Vendor Information.Tax ID;taxId;tax_id;Federal Employer ID;Group Tax ID Number\ngroup_npi|npi|Group NPI;Type 2 NPI;NPI Type 2;NPI-2;Organization NPI;Organizational NPI;Group Billing NPI;Billing NPI;Entity NPI;NPI Number.Group;Employing Group.Group NPI;Group Practice Organization NPI;Group 1 NPI;Group 2 NPI;G-NPI;groupNpi;npi2;NPI Type II\ngroup_state_of_incorporation|state|State of Incorporation;Incorporation State;State Incorporated;state_of_incorporation\ngroup_entity_type|choice|Entity Type;Organization Type;Business Type;Type of Organization;Ownership Type;Corporate Structure;Individual or Sole Proprietor;Federal tax classification;C Corporation;S Corporation;Partnership;Limited liability company;Trust/estate;IRS Status;Proprietary;Non-Profit\ngroup_exempt_payee_code|text|Exempt payee code;Exemptions\ngroup_fatca_code|text|Exemption from FATCA reporting code;FATCA Code\ngroup_contact_name|text|Group Contact Name;Entity Contact;Credentialing Contact;Credentialing Contact Name;Contact Person (Group);Name_2\ngroup_contact_phone|phone|Group Contact Phone;Credentialing Contact Phone;Entity Phone;contactPhone;Phone_7\ngroup_contact_fax|phone|Group Contact Fax;Credentialing Contact Fax;contactFax;Fax_7\ngroup_contact_email|email|Group Contact Email;Credentialing Contact Email;Entity Email;Email_2\ngroup_medicare_ptan|text|Group PTAN;Group Medicare Number;Group Medicare ID;Organization PTAN\ngroup_medicaid_number|text|Group Medicaid Number;Group Medicaid ID\nbank_name|text|Bank Name;Financial Institution;Name of Bank;Depository Name\nbank_routing_number|number|Routing Number;ABA Number;ABA Routing Number;Routing Transit Number;RTN;routing_number\nbank_account_number|number|Account Number;Bank Account Number;Depositor Account Number;account_number\nbank_account_type|choice|Account Type;Checking/Savings;Type of Account\neft_enrolled|yesno|EFT;Electronic Funds Transfer;EFT Enrollment;Direct Deposit\nelectronic_claims|yesno|Electronic Claims;Submit Claims Electronically;EDI;Clearinghouse\nsignatory_name|text|Authorized Signatory;Authorized Signer;Authorized Official;Contract Signatory;Authorized Contract Signatory Name;Delegated Official;Signatory Name;Name of Authorized Representative;Provider's signatory;Signatory.Name\nsignatory_title|text|Signatory Title;Title of Authorized Official;Title / Title_EOHHS;Title (Signer);Position\nsignatory_phone|phone|Signatory Phone;Signatory.Phone\nsignatory_email|email|Signatory Email;Signatory.Email;Delegated official signature email;Practitioner signature email\nform_date|date|Date;Today's Date;Date Signed;Signature Date;Date of Application;Application Date;Submission Date;Signature.Date;Practitioner.Date Signed;Applicant Initials and Date;date S5;Todays Date\nsignature|text|Signature;Applicant Signature;Provider Signature;Signature of Practitioner;Signature.Signature;Signature2\nform_completed_by_name|text|Form Completed By;Name of Person Completing Form;Prepared By;Completed By;Practitioner Data Form completed by\nform_completed_by_email|email|Email of Person Completing Form;Preparer Email;Email_intro\nform_completed_by_phone|phone|Phone of Person Completing Form;Preparer Phone;Tel_intro\nline_of_business|choice|Line of Business;Lines of Business;LOB;Product;Commercial;Medicare Advantage;Managed Medicaid;Marketplace;Exchange;Plan Type\npayer_name|text|Payer;Payor;Health Plan;Health Plan Name;Payer Name;Entity Applying To;Submission To;Insurance Plan\nenrollment_effective_date|date|Effective Date;Requested Effective Date;Reassignment Effective Date;Participation Effective Date;Contract Effective Date\nenrollment_request_type|choice|Request Type;Application Type;New Enrollment;Revalidation;Re-validation;Reactivation;Add Location;Demographic Update;LOI Type;RFA New enrolment\nhealth_plan_provider_id|text|Health Plan ID;Plan Provider ID;Payer Provider ID;Provider ID (Plan);Health Plan Provider Number\nrevalidation_date|date|Re-validation Date;Revalidation Due Date;Recredentialing Date\nfacility_based|yesno|Facility-Based;Hospital Based;Hospital based only;Hospitalist;Hospital / ED / Urgent Care Only\nenrollment_state|state|Enrollment State;State Applying For;Registration State";
+const ZP_KB_RAW = "provider_first_name|text|First Name;Given Name;Provider First Name;Practitioner First Name;Legal First Name;Legal First name of practitioner;Legal First name of the applicant;Applicant First Name;FName;First;first_name;firstName;first_nm;Provider.FirstName;practitioner.firstName;providertable.firstname;Name (First);First Name of Provider;Given\nprovider_middle_name|text|Middle Name;Provider Middle Name;Legal Middle Name;MName;middle_name;middleName;middle_nm;Name (Middle);Middle\nprovider_middle_initial|text|Middle Initial;MI;M.I.;Legal MI name of practitioner;Middle Init;middle_initial;middleInitial;M I;Initial\nprovider_last_name|text|Last Name;Surname;Family Name;Provider Last Name;Practitioner Last Name;Legal Last Name;Legal Last name of practitioner;Legal Last name of the applicant;LName;Last;last_name;lastName;last_nm;providertable.Lastname;Name (Last)\nprovider_suffix|text|Suffix;Name Suffix;Jr/Sr/III;Generation;Jr., Sr., etc.;name_suffix\nprovider_full_name|text|Full Name;Provider Name;Practitioner Name;Name of Practitioner;Applicant Name;Applicant (provider) name;Name of Applicant;Printed Name;Printed Legal Name;Printed Legal Name of Practitioner;Printed Legal Name of Applicant;Legal Name of Practitioner;Physician Name;Clinician Name;Provider Full Name;Name (Last, First, Middle);Last, First, Middle;Re: Provider name;Provider name and degree;Signing Provider Name;Practitioner.Name;full_name;fullName;provider_name;providerName;Individual Name;Name;Your Name;Name of Provider;Provider Printed Name;Print Name;Printed Name of Provider;Name of Individual;Practitioner\nprovider_maiden_name|text|Maiden Name;Birth Name;Name at Birth;maiden_name;maidenName\nprovider_other_name|text|Other Name;Other Names;Former Name;Previous Name;Alias;AKA;Also Known As;Other Names Used;Any Other Name Used;Prior Name;other_names;otherNames;Other Name 2\nprovider_other_name_years|text|Years Associated;Years Associated 2;Dates Used;Date Range Used;From/To (Other Name)\nprovider_degree|choice|Degree;Professional Degree;Credentials;Credential;Title;Professional Title;Degree/Title;Clinical Degree;Professional Designation;Credentials (MD, DO, NP, PA);Type of Degree;provider_credentials\nprovider_type|choice|Provider Type;Practitioner Type;Type of Professional;Type of Practitioner;Professional Type;Provider Category;Healthcare Services Rendered;Applicant Type;provider_type;providerType;Discipline\nprovider_initials|text|Initials;Applicant Initials;Provider Initials;Initial Here\nprovider_gender|choice|Gender;Sex;Gender (M/F);Male/Female;Provider Gender;Practitioner Gender;gender_cd;Sex (M/F)\nprovider_dob|date|Date of Birth;DOB;Birth Date;Birthdate;Date Of Birth (MM/DD/YYYY);D.O.B.;birth_date;dateOfBirth;DOB_1.2_A;Applicant DOB;Birth;Born;Date of birth (mm/dd/yyyy)\nprovider_birth_city|text|Birth City;City of Birth;birth_city;birthCity\nprovider_birth_state|state|Birth State;State of Birth;birth_state;birthState\nprovider_birth_country|text|Birth Country;Country of Birth;birth_country;birthCountry\nprovider_place_of_birth|text|Place of Birth;Birthplace;Birth Place;City/State of Birth;City, State, Country of Birth;place_of_birth\nprovider_ssn|ssn|Social Security Number;SSN;Social Security #;Social Security No.;Soc Sec No;SS#;SSN #;Individual SSN;Practitioner Social Security Number;Provider SSN;Tax ID/SSN;ssnNum;social_security_number;socialSecurityNumber;Social Security;SS Number\nprovider_ssn_last4|ssn|Last 4 of SSN;Last 4 SSN;SSN Last 4;Last Four of SSN;Last 4 of SSN or NPI;ssn_last4\nprovider_citizenship|text|Citizenship;Country of Citizenship;Citizenship Country;citizenship_country;citizenshipCountry;Nationality\nprovider_us_citizen|yesno|US Citizen;U.S. Citizen;Are you a US citizen?;Citizen of the United States;us_citizen;usCitizen\nprovider_visa_number|text|Visa Number;Visa #;Visa No;visa_number\nprovider_visa_status|text|Visa Status;Visa Type;Immigration Status;visa_status\nprovider_work_eligible|yesno|Eligible to Work in United States;Eligible to work in the US;Work Authorization;Authorized to Work in US;work_eligibility\nprovider_race|choice|Race;Race/Ethnicity;Provider Race;Racial Background\nprovider_ethnicity|choice|Ethnicity;Hispanic or Latino;Not Hispanic or Latino;Hispanic/Latino Origin\nprovider_languages|text|Languages;Languages Spoken;Language(s) Spoken;Non-English Languages;Other Languages;Languages Other Than English;Foreign Languages;Languages Spoken Other Specify;Practitioner Languages;languages_spoken;languagesSpoken\nprovider_military_service|yesno|US Military Service or Public Health;Military Service;Have you served in the military?;Military Experience;military_service\nprovider_military_active|yesno|Currently on Active or Reserve Military Duty;Active Duty;Reserve Duty;Active Military Duty\nprovider_military_branch|text|Branch of Service;Military Branch;Branch\nprovider_military_dates|text|Dates of Service;Military Dates of Service;Service Dates\nprovider_military_last_location|text|Last Location;Last Duty Station;Last Military Location\nprovider_status_active|yesno|Is Active;Status;Provider Status;is_active;Active/Inactive\nprovider_email|email|Email;E-mail;Email Address;E-mail Address;Primary Email;Primary Email Address;Provider Email;Practitioner Email;Personal Email;Preferred Contact E-mail;Email_1.2;primary_email_address;primaryEmailId;emailAddress\nprovider_other_email|email|Other Emails;Additional Emails;Alternate Email;Secondary Email;other_emails;additionalEmails\nprovider_home_phone|phone|Home Phone;Home Phone Number;Home Telephone;Residence Phone;home_number;homeNumber;Tel_1.2;Phone;Telephone;Phone Number;Telephone Number\nprovider_mobile_phone|phone|Mobile Phone;Cell Phone;Cell;Mobile;Cell Number;Mobile Number;Primary Phone;Provider Phone;Personal Phone;Phone Number (Provider);primary_phone;mobileNumber;cellPhone\nprovider_fax|phone|Provider Fax;Home Fax;Fax_1.2;provider_fax_number;Fax;Fax Number\nprovider_pager|phone|Pager;Pager Number;Beeper\nprovider_preferred_contact_name|text|Preferred Contact Name;Preferred Contact;Name_intro;Contact Person Completing Application\nhome_address_line1|text|Home Address;Home Address Line 1;Home Street Address;Home Street Address 1;Home Street;Home Address 1;Home Addr1;Home Street 1;Home Mailing Address;Residential Address;Residence Address;Legal Home Address;LegalHome Address_1.2;Home adress;Home Address Street;Licensee Address;home_street_address_1;home;homeStreetAddress1;Street (Home)\nhome_address_line2|text|Home Address Line 2;Home Street Address 2;Home Address 2;Home Suite;Home Suite/Apt;Home Addr2;Home Street 2;Home Building/Suite;home_street_address_2;home1;homeStreetAddress2\nhome_city|text|Home City;Home Town;City_1.2;home_city;homeCity;Residence City\nhome_state|state|Home State;Home State Code;Home ST;State_1.2;home_state;homeState;Home State or Country\nhome_zip|zip|Home Zip;Home Zip Code;Home Postal Code;Home Zipcode;Home Zip+4;Zip_1.2;home_zip_code;zipcode;homeZipCode\nhome_county|text|Home County;Home Parish;home_county\nhome_country|text|Home Country;home_country\nmailing_address_line1|text|Correspondence Address;Correspondence Address Line 1;Correspondence Street Address;Correspondence Street Address 1;Correspondence Street;Correspondence Address 1;Correspondence Addr1;Correspondence Street 1;Mailing Address (Provider);Provider Mailing Address;Credentialing Correspondence Address 1;Practice Correspondence Address 1;Address for Correspondence;Mailing Address;Mailing Address Line 1;Mailing Street Address;Mailing Street Address 1;Mailing Street;Mailing Address 1;Mailing Addr1;Mailing Street 1;Correspondence Address (Group);Group Address;Group Practice Organization Address;Address (number, street, and apt. or suite no.);mailing_street_address_1;mailingStreetAddress1 (tax entity)\nmailing_address_line2|text|Correspondence Address Line 2;Correspondence Street Address 2;Correspondence Address 2;Correspondence Suite;Correspondence Suite/Apt;Correspondence Addr2;Correspondence Street 2;Correspondence Building/Suite;Credentialing Correspondence Address 2;Practice Correspondence Address 2;Mailing Address Line 2;Mailing Street Address 2;Mailing Address 2;Mailing Suite;Mailing Suite/Apt;Mailing Addr2;Mailing Street 2;Mailing Building/Suite\nmailing_city|text|Correspondence City;Correspondence Town;Credentialing Correspondence City;Practice Correspondence City;Mailing City;Mailing Town;City, state, and ZIP code;City_9\nmailing_state|state|Correspondence State;Correspondence State Code;Correspondence ST;Credentialing Correspondence State;Practice Correspondence State;Mailing State;Mailing State Code;Mailing ST;State_9\nmailing_zip|zip|Correspondence Zip;Correspondence Zip Code;Correspondence Postal Code;Correspondence Zipcode;Correspondence Zip+4;Credentialing Correspondence Zip;Practice Correspondence Zip;Mailing Zip;Mailing Zip Code;Mailing Postal Code;Mailing Zipcode;Mailing Zip+4;Zip_9\nmailing_county|text|Correspondence County;Correspondence Parish;Mailing County;Mailing Parish\nmailing_country|text|Correspondence Country;Mailing Country\nprovider_npi|npi|NPI;Individual NPI;NPI Number;NPI #;Type 1 NPI;NPI Type 1;NPI-1;Provider NPI;Practitioner NPI;Rendering NPI;National Provider Identifier;National Provider Identifier Number NPI;National Provider ID;Applicants National Provider Identification;NPI Number.Individual;Practitioner.NPI Number;Disclosure.Practitioner NPI;Signing Provider.NPI;Personal NPI;NATIONAL PROVIDER IDENTIFIER WHEN AVAILABLE;individual_npi;individualNpi;npiNumber;npi_1;npi1;NPI Type I;Individual NPI Number\nprovider_caqh_id|number|CAQH ID;CAQH #;CAQH Number;CAQH Provider ID;CAQH Provider Number;CAQH ProView ID;CAQH Provider #;ProView ID;CAQH;caqh_id;caqhId;caqhNumber\nprovider_caqh_username|text|CAQH Username;CAQH Login;CAQH User ID;Username;Portal Username;Login ID\nprovider_caqh_password|text|CAQH Password;Password;Portal Password\nprovider_caqh_attestation_date|date|Last CAQH Attestation Date;CAQH Attestation Date;Last Attestation Date;Attestation Date;last_caqh_attestation_date\nprovider_upin|text|UPIN;UPIN Number;Unique Physician Identification Number\nprovider_medicare_ptan|text|Medicare Number;Medicare #;Medicare Provider Number;Medicare ID;PTAN;Medicare PTAN;Individual PTAN;Provider Transaction Access Number;Medicare Provider ID;Medicare/PTAN;professional_id_medicare.number;medicareNumber;medicare_number\nprovider_medicare_state|state|Medicare State;professional_id_medicare.state\nprovider_medicare_enrolled|yesno|Is the applicant enrolled in Medicare as a provider?;Participating Medicare Provider;ARE YOU A PARTICIPATING MEDICARE PROVIDER?;Does the provider participate in Medicare;Medicare Participating;Enrolled in Medicare;Medicare Enrollment Status\nprovider_medicaid_number|text|Medicaid Number;Medicaid #;Medicaid ID;Medicaid Provider Number;Medicaid Provider ID;State Medicaid Number;AHCCCS ID;Medi-Cal Number;MassHealth PID/SL;MHPIDSL;PROMISe ID;professional_id_medicaid.number;medicaidNumber;medicaid_number;medicaid_id\nprovider_medicaid_state|state|Medicaid State;State of Medicaid;professional_id_medicaid.state;medicaid_state\nprovider_medicaid_pending|yesno|Medicaid Number Pending;Medicaid Pending;Applied for Medicaid\nprovider_medicaid_prior_participation|yesno|Other State Medicaid;Prior Medicaid Participation\nprovider_ecfmg_number|text|ECFMG Number;ECFMG #;ECFMG Certificate Number;ECFMG;ecfmg_number;ecfmgNumber\nprovider_ecfmg_issue_date|date|ECFMG Issue Date;ECFMG Date Issued;ECFMG Certification Date;ecfmg_issue_date\nprovider_ecfmg_expiration_date|date|ECFMG Expiration Date;ECFMG Valid Through\nprovider_taxonomy_primary|text|Taxonomy;Taxonomy Code;Primary Taxonomy;Primary Taxonomy Code;NUCC Taxonomy;Provider Taxonomy;Healthcare Provider Taxonomy Code;nuccTaxonomyCode;taxonomy_code;taxonomyCode;primary_taxonomy\nprovider_taxonomy_secondary|text|Secondary Taxonomy;Secondary Taxonomy Code;Additional Taxonomy;secondary_taxonomy\nprovider_nucc_grouping|text|NUCC Grouping;Provider Grouping;nucc_grouping;nuccGrouping\nprovider_primary_practice_state|state|Primary Practice State;Primary State of Practice;primary_practice_state;primaryPracticeState\nprovider_additional_practice_states|text|Additional Practice States;Other Practice States;Additional States;additional_practice_states;additionalPracticeState\nprovider_practice_setting|choice|Practice Setting;practice_setting;practiceSetting\nprovider_clia_number|text|CLIA Number;CLIA #;CLIA ID;CLIA Certificate Number;clia_number\nprovider_clia_expiration|date|CLIA Expiration;CLIA Expiration Date;CLIA Exp Date\nlicense_number|text|License Number;License #;License No;State License Number;State License No.;Medical License Number;Professional License Number;Applicants Professional License Number;State/License number;Practitioner.License Number;Lic #;Lic No;License ID;State License #;RN License;APRN License;licenseNumber;license_number;professional_id_licenses.number\nlicense_state|state|License State;State of License;Issuing State;State Issued;License Issuing State;Licensing State;State Licensed;licenseState;license_state;professional_id_licenses.state\nlicense_type|choice|License Type;Type of License;Licensure Type;license_type;licensetype;professional_id_type\nlicense_issue_date|date|License Issue Date;Issue Date;Date Issued;Original Issue Date;License Effective Date;Effective Date (License);issueDate;issue_date\nlicense_expiration_date|date|License Expiration Date;Expiration Date;Exp Date;Expiration;Expires;Expiry Date;License Exp;Renewal Date;State License Expiration;expireDate;expiration_date\nlicense_status|choice|License Status;Status (License);licenseStatus;override_licenses_status\nlicense_unlimited|yesno|License Unlimited;Unlimited;Not Unlimited;license_unlimited\nlicense_currently_practicing|yesno|Currently Practicing in State;Currently Practicing;is_currently_practicing_in_state\nlicense_compact|yesno|Compact License;Multistate License;Interstate Compact;IMLC\ndea_number|text|DEA Number;DEA #;DEA No;DEA Registration Number;DEA Registration #;DEA Certificate Number;Federal DEA;DEA;DEA number or certificate;DEA ID;professional_id_dea.number;dea_number;deaNumber\ndea_state|state|DEA State;DEA Registration State;State of DEA;professional_id_dea.state;dea_state\ndea_issue_date|date|DEA Issue Date;DEA Date Issued;DEA Effective Date;dea_issue_date\ndea_expiration_date|date|DEA Expiration Date;DEA Exp Date;DEA Expiration;DEA Expires;dea_expiration_date\ndea_schedules|choice|Drug Schedules;DEA Schedules;Schedules;Controlled Substance Schedules;Schedule 2, 2N, 3, 3N, 4, 5\ndea_pending|yesno|DEA Number Pending;DEA Pending;Applied for DEA\ndea_none|yesno|Do not have a DEA in practice state;No DEA;DEA Not Applicable;DEA N/A\ndea_waiver_xdea|text|XDEA;X-DEA;DEA X Number;DATA Waiver;DEA Waiver;Buprenorphine Waiver\ncds_number|text|CDS Number;CDS #;CDS License Number;CDS Registration Number;CDS Certificate Number;State Controlled Substance Number;State Controlled License No.;Controlled Dangerous Substance Number;CSR Number;Controlled Substance Registration;State CSR;professional_id_cds.number;cds_number\ncds_state|state|CDS State;CDS Issue State;CDS Issuing State;professional_id_cds.state;cds_state\ncds_issue_date|date|CDS Issue Date;CDS Date Issued;cds_issue_date\ncds_expiration_date|date|CDS Expiration Date;CDS Exp Date;State Controlled License Expiration;cds_expiration_date\nspecialty_primary|choice|Primary Specialty;Specialty;Provider Specialty;Practice Specialty;Area of Specialty;Specialty Description;Field of Practice;Primary Medicare Services Rendered;Physician Specialty;primarySpecialty;primary_specialty;speciality\nspecialty_secondary|choice|Secondary Specialty;Additional Specialty;Other Specialty;Sub-Specialties;Subspecialty;Sub Specialty;secondary_specialty\nspecialty_pcp|yesno|PCP;Primary Care Provider;Is the provider a PCP;PCP Designation;Primary Care Physician;Practitioner type: PCP;PCP/Specialist\nboard_certified|yesno|Board Certified;Board Certification;Are you board certified?;Is Board Certified;Board Certified (Y/N);Board Status;is_board_certified\nboard_name|text|Certifying Board;Certifying Board Name;Board Name;Name of Certifying Board;Board;Specialty Board;certifying_board_name\nboard_specialty|text|Board Specialty;Specialty Certified;Area of Certification;Area of Certifications;Other Area of Certifications;Certification Name;Certified Specialty\nboard_certificate_number|text|Certification Number;Board Certificate Number;Certificate #;Certificate Number;certifications.number\nboard_initial_date|date|Initial Certification Date;Certification Date;Date Certified;Original Certification Date;Initial Date;initial_date\nboard_recert_date|date|Recertification Date;Re-certification Date;Recert Date;Last Recertification Date;recertification_date\nboard_expiration_date|date|Certification Expiration Date;Board Expiration Date;Certification Expires;Board Exp Date\nboard_exam_date|date|Board Exam Date;Date of Exam;Exam Date;Examination Date;Date Sat for Exam;board_exam_date\nboard_not_certified_reason|text|Not Board Certified Reason;If not certified, explain;Reason Not Certified;Board Eligible\nboard_moc|yesno|Maintenance of Certification;MOC;Participating in MOC\nboard_directory_listing|yesno|List in HMO Directory;List in PPO Directory;List in POS Directory;Board Directory Listing\neducation_school_name|text|Medical School;Professional School;Medical/Professional School;School Name;Institution Name;Name of Institution;Name of School;University;College;Graduate School;Undergraduate School;Professional Degree School;Institution;nameOfInstitution;educations.name;institution_name;school_name\neducation_degree|choice|Degree Earned;Degree Received;Degree Awarded;Education Degree;Degree (Education);educations.degree;providerEducation.degree\neducation_start_date|date|Education Start Date;Attended From;From Date;Start Date (Education);startDate;educations.start_date\neducation_end_date|date|Graduation Date;Date of Graduation;Completion Date;Attended To;To Date;End Date (Education);Date Graduated;endDate;educations.end_date\neducation_graduation_year|number|Graduation Year;Year of Graduation;Year Graduated;Grad Year\neducation_city|text|School City;Institution City;educations.city\neducation_state|state|School State;Institution State;educations.state\neducation_country|text|School Country;Institution Country;educations.country\neducation_address|text|School Address;Institution Address;educations.address_street_1\neducation_zip|zip|School Zip;Institution Zip;educations.postal_code\neducation_type|choice|Education Type;Undergraduate;Graduate;Other Graduate-Level Education;Other Professional Degrees\ntraining_institution|text|Residency Program;Residency Institution;Internship Institution;Fellowship Institution;Training Institution;Hospital/Program Name;Program Name;Post-Graduate Education;Post Graduate Training;Postgraduate Institution;Internship;Residency;Fellowship;training_institution_name;professional_training\ntraining_type|choice|Training Type;Type of Training;Internship/Residency/Fellowship;Program Type;training;training_type\ntraining_specialty|text|Training Specialty;Residency Specialty;Fellowship Specialty;Program Specialty;Specialty (Training)\ntraining_start_date|date|Training Start Date;Residency Start Date;Fellowship Start Date;Internship Start Date;From (Training)\ntraining_end_date|date|Training End Date;Residency End Date;Fellowship End Date;Internship End Date;Completion Date (Training);To (Training)\ntraining_program_director|text|Program Director;Director Name;Residency Director\ntraining_completed|yesno|Completed Program;Program Completed;Did you complete the program?\ntraining_address|text|Training Address;Program Address;Residency Address\nhospital_name|text|Hospital Name;Primary Hospital;Primary Hospital Affiliation;Hospital Affiliation;Admitting Hospital;Hospital Where You Have Privileges;Facility Name (Hospital);Other Hospital;Current Hospital;Previous Hospital;Hospital Name for Admitting Physician;hospital_with_admitting_privileges.name;hospital_name\nhospital_city|text|Hospital City;Hospital City State\nhospital_state|state|Hospital State\nhospital_address|text|Hospital Address;Hospital Street\nhospital_zip|zip|Hospital Zip;Hospital Postal Code\nhospital_phone|phone|Hospital Phone;Medical Staff Office Phone\nhospital_tax_id|tin|Hospital Tax ID;hospital_with_admitting_privileges.tax_id\nhospital_privilege_status|choice|Privilege Status;Staff Category;Type of Privileges;Privileges;Admitting Privileges;Staff Status;Full/Provisional/Courtesy\nhospital_start_date|date|Affiliation Start Date;Privileges Start Date;Appointment Date;Date Privileges Granted\nhospital_end_date|date|Affiliation End Date;Privileges End Date\nhospital_no_privileges|yesno|No Hospital Privileges;No Admitting Privileges;N/A Hospital Privileges;Do you have hospital privileges?\nhospital_admitting_arrangement|text|Admitting Arrangement;Covering Arrangements;Admitting Arrangements;Admitting Physician;Hospitalist Arrangement;Arrangement.Choice;If no privileges, describe admitting arrangements;hospital_with_admitting_arrangements\ncovering_provider_name|text|Covering Provider Name;Covering Physician;Covering Colleague;Call Coverage Partner;call_coverage_partners;call_coverage_colleagues\ncovering_provider_npi|npi|Covering Provider NPI;Covering Physician NPI\nmalpractice_carrier|text|Malpractice Carrier;Insurance Carrier;Carrier Name;Liability Carrier;Professional Liability Carrier;Insurance Company;Name of Carrier;Carrier or Self-Insured Name;Malpractice Insurance Company;Insurer;professional_liability_insurances.name;carrier_name\nmalpractice_policy_number|text|Policy Number;Policy #;Policy No;Malpractice Policy Number;Insurance Policy Number;Liability Policy Number;policy_number\nmalpractice_effective_date|date|Policy Effective Date;Coverage Start Date;Policy Start Date;Insurance Effective Date;Original Effective Date;current_effective_date\nmalpractice_expiration_date|date|Policy Expiration Date;Expiration Date (Policy);Coverage End Date;Policy End Date;Insurance Expiration Date;current_expiration_date\nmalpractice_per_occurrence|money|Per Occurrence;Per Occurrence Limit;Coverage Per Occurrence;Each Claim;Per Claim;Occurrence Limit;Amount Per Occurrence;per_occurrence_limit;per_occurence_limit;CoveragePerOccurrence\nmalpractice_aggregate|money|Aggregate;Aggregate Limit;Aggregate Coverage;Coverage Aggregate;Annual Aggregate;Aggregate Coverage Limit;aggregate_limit;CoverageAggregate\nmalpractice_coverage_type|choice|Coverage Type;Claims Made/Occurrence;Type of Coverage;Individual Coverage;Group Coverage;coverage_type\nmalpractice_self_insured|yesno|Self-Insured;Self Insured;Self-Insured Flag;is_self_insured\nmalpractice_unlimited|yesno|Unlimited Coverage\nmalpractice_tail|yesno|Tail Coverage;Prior Acts Coverage;Nose Coverage\nmalpractice_carrier_address|text|Carrier Address;Insurance Company Address;professional_liability_insurances.address_street_1\nmalpractice_carrier_city|text|Carrier City\nmalpractice_carrier_state|state|Carrier State\nmalpractice_carrier_zip|zip|Carrier Zip\nmalpractice_carrier_phone|phone|Carrier Phone;Insurance Company Phone\nmalpractice_time_with_carrier|text|Time with Carrier;Length of Time with Carrier;Years with Carrier;length_of_time_with_carrier\nmalpractice_covered_location|text|Covered Practice Location;Institution Affiliation;Covered Location\nmalpractice_attached|yesno|Professional Liability Attached;COI Attached;Certificate of Insurance Attached\nclaim_incident_date|date|Incident Date;Date of Incident;Date of Occurrence;incident_date\nclaim_filed_date|date|Claim Filed Date;Date Claim Filed;Date of Claim\nclaim_carrier|text|Carrier Involved;Professional Liability Carrier Involved;Claim Carrier\nclaim_status|choice|Claim Status;Disposition;Is Pending;Open/Closed;is_pending\nclaim_settlement_amount|money|Settlement Amount;Amount Paid;Amount of Settlement;settlement_amount\nclaim_court|text|Court Name;Court;Court/State;court_name\nclaim_description|text|Claim Description;Description of Allegation;Allegation;description\nemployer_name|text|Employer Name;Employer;Practice Name (Work History);Name of Employer;Previous Practice;Work History;employer_name;employerName\nemployer_address|text|Employer Address;Employer Street;employment_histories.address\nemployer_city|text|Employer City\nemployer_state|state|Employer State\nemployer_zip|zip|Employer Zip\nemployer_country|text|Employer Country\nemployer_phone|phone|Employer Phone;Employer Telephone\nemployer_fax|phone|Employer Fax\nemployer_email|email|Employer Email\nemployer_contact|text|Employer Contact;Contact Information;Supervisor Name;Contact Name (Employer)\nemployment_start_date|date|Employment Start Date;Start Date;Date Started;From (MM/YYYY);Employed From;Effective Date of Employment;Practitioner.Effective Date of Employment;Practitioner effective date with practice;Provider Start Date;start_date\nemployment_end_date|date|Employment End Date;End Date;To (MM/YYYY);Employed To;Date Left;end_date\nemployment_current|yesno|Currently Employed;Current Employer;Is this your current employer?;Present;currently_employed\nemployment_leave_reason|text|Reason for Leaving;Reason for Discontinuance;Reason for Departure;reason_for_discontinuance\ngap_start_date|date|Gap Start Date;Gap From\ngap_end_date|date|Gap End Date;Gap To\ngap_explanation|text|Gap Explanation;Explanation of Gap;Reason for Gap;Gaps in Work History;gap_explanation\nreference_name|text|Reference Name;Professional Reference;Name of Reference;Peer Reference;professional_references.name\nreference_title|text|Reference Title;Reference Degree;Reference Specialty\nreference_organization|text|Reference Organization;Reference Practice Name\nreference_address|text|Reference Address;Reference Street\nreference_city|text|Reference City\nreference_state|state|Reference State\nreference_zip|zip|Reference Zip\nreference_phone|phone|Reference Phone;Reference Telephone\nreference_fax|phone|Reference Fax\nreference_email|email|Reference Email;Reference E-mail\nreference_relationship|text|Relationship;Relationship to Applicant;Professional Relationship\nreference_years_known|number|Years Known;Length of Acquaintance;How Long Known\ndisclosure_answer|yesno|Disclosure Question;Attestation Question;Have you ever been convicted;Has your license ever been;Has the applicant ever been subject to any disciplinary action;Final Adverse Legal Actions;Has legal action been imposed against an applicant?;Program Exclusion;Administrative Sanction;Suspension of Payment;Program Debarment;Pending Criminal Judgment;Civil Monetary Penalty;Health Related Conviction;Abuse Conviction\ndisclosure_explanation|text|Explanation;Please Explain;Disclosure Explanation;If yes, explain;Disclosure Detail;Disclosure.Explanation\nownership_percent|number|% of Ownership;Ownership Percentage;Percent Ownership\nownership_owner_name|text|Name of Individual or Entity (Owner);Owner Name;Managing Employee;Managing Control;Entity Owner\nsupervising_physician_name|text|Supervising Physician;Supervising Physician Name;Collaborating Physician;Collaborative Physician;Supervisor;supervising_or_collaborative_physician_name;supervisingPhysician\nsupervising_physician_npi|npi|Supervising Physician NPI;Collaborating Physician NPI;Supervising NPI\nsupervising_physician_specialty|text|Supervising Physician Specialty;Supervising Specialty\nsupervising_physician_caqh|number|Supervising Physician CAQH ID\nsupervising_physician_na|yesno|Supervising Physician NA;Supervising Physician N/A\npractice_name|text|Practice Name;Location Name;Practice Location Name;Site Name;Clinic Name;Facility Name;Office Name;Service Location Name;Facility.Name;Group name dba;location_name;locationName;practiceName\npractice_location_type|choice|Location Type;Type of Practice;Facility Type;Practice Type;Address Type;Site Type;location_type\npractice_address_line1|text|Practice Address;Practice Address Line 1;Practice Street Address;Practice Street Address 1;Practice Street;Practice Address 1;Practice Addr1;Practice Street 1;Service Address;Service Location Address;Primary Service Location;Physical Address;Physical Address of Practice;Location Address;Office Address;Site Address;PSL Street Address;Primary Practice Location;Primary Address;Employing Group.Service Location Address;License Address;Street Address 1;Address 1;Number/Street;mailingStreetAddress1;street_address_1;streetAddress1\npractice_address_line2|text|Practice Address Line 2;Practice Street Address 2;Practice Address 2;Practice Suite;Practice Suite/Apt;Practice Addr2;Practice Street 2;Practice Building/Suite;Street Address 2;Address 2;Building or Suite;mailingStreetAddress2;street_address_2\npractice_city|text|Practice City;Practice Town;Service City;Location City;Office City;Employing Group.City;mailingCity;City\npractice_state|state|Practice State;Practice State Code;Practice ST;Service State;Location State;Office State;Employing Group.State;mailingState;State\npractice_zip|zip|Practice Zip;Practice Zip Code;Practice Postal Code;Practice Zipcode;Practice Zip+4;Service Zip;Location Zip;Office Zip;Employing Group.Zip Code;City State Zip;mailingZipCode;Zip Code;Zip\npractice_county|text|Practice County;Practice Parish;Location County;County\npractice_country|text|Practice Country\npractice_phone|phone|Practice Phone;Office Phone;Phone Number;Phone;Telephone;Business Phone;Appointment Phone;Location Phone;Practice Telephone;Billing Phone Number;Practice Contact Phone;phoneNumber;phone_number;Tel\npractice_fax|phone|Practice Fax;Office Fax;Fax Number;Fax;Location Fax;Practice Contact Fax;faxNumber;fax_number\npractice_email|email|Practice Email;Practice Email Address;Office Email;Location Email;Business Email;Current Business Email Address;practiceEmail;practice_email\npractice_website|text|Website;Practice Website;Practice Website Address;Web Address;URL\npractice_contact_name|text|Manager Name;Office Manager Name;Practice Manager Name;Office Manager Contact;Contact Name;Contact Person;Office Contact;Office Manager;Practice Contact Name;Office Contact Name;Practice Manager;contactPerson;contact_name\npractice_contact_title|text|Contact Title;Office Contact Title;Contact Position\npractice_contact_phone|phone|Manager Phone;Manager Phone #;Office Manager Phone;Office Manager Telephone;Contact Phone;Office Contact Phone\npractice_contact_email|email|Manager Email;Office Manager Email;Office Manager E-mail;Contact Email;Contact Email ID;Office Contact Email;Practice Contact Email;contactEmail\npractice_medicaid_number|text|Site Medicaid Number;Location Medicaid ID;Site-Specific Medicaid Number;Medicaid Number (Location)\npractice_department|text|Department Name;Department;Clinic/Department Number\npractice_mbe|yesno|Minority Business Enterprise;Minority or Female Owned Business;MBE;Minority Owned\npractice_start_date|date|Start Date at Location;Location Start Date;Start Effective Date;Date Started at Practice;Provider Effective Date;Effective Date at Location\npractice_is_primary|yesno|Primary Location;Primary Practice;Primary Place of Service;Is Primary;Primary Office\npractice_office_hours|text|Office Hours;Hours of Operation;Office Business Hours;Business Hours;Hours;Open;Closed;Office Hours and Coverage\npractice_hours_monday|text|Monday Hours;Office Hours.Monday;OPEN_Monday;CLOSED_Monday;Mon Open;Mon Close;Mon;Monday Open;Monday Closed\npractice_hours_tuesday|text|Tuesday Hours;Office Hours.Tuesday;OPEN_Tuesday;CLOSED_Tuesday;Tue Open;Tue Close;Tue;Tuesday Open;Tuesday Closed\npractice_hours_wednesday|text|Wednesday Hours;Office Hours.Wednesday;OPEN_Wednesday;CLOSED_Wednesday;Wed Open;Wed Close;Wed;Wednesday Open;Wednesday Closed\npractice_hours_thursday|text|Thursday Hours;Office Hours.Thursday;OPEN_Thursday;CLOSED_Thursday;Thu Open;Thu Close;Thu;Thursday Open;Thursday Closed\npractice_hours_friday|text|Friday Hours;Office Hours.Friday;OPEN_Friday;CLOSED_Friday;Fri Open;Fri Close;Fri;Friday Open;Friday Closed\npractice_hours_saturday|text|Saturday Hours;Office Hours.Saturday;OPEN_Saturday;CLOSED_Saturday;Sat Open;Sat Close;Sat;Saturday Open;Saturday Closed\npractice_hours_sunday|text|Sunday Hours;Office Hours.Sunday;OPEN_Sunday;CLOSED_Sunday;Sun Open;Sun Close;Sun;Sunday Open;Sunday Closed\npractice_accepting_new_patients|yesno|Accepting New Patients;Is the provider accepting new patients?;Accept New Patients;Are you accepting new Medicare patients?;New Patients\npractice_age_limits|text|Age Limitations;Age Limits;Age Limit;Patient Age Range;Lower Age Limit;Upper Age Limit;Ages Seen;accessibility.ageLimitation\npractice_gender_limits|choice|Gender Limitations;Gender Limit;Patient Gender;Practice Limitations\npractice_telehealth|yesno|Telehealth;Offers Telehealth;Does the provider offer telehealth services?;Type of Care;Care Delivery Modality;Telehealth/In Person\npractice_handicap_access|yesno|Handicap Accessible;ADA Accessible;Wheelchair Accessible;Accessibility\npractice_public_transport|choice|Public Transportation;Accessible by Public Transportation\npractice_office_languages|text|Office Staff Languages;Languages Spoken by Staff;Interpreter Services;Interpreter Available\npractice_lab_services|yesno|Lab Services at Site;On-site Lab;Laboratory Services;X-ray On Site\npractice_emr|yesno|EMR;Electronic Medical Records;Medical Record Keeping;EHR\npractice_eprescribe|yesno|E-Prescribe;Electronic Prescribing;e-prescribing\npractice_directory_listing|yesno|Directory Listing;Directory Opt-Out;List in Directory;I wish to list this site in the directory\npractice_group_type|choice|Group Type;Practice Type (Single/Multi Specialty);Multi Specialty;Single Specialty Group;FQHC/RHC\nbilling_address_line1|text|Billing Address;Billing Address Line 1;Billing Street Address;Billing Street Address 1;Billing Street;Billing Address 1;Billing Addr1;Billing Street 1;Billing Address of Practice;Billing Vendor Information.Billing Address;Pay To Address;Pay-to Address;Remit Address;Remittance Address;Payment Address;billingStreetAddress1;billing_street_address_1;NumberStreet_2.3\nbilling_address_line2|text|Billing Address Line 2;Billing Street Address 2;Billing Address 2;Billing Suite;Billing Suite/Apt;Billing Addr2;Billing Street 2;Billing Building/Suite;billingStreetAddress2;Building or Suite_2.3\nbilling_city|text|Billing City;Billing Town;Pay To City;Remit City;billingCity;City_2.3\nbilling_state|state|Billing State;Billing State Code;Billing ST;Pay To State;Remit State;billingState;State_2.3\nbilling_zip|zip|Billing Zip;Billing Zip Code;Billing Postal Code;Billing Zipcode;Billing Zip+4;Pay To Zip;Remit Zip;Zip+4;billingZipCode;Zip_2.3\nbilling_county|text|Billing County;Billing Parish\nbilling_country|text|Billing Country\nbilling_po_box|text|PO Box;P.O. Box;Billing PO Box;Lockbox\nbilling_phone|phone|Billing Phone;Billing Office Telephone;Billing Office Phone;Billing Telephone;Tel_2.3\nbilling_fax|phone|Billing Fax;Billing Office Fax;Fax_2.3\nbilling_email|email|Billing Email;Billing Office Email;Email_2.3\nbilling_contact_name|text|Billing Contact;Billing Contact Name;Billing Representative;Billing Manager\nbilling_same_as_mailing|yesno|Billing Same as Mailing;Same as Mailing Address;Is the billing address the same as the legal address?;billingAddressSameAsMailing;Same as Practice\ngroup_legal_name|text|Contract Entity Name;Contracting Entity Name;Contracted Entity Name;Contract Entity;Name of Contracting Entity;Contracting Entity;Legal Business Name;Legal Name;Legal Entity Name;Group Name;Practice Name (Legal);Organization Name;Entity Name;Business Name;Name (as shown on your income tax return);Name of Entity;Legal Name of Provider;Payable Name;Payee Name;1099 Name;Name on W-9;Contracting Group Name;Group Practice Organization Name;Employing Group.Name;Payment Group Name;Corporation Name;Billing Group Name;legalName;legal_name;group_name;Name as shown on your income tax return;Name as shown on income tax return;Legal Name of Entity;Organization Legal Name\ngroup_dba|text|DBA;Doing Business As;DBA Name;Doing Business As DBA Name of Entity;Trade Name;Fictitious Name;Business name/disregarded entity name;Business name/disregarded entity name, if different from above\ngroup_tin|tin|Contract Entity Tax ID;Contracting Entity Tax ID;Contract Entity TIN;Contract Entity Tax ID Number;Tax ID;TIN;Tax ID Number;Tax Identification Number;Federal Tax ID;Federal Tax ID Number;FEIN;EIN;Employer Identification Number;Group Tax ID;Group TIN;IRS Number;Taxpayer Identification Number;TIN/EIN;SSN or EIN;Billing Vendor Information.Tax ID;taxId;tax_id;Federal Employer ID;Group Tax ID Number\ngroup_npi|npi|Contract Entity NPI;Contracting Entity NPI;Contract Entity NPI Number;Group NPI;Type 2 NPI;NPI Type 2;NPI-2;Organization NPI;Organizational NPI;Group Billing NPI;Billing NPI;Entity NPI;NPI Number.Group;Employing Group.Group NPI;Group Practice Organization NPI;Group 1 NPI;Group 2 NPI;G-NPI;groupNpi;npi2;NPI Type II\ngroup_state_of_incorporation|state|State of Incorporation;Incorporation State;State Incorporated;state_of_incorporation\ngroup_entity_type|choice|Entity Type;Organization Type;Business Type;Type of Organization;Ownership Type;Corporate Structure;Individual or Sole Proprietor;Federal tax classification;C Corporation;S Corporation;Partnership;Limited liability company;Trust/estate;IRS Status;Proprietary;Non-Profit\ngroup_exempt_payee_code|text|Exempt payee code;Exemptions\ngroup_fatca_code|text|Exemption from FATCA reporting code;FATCA Code\ngroup_contact_name|text|Group Contact Name;Entity Contact;Credentialing Contact;Credentialing Contact Name;Contact Person (Group);Name_2\ngroup_contact_phone|phone|Group Contact Phone;Credentialing Contact Phone;Entity Phone;contactPhone;Phone_7\ngroup_contact_fax|phone|Group Contact Fax;Credentialing Contact Fax;contactFax;Fax_7\ngroup_contact_email|email|Group Contact Email;Credentialing Contact Email;Entity Email;Email_2\ngroup_medicare_ptan|text|Group PTAN;Group Medicare Number;Group Medicare ID;Organization PTAN\ngroup_medicaid_number|text|Group Medicaid Number;Group Medicaid ID\nbank_name|text|Bank Name;Financial Institution;Name of Bank;Depository Name\nbank_routing_number|number|Routing Number;ABA Number;ABA Routing Number;Routing Transit Number;RTN;routing_number\nbank_account_number|number|Account Number;Bank Account Number;Depositor Account Number;account_number\nbank_account_type|choice|Account Type;Checking/Savings;Type of Account\neft_enrolled|yesno|EFT;Electronic Funds Transfer;EFT Enrollment;Direct Deposit\nelectronic_claims|yesno|Electronic Claims;Submit Claims Electronically;EDI;Clearinghouse\nsignatory_name|text|Authorized Signatory;Authorized Signer;Authorized Official;Contract Signatory;Authorized Contract Signatory Name;Delegated Official;Signatory Name;Name of Authorized Representative;Provider's signatory;Signatory.Name\nsignatory_title|text|Signatory Title;Title of Authorized Official;Title / Title_EOHHS;Title (Signer);Position\nsignatory_phone|phone|Signatory Phone;Signatory.Phone\nsignatory_email|email|Signatory Email;Signatory.Email;Delegated official signature email;Practitioner signature email\nform_date|date|Date;Today's Date;Date Signed;Signature Date;Date of Application;Application Date;Submission Date;Signature.Date;Practitioner.Date Signed;Applicant Initials and Date;date S5;Todays Date\nsignature|text|Signature;Applicant Signature;Provider Signature;Signature of Practitioner;Signature.Signature;Signature2\nform_completed_by_name|text|Form Completed By;Name of Person Completing Form;Prepared By;Completed By;Practitioner Data Form completed by\nform_completed_by_email|email|Email of Person Completing Form;Preparer Email;Email_intro\nform_completed_by_phone|phone|Phone of Person Completing Form;Preparer Phone;Tel_intro\nline_of_business|choice|Line of Business;Lines of Business;LOB;Product;Commercial;Medicare Advantage;Managed Medicaid;Marketplace;Exchange;Plan Type\npayer_name|text|Payer;Payor;Health Plan;Health Plan Name;Payer Name;Entity Applying To;Submission To;Insurance Plan\nenrollment_effective_date|date|Effective Date;Requested Effective Date;Reassignment Effective Date;Participation Effective Date;Contract Effective Date\nenrollment_request_type|choice|Request Type;Application Type;New Enrollment;Revalidation;Re-validation;Reactivation;Add Location;Demographic Update;LOI Type;RFA New enrolment\nhealth_plan_provider_id|text|Health Plan ID;Plan Provider ID;Payer Provider ID;Provider ID (Plan);Health Plan Provider Number\nrevalidation_date|date|Re-validation Date;Revalidation Due Date;Recredentialing Date\nfacility_based|yesno|Facility-Based;Hospital Based;Hospital based only;Hospitalist;Hospital / ED / Urgent Care Only\nenrollment_state|state|Enrollment State;State Applying For;Registration State\nprovider_type_code|text|Provider Type Code;CAQH Provider Type Code\nprovider_individual_tin|tin|Individual Tax ID;Individual TIN;Provider Individual Tax ID\nprovider_medicaid_enrolled|yesno|Participating Medicaid Provider;Are you a participating Medicaid provider?;Medicaid Participating;Enrolled in Medicaid\nprovider_usmle_number|text|USMLE Number;USMLE ID;USMLE #\npractice_contact_fax|phone|Office Manager Fax;Manager Fax;Contact Fax\nmalpractice_original_effective_date|date|Original Effective Date (Policy);Policy Original Effective Date;Retroactive Date;Prior Acts Date";
 const ZP_ACRONYMS = {"NPI": "National Provider Identifier (10-digit; Type 1 = individual, Type 2 = organization/group)", "CAQH": "Council for Affordable Quality Healthcare (ProView credentialing database)", "TIN": "Taxpayer Identification Number", "EIN": "Employer Identification Number", "FEIN": "Federal Employer Identification Number", "SSN": "Social Security Number", "DOB": "Date of Birth", "DEA": "Drug Enforcement Administration (controlled substance registration)", "CDS": "Controlled Dangerous Substance (state registration)", "CSR": "Controlled Substance Registration (state)", "PTAN": "Provider Transaction Access Number (Medicare)", "UPIN": "Unique Physician Identification Number (legacy Medicare)", "ECFMG": "Educational Commission for Foreign Medical Graduates", "IMG": "International Medical Graduate", "PECOS": "Provider Enrollment, Chain and Ownership System (Medicare)", "NPPES": "National Plan and Provider Enumeration System", "CMS": "Centers for Medicare & Medicaid Services", "I&A": "CMS Identity & Access Management system", "CMS-855I": "Medicare enrollment application for individual physicians/non-physician practitioners", "CMS-855B": "Medicare enrollment application for clinics/group practices", "CMS-855R": "Medicare reassignment of benefits", "CMS-855A": "Medicare enrollment for institutional providers", "CMS-855S": "Medicare enrollment for DMEPOS suppliers", "CMS-460": "Medicare participating physician/supplier agreement", "CMS-588": "Medicare EFT authorization agreement", "MAC": "Medicare Administrative Contractor", "W-9": "IRS Request for Taxpayer Identification Number and Certification", "CP 575": "IRS EIN assignment notice letter", "COI": "Certificate of Insurance", "LOI": "Letter of Intent / Letter of Interest", "CRF": "Contract Request Form", "RFP": "Request for Participation", "TSCA": "Texas Standardized Credentialing Application", "KHA": "Kentucky (Hospital Association) Credentialing Alliance application", "AzAHP": "Arizona Association of Health Plans", "MPE-2": "WV Medicaid Statement of Practitioner Authorization", "LOB": "Line of Business", "MA": "Medicare Advantage", "HMO": "Health Maintenance Organization", "PPO": "Preferred Provider Organization", "POS": "Point of Service (plan) / Place of Service", "EPO": "Exclusive Provider Organization", "PCP": "Primary Care Provider", "OB": "Obstetrics", "EPSDT": "Early and Periodic Screening, Diagnostic and Treatment", "D-SNP": "Dual-eligible Special Needs Plan", "FQHC": "Federally Qualified Health Center", "RHC": "Rural Health Clinic", "CLIA": "Clinical Laboratory Improvement Amendments", "NUCC": "National Uniform Claim Committee (taxonomy codes)", "EFT": "Electronic Funds Transfer", "ERA": "Electronic Remittance Advice", "EDI": "Electronic Data Interchange", "DBA": "Doing Business As", "LLC": "Limited Liability Company", "PLLC": "Professional Limited Liability Company", "PC": "Professional Corporation", "PA": "Physician Assistant / Professional Association", "MD": "Doctor of Medicine", "DO": "Doctor of Osteopathic Medicine", "NP": "Nurse Practitioner", "APRN": "Advanced Practice Registered Nurse", "CRNA": "Certified Registered Nurse Anesthetist", "PMHNP": "Psychiatric Mental Health Nurse Practitioner", "LCSW": "Licensed Clinical Social Worker", "LPC": "Licensed Professional Counselor", "LMHC": "Licensed Mental Health Counselor", "LMFT": "Licensed Marriage and Family Therapist", "PsyD": "Doctor of Psychology", "BCBA": "Board Certified Behavior Analyst", "BH": "Behavioral Health", "NPDB": "National Practitioner Data Bank", "OIG": "Office of Inspector General", "SAM": "System for Award Management (exclusions)", "MOC": "Maintenance of Certification", "ABMS": "American Board of Medical Specialties", "AOA": "American Osteopathic Association", "BLS": "Basic Life Support", "ACLS": "Advanced Cardiac Life Support", "PALS": "Pediatric Advanced Life Support", "CPR": "Cardiopulmonary Resuscitation", "MBE": "Minority Business Enterprise", "EMR": "Electronic Medical Record", "EHR": "Electronic Health Record", "ADA": "Americans with Disabilities Act", "UHC": "UnitedHealthcare", "BCBS": "Blue Cross Blue Shield", "AHCCCS": "Arizona Health Care Cost Containment System (AZ Medicaid)", "PSL": "Primary Service Location", "PID/SL": "MassHealth Provider ID / Service Location", "ATN": "Application Tracking Number", "PDMP": "Prescription Drug Monitoring Program", "NJPMP": "New Jersey Prescription Monitoring Program", "XDEA": "DEA X-waiver (buprenorphine)", "IMLC": "Interstate Medical Licensure Compact", "FSMB": "Federation of State Medical Boards", "HITL": "Human in the loop", "OA": "Operations Analyst", "CVO": "Credentials Verification Organization", "PSV": "Primary Source Verification", "FTE": "Full-Time Equivalent", "TAT": "Turnaround Time", "MCO": "Managed Care Organization", "VA CCN": "Veterans Affairs Community Care Network", "FATCA": "Foreign Account Tax Compliance Act", "MI": "Middle Initial", "ZIP": "Zone Improvement Plan (postal code)", "SS#": "Social Security Number"};
 /* ==================================================================
    ZenPDF Smart Match — understands what a form field is asking for.
@@ -5113,7 +5138,7 @@ const Bus = Z.Bus = {
 /* ---------- settings ---------- */
 const Settings = Z.Settings = {
   KEY: 'zp8-settings',
-  d: { theme: 'system', region: 'auto', motion: 'system', persist: true, view: 'grid', thumbs: 128, sigColor: '#1c3faa', exportDpi: 150, autoKeep: false, lastTool: null, recentTools: [] },
+  d: { theme: 'system', region: 'auto', motion: 'system', persist: true, view: 'grid', thumbs: 128, sigColor: '#1c3faa', exportDpi: 150, autoKeep: false, previewDl: true, lastTool: null, recentTools: [] },
   v: null,
   load() {
     try { this.v = Object.assign({}, this.d, JSON.parse(localStorage.getItem(this.KEY) || '{}')); } catch (_) { this.v = Object.assign({}, this.d); }
@@ -5860,7 +5885,7 @@ const Store = Z.Store = {
     catch (e) { this.quotaWarn(e); }
   },
   metaOf(f) {
-    return { id: f.id, name: f.name, size: f.size, pages: f.pages, added: f.added, modified: f.modified, ver: f.ver, edits: f.edits, order: f.order, info: f.info || null, thumb: f.thumb || null };
+    return { id: f.id, name: f.name, size: f.size, pages: f.pages, added: f.added, modified: f.modified, ver: f.ver, edits: f.edits, order: f.order, info: f.info || null, thumb: f.thumb || null, sum: f.sum || null };
   },
   async delFile(id) {
     try { await this.run(['meta', 'blobs'], 'readwrite', (tx) => { tx.objectStore('meta').delete(id); tx.objectStore('blobs').delete(id); }); } catch (e) { console.warn(e); }
@@ -5940,12 +5965,46 @@ const Docs = Z.Docs = {
   get(id) { return this.files.find(f => f.id === id) || null; },
   sorted() { return this.files.slice().sort((a, b) => (b.modified || 0) - (a.modified || 0)); },
 
+  /* a fingerprint of a file's bytes — the same document added twice is
+     the same file, not a second copy in Recents */
+  async digest(bytes) {
+    try {
+      if (window.crypto && crypto.subtle && bytes.length) {
+        const h = await crypto.subtle.digest('SHA-256', bytes);
+        return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+    } catch (_) {}
+    let a = 0x811c9dc5, b = 0x01000193 ^ bytes.length;
+    for (let i = 0; i < bytes.length; i++) { a = Math.imul(a ^ bytes[i], 16777619); if ((i & 1023) === 0) b = Math.imul(b ^ a, 2246822507); }
+    return 'f' + (a >>> 0).toString(16) + (b >>> 0).toString(16) + bytes.length.toString(16);
+  },
+  async findSame(bytes, sum) {
+    for (const g of this.files) {
+      if (g.size !== bytes.length || this.hasEdits(g)) continue;
+      if (!g.sum) { try { g.sum = await this.digest(await this.raw(g)); } catch (_) { continue; } }
+      if (g.sum === sum) return g;
+    }
+    return null;
+  },
   async add(name, bytes, opts) {
     opts = opts || {};
+    let sum = null;
+    if (opts.dedupe !== false && bytes && bytes.length) {
+      sum = await this.digest(bytes);
+      const same = await this.findSame(bytes, sum);
+      if (same) {
+        same.modified = Date.now();
+        Store.putMeta(same);
+        Bus.emit('files', { touched: same });
+        if (!opts.quiet) toast('<b>' + esc(same.name) + '</b> is already in Files', { type: 'info', ms: 2400, sub: 'Same content — no second copy was made.' });
+        same.reused = true;
+        return same;
+      }
+    }
     const f = {
       id: uid('f'), name: safeName(name || 'document.pdf', 'pdf'), bytes, blob: null, size: bytes.length,
       pages: opts.pages || 0, ver: 1, added: Date.now(), modified: Date.now(), order: this.files.length,
-      edits: { objs: [], form: {}, rev: 0 }, info: opts.info || null, thumb: null, history: [], _blobDirty: true,
+      edits: { objs: [], form: {}, rev: 0 }, info: opts.info || null, thumb: null, history: [], _blobDirty: true, sum,
     };
     if (!f.pages) { try { f.pages = (await loadPdf(bytes)).getPageCount(); } catch (_) { f.pages = 0; } }
     this.files.push(f);
@@ -5982,6 +6041,7 @@ const Docs = Z.Docs = {
   },
   async replace(f, bytes, note, o) {
     o = o || {};
+    f.sum = null;
     const prev = await this.raw(f).catch(() => null);
     if (prev) {
       f.history.push({ bytes: prev, ver: f.ver, note: note || 'Change', at: Date.now(), edits: JSON.parse(JSON.stringify(f.edits)), pages: f.pages, name: f.name });
@@ -8842,6 +8902,107 @@ async function exportAs(bytes, fmt, o, P) {
   }
   throw new Error('Unknown format');
 }
+/* see exactly what will be downloaded before it is saved */
+async function previewDownload(items, o) {
+  o = o || {};
+  if (!items || !items.length) return null;
+  let cur = 0, token = 0;
+  const kindOf = (n) => { const e = extOf(n); return e === 'pdf' ? 'pdf' : /^(jpe?g|png|webp|gif|svg|bmp)$/.test(e) ? 'image' : /^(txt|csv|tsv|json|md|xml|html?|rtf|log)$/.test(e) ? 'text' : e === 'docx' ? 'docx' : /^(xlsx|xls|ods)$/.test(e) ? 'xlsx' : e === 'pptx' ? 'pptx' : e === 'zip' ? 'zip' : 'other'; };
+  const sizeOf = (it) => it.data.size || it.data.length || 0;
+  const bytesOf = async (it) => it.data instanceof Uint8Array ? it.data : new Uint8Array(await toBlob(it.data, it.name).arrayBuffer());
+  const total = items.reduce((t, it) => t + sizeOf(it), 0);
+  const body = h(`<div><div class="dlp-meta"><span class="badge gray">${plural(items.length, 'file')}</span><span>${fmtBytes(total)}${items.length > 1 ? ' · downloaded together as one ZIP' : ''}</span></div>
+    <div class="${items.length > 1 ? 'dlp' : ''}">${items.length > 1 ? `<div class="dlp-list">${items.slice(0, 200).map((it, i) => `<button type="button" data-i="${i}" class="${i ? '' : 'on'}"><span class="ell" style="display:block">${esc(it.name)}</span><small>${fmtBytes(sizeOf(it))}</small></button>`).join('')}</div>` : ''}<div class="dlp-view" id="dlp-view"><div class="dlp-spin"></div></div></div></div>`);
+  const view = $('#dlp-view', body);
+  const show = async (i) => {
+    cur = i; const my = ++token;
+    const it = items[i], k = kindOf(it.name);
+    view.innerHTML = '<div class="dlp-spin"></div>';
+    const done = (html) => { if (my === token) view.innerHTML = html; };
+    try {
+      if (k === 'pdf') {
+        const b = await bytesOf(it);
+        const pdf = await openPdfjs(b.slice());
+        if (my !== token) { pdf.destroy(); return; }
+        const n = pdf.numPages, lim = Math.min(n, 40);
+        view.innerHTML = '';
+        const w = Math.min(560, (view.clientWidth || 560) - 28);
+        for (let p = 1; p <= lim && my === token; p++) {
+          const page = await pdf.getPage(p), v = page.getViewport({ scale: 1 });
+          const cv = await renderPage(page, Math.min(2, (w * Math.min(2, window.devicePixelRatio || 1)) / v.width));
+          if (my !== token) { freeCanvas(cv); break; }
+          const img = document.createElement('img'); img.className = 'pg'; img.alt = 'Page ' + p; img.style.width = w + 'px';
+          img.src = cv.toDataURL('image/jpeg', 0.85); freeCanvas(cv);
+          view.appendChild(img); view.appendChild(h(`<div class="pgn">Page ${p} of ${n}</div>`));
+        }
+        if (n > lim && my === token) view.appendChild(h(`<div class="muted" style="font-size:13px">…and ${n - lim} more pages</div>`));
+        try { pdf.destroy(); } catch (_) {}
+      } else if (k === 'image') {
+        const u = URL.createObjectURL(toBlob(it.data, it.name));
+        done(`<img class="pg" src="${u}" alt="" style="max-width:100%">`);
+        setTimeout(() => URL.revokeObjectURL(u), 120000);
+      } else if (k === 'text') {
+        const t = new TextDecoder().decode((await bytesOf(it)).slice(0, 200000));
+        done(`<pre>${esc(t)}${sizeOf(it) > 200000 ? '\n…' : ''}</pre>`);
+      } else if (k === 'docx') {
+        await need('mammoth');
+        const b = await bytesOf(it);
+        const r = await mammoth.convertToHtml({ arrayBuffer: b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) });
+        const d = new DOMParser().parseFromString(r.value, 'text/html');
+        d.querySelectorAll('script,style,iframe,object,embed,link,meta').forEach(n => n.remove());
+        d.querySelectorAll('*').forEach(n => Array.from(n.attributes).forEach(a => { if (/^on/i.test(a.name) || (/^(href|src)$/i.test(a.name) && /^\s*javascript:/i.test(a.value))) n.removeAttribute(a.name); }));
+        done(`<div class="doc">${d.body.innerHTML || '<i>This document is empty</i>'}</div>`);
+      } else if (k === 'xlsx') {
+        await need('xlsx');
+        const wb = XLSX.read(await bytesOf(it), { type: 'array' });
+        const sn = wb.SheetNames[0];
+        const html = XLSX.utils.sheet_to_html(wb.Sheets[sn], { editable: false });
+        const d = new DOMParser().parseFromString(html, 'text/html');
+        d.querySelectorAll('script,style').forEach(n => n.remove());
+        done(`<div class="doc" style="font-family:Arial,sans-serif"><div class="muted" style="font-size:12px;margin-bottom:8px">${esc(sn)}${wb.SheetNames.length > 1 ? ' · ' + plural(wb.SheetNames.length, 'sheet') : ''}</div>${(d.querySelector('table') || d.body).outerHTML}</div>`);
+      } else if (k === 'pptx' || k === 'zip') {
+        if (!window.JSZip) throw new Error('zip reader missing');
+        const z = await JSZip.loadAsync(await bytesOf(it));
+        if (k === 'pptx') {
+          const slides = Object.keys(z.files).filter(n => /^ppt\/slides\/slide\d+\.xml$/.test(n)).sort((a, b) => +a.match(/\d+/)[0] - +b.match(/\d+/)[0]);
+          const out = [];
+          for (const sl of slides.slice(0, 30)) {
+            const x = await z.file(sl).async('string');
+            const runs = Array.from(x.matchAll(/<a:t>([^<]*)<\/a:t>/g)).map(m => m[1]).filter(t => t.trim());
+            out.push(`<div class="slide"><b>${esc(runs[0] || 'Slide ' + (out.length + 1))}</b>${esc(runs.slice(1, 14).join(' · '))}</div>`);
+          }
+          done(out.join('') || '<div class="muted">No slides</div>');
+        } else {
+          const names = Object.keys(z.files).filter(n => !z.files[n].dir);
+          done(`<pre>${esc(names.slice(0, 500).join('\n'))}${names.length > 500 ? '\n…' : ''}</pre>`);
+        }
+      } else done(`<div class="muted" style="padding:30px;text-align:center">${esc(it.name)}<br>${fmtBytes(sizeOf(it))} — no preview for this type</div>`);
+    } catch (e) {
+      console.warn('[ZenPDF] preview', e);
+      done(`<div class="muted" style="padding:30px;text-align:center">Preview isn’t available for this file, but it is ready to download.</div>`);
+    }
+  };
+  body.addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (!b) return; $$('[data-i]', body).forEach(x => x.classList.toggle('on', x === b)); show(+b.dataset.i); });
+  const foot = [{ label: o.back ? 'Back' : 'Cancel', value: null }];
+  if (o.share && canShareFiles()) foot.push({ label: 'Share', icon: 'share', value: 'share' });
+  foot.push({ label: items.length > 1 ? 'Download all' : 'Download', icon: 'download', kind: 'primary', id: 'dl', value: 'download' });
+  const s = sheet({ title: o.title || 'Preview', sub: items.length === 1 ? esc(items[0].name) + ' · ' + fmtBytes(sizeOf(items[0])) : 'Check everything before it is saved', body, foot, size: 'xwide', enter: 'dl' });
+  setTimeout(() => show(0), 60);
+  const r = await s.result;
+  token++;
+  return r;
+}
+/* every download in the app comes through here: preview first (unless
+   turned off in Settings), then save */
+async function deliverChecked(items, zipName, how, o) {
+  if (Settings.get('previewDl') !== false && !(o && o.noPreview)) {
+    const r = await previewDownload(items, Object.assign({ share: how === 'share' }, o || {}));
+    if (!r) return false;
+    how = r;
+  }
+  await deliver(items, zipName, how);
+  return true;
+}
 async function deliver(items, zipName, how) {
   if (!items.length) return;
   if (how === 'share') {
@@ -8889,15 +9050,18 @@ function exportSheet(f, o) {
       else if (st.pages === 'current') pages = [o.current];
     } catch (e) { toast(esc(e.message), 'err'); $('#ex-range', body).classList.add('err'); return false; }
     api.close(true);
+    let items = null;
     await withProgress({ title: 'Preparing ' + (fmts.find(x => x.id === st.fmt) || {}).label, sub: f.name }, async (P) => {
       try {
         const bytes = await Docs.bytes(f, st.fmt === 'pdf-flat' ? { flatten: true } : undefined);
-        const items = await exportAs(bytes, st.fmt, { name: st.name, pages, total: f.pages, dpi: st.dpi }, P);
-        P.sub('Saving…');
-        await deliver(items, st.name + (items.length > 1 ? ' ' + st.fmt.toUpperCase() : ''), how);
-        if (how !== 'share') toast('Downloaded <b>' + esc(items.length > 1 ? items.length + ' files' : items[0].name) + '</b>', { type: 'ok' });
-      } catch (e) { fail(e, 'Download failed'); }
+        items = await exportAs(bytes, st.fmt, { name: st.name, pages, total: f.pages, dpi: st.dpi }, P);
+      } catch (e) { items = null; fail(e, 'Download failed'); }
     });
+    if (!items || !items.length) return false;
+    try {
+      const ok = await deliverChecked(items, st.name + (items.length > 1 ? ' ' + st.fmt.toUpperCase() : ''), how, { title: 'Preview download' });
+      if (ok && how !== 'share') toast('Downloaded <b>' + esc(items.length > 1 ? items.length + ' files' : items[0].name) + '</b>', { type: 'ok' });
+    } catch (e) { fail(e, 'Download failed'); }
     return false;
   };
   const foot = [{ label: 'Cancel', value: null }];
@@ -8941,7 +9105,7 @@ function resultSheet(results, ctx) {
   };
   body.addEventListener('click', async (e) => {
     const dl = e.target.closest('[data-dl]'), pv = e.target.closest('[data-pv]'), op = e.target.closest('[data-open]');
-    if (dl) { const r = results[+dl.dataset.dl]; downloadBlob(toBlob(r.data, r.name), r.name); }
+    if (dl) { const r = results[+dl.dataset.dl]; await deliverChecked([r], r.name, 'download', { back: true }); }
     if (pv) { const r = results[+pv.dataset.pv]; previewSheet(r.data, r.name); }
     if (op) {
       const r = results[+op.dataset.open];
@@ -8960,8 +9124,8 @@ function resultSheet(results, ctx) {
   } });
   if (pdfs.length) foot.push({ label: pdfs.length > 1 ? 'Save all to Files' : 'Save to Files', icon: 'folder', click: async (a) => { await keep(); a.close('kept'); return false; } });
   foot.push({ label: results.length > 1 ? 'Download all' : 'Download', icon: 'download', kind: 'primary', id: 'dl', click: async () => {
-    await deliver(results, ctx.zipName || (ctx.title || 'ZenPDF') + ' results');
-    toast('Downloaded', { type: 'ok', ms: 1800 });
+    const ok = await deliverChecked(results, ctx.zipName || (ctx.title || 'ZenPDF') + ' results', 'download', { back: true });
+    if (ok) toast('Downloaded', { type: 'ok', ms: 1800 });
     return false;
   } });
   const api = sheet({ title: '', body, foot, size: results.length > 1 ? 'wide' : '', enter: 'dl', cls: 'result' });
@@ -10310,13 +10474,16 @@ function renderSettings(v) {
     <div class="group-title">Smart Autofill</div><div class="group">
       <div class="cell"><div class="c-main"><div class="c-title">Region</div><div class="c-sub">How dates, phone numbers, PIN/ZIP codes and money are written</div></div><select class="input sm" id="st-region" style="width:150px"><option value="auto">Automatic (${regionNow() === 'IN' ? 'India' : regionNow() === 'US' ? 'US' : 'International'})</option><option value="IN">India</option><option value="US">United States</option><option value="INTL">International</option></select></div>
       <button class="cell tap" data-act="profiles"><div class="c-main"><div class="c-title">My details & profiles</div><div class="c-sub">The answers Autofill uses — kept only here</div></div><span class="chev">${icon('chev-r', 'sm')}</span></button>
-      <button class="cell tap" data-act="forget"><div class="c-main"><div class="c-title">Forget learned corrections</div><div class="c-sub">Autofill remembers fixes you made on each form</div></div></button>
+      <button class="cell tap" data-act="afexport"><div class="c-main"><div class="c-title">Back up Autofill data</div><div class="c-sub">Profiles and the fixes Autofill learned — as a file you keep safe</div></div><span class="chev">${icon('download', 'sm')}</span></button>
+      <button class="cell tap" data-act="afimport"><div class="c-main"><div class="c-title">Restore from a backup</div><div class="c-sub">Bring profiles and learned fixes to this device or browser</div></div><span class="chev">${icon('upload', 'sm')}</span></button>
+      <button class="cell tap danger" data-act="forget"><div class="c-main"><div class="c-title">Forget learned corrections</div><div class="c-sub">Autofill remembers fixes you made on each form</div></div></button>
     </div>
     <div class="group-title">Signatures</div><div class="group">
       <button class="cell tap" data-act="sigs"><div class="c-main"><div class="c-title">Saved signatures</div><div class="c-sub">${plural(sigs.length, 'signature')}</div></div><span class="chev">${icon('chev-r', 'sm')}</span></button>
     </div>
     <div class="group-title">Storage</div><div class="group">
       <div class="cell"><div class="c-main"><div class="c-title">Keep my workspace</div><div class="c-sub">Files and edits stay on this device between visits</div></div>${switchHtml('st-persist', s.get('persist'))}</div>
+      <div class="cell"><div class="c-main"><div class="c-title">Preview before downloading</div><div class="c-sub">See every page or file before it is saved</div></div>${switchHtml('st-pdl', s.get('previewDl') !== false)}</div>
       <div class="cell"><div class="c-main"><div class="c-title">Keep tool results automatically</div><div class="c-sub">New files from tools are saved to Files</div></div>${switchHtml('st-keep', s.get('autoKeep'))}</div>
       <div class="cell"><div class="c-main"><div class="c-title">Space used</div><div class="c-sub" id="st-usage">Measuring…</div></div></div>
       <button class="cell tap danger" data-act="clear"><div class="c-main"><div class="c-title">Remove all files</div></div></button>
@@ -10337,13 +10504,16 @@ function renderSettings(v) {
     else { await Store.clear(); toast('Files will be forgotten when you close ZenPDF', { type: 'info' }); }
   };
   $('#st-keep', v).onchange = (e) => s.set('autoKeep', e.target.checked);
+  $('#st-pdl', v).onchange = (e) => s.set('previewDl', e.target.checked);
   Store.usage().then(u => { const el = $('#st-usage', v); if (el) el.textContent = u ? fmtBytes(u.usage || 0) + ' of ' + fmtBytes(u.quota || 0) + ' available to ZenPDF' : 'Not available in this browser'; });
   if (!Z.installEvt && !/iPhone|iPad/.test(navigator.userAgent)) { const ib = $('#st-install', v); if (matchMedia('(display-mode: standalone)').matches) { ib.querySelector('.c-sub').textContent = 'Installed — you’re using the app'; ib.disabled = true; } }
   v.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-act]'); if (!b) return;
     const a = b.dataset.act;
     if (a === 'profiles') Z.Autofill.manageProfiles();
-    else if (a === 'forget') { const ok = await confirmBox('Forget corrections?', 'Autofill will match every form fresh again.', { ok: 'Forget', danger: true }); if (ok) { const db = await KV.db().catch(() => null); if (db) { const tx = db.transaction('kv', 'readwrite'); const st2 = tx.objectStore('kv'); const keys = await new Promise(r => { const q2 = st2.getAllKeys(); q2.onsuccess = () => r(q2.result); q2.onerror = () => r([]); }); keys.filter(k => /^mem:/.test(k)).forEach(k => st2.delete(k)); } toast('Forgotten', { type: 'ok' }); } }
+    else if (a === 'afexport') { try { const d = await AFMem.exportAll(); toast('Backup saved', { type: 'ok', sub: plural((d.profiles || []).length, 'profile') + ' · ' + plural(Object.keys(d.memory || {}).length, 'form') + ' of learned fixes' }); } catch (err) { fail(err, 'Backup failed'); } }
+    else if (a === 'afimport') { const [f] = await pickFiles({ multiple: false, accept: '.json,application/json' }); if (!f) return; try { const r = await AFMem.importFile(f); toast('Restored', { type: 'ok', sub: plural(r.profiles, 'profile') + ' · ' + plural(r.forms, 'form') + ' of learned fixes' }); } catch (err) { fail(err, 'Couldn’t restore'); } }
+    else if (a === 'forget') { const ok = await confirmBox('Forget corrections?', 'Autofill will match every form fresh again. Back up first if you might want them later.', { ok: 'Forget', danger: true }); if (ok) { await AFMem.clear(); toast('Forgotten', { type: 'ok' }); } }
     else if (a === 'sigs') { await Z.Sign.manage(); renderSettings(v); }
     else if (a === 'clear') { if (!Docs.files.length) { toast('There are no files', 'info'); return; } const ok = await confirmBox('Remove all files?', plural(Docs.files.length, 'file') + ' will be removed from this device. This can’t be undone.', { ok: 'Remove all', danger: true }); if (ok) { Docs.files.slice().forEach(f => Docs.remove(f.id)); await Store.clear(); toast('All files removed', { type: 'ok' }); } }
     else if (a === 'install') installApp();
@@ -12297,7 +12467,7 @@ const Editor = Z.Editor = {
           inp.title = a.alternativeText || name;
           inp.addEventListener('focus', () => { this.formBefore = this.snap(); });
           inp.addEventListener('input', () => { vals[name] = inp.value; node.classList.add('filled'); node.classList.remove('auto'); this.syncField(name, P); Docs.setEdits(this.f, this.edits, true); });
-          inp.addEventListener('change', () => { if (this.formBefore) { this.push(this.formBefore); this.formBefore = null; } });
+          inp.addEventListener('change', () => { if (this.formBefore) { this.push(this.formBefore); this.formBefore = null; } try { Z.Autofill.noteEdit(this, name, inp.value); } catch (_) {} });
           inp.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter' && !a.multiLine) { e.preventDefault(); this.focusNextField(inp, e.shiftKey); } if (e.key === 'Tab') { e.preventDefault(); this.focusNextField(inp, e.shiftKey); } });
         } else if (a.fieldType === 'Btn' && (a.checkBox || a.radioButton)) {
           const isR = !!a.radioButton;
@@ -12311,13 +12481,14 @@ const Editor = Z.Editor = {
             this.push(before);
             Docs.setEdits(this.f, this.edits, true);
             this.syncField(name);
+            try { Z.Autofill.noteEdit(this, name, vals[name]); } catch (_) {}
           });
         } else if (a.fieldType === 'Ch') {
           const v = has ? vals[name] : (Array.isArray(a.fieldValue) ? a.fieldValue[0] : a.fieldValue);
           node = h(`<div class="fw ${a.readOnly ? 'ro' : ''}" data-f="${attr(name)}" style="${pos}"><select style="${fontCss}" ${a.readOnly ? 'disabled' : ''}><option value=""></option>${(a.options || []).map(op => `<option value="${attr(op.exportValue)}">${esc(op.displayValue)}</option>`).join('')}</select></div>`);
           const sel = $('select', node); sel.value = v == null ? '' : String(v);
           if (v && sel.value !== String(v)) { sel.appendChild(h(`<option value="${attr(v)}">${esc(v)}</option>`)); sel.value = String(v); }
-          sel.addEventListener('change', () => { const before = this.snap(); vals[name] = sel.value; this.push(before); Docs.setEdits(this.f, this.edits, true); this.syncField(name, P); node.classList.add('filled'); });
+          sel.addEventListener('change', () => { const before = this.snap(); vals[name] = sel.value; this.push(before); Docs.setEdits(this.f, this.edits, true); this.syncField(name, P); node.classList.add('filled'); try { Z.Autofill.noteEdit(this, name, sel.value); } catch (_) {} });
         } else if (a.fieldType === 'Sig') {
           node = h(`<button type="button" class="fw ck" data-sigfield style="${pos};color:var(--accent);font-size:calc(10px * var(--z));font-weight:600;display:grid;place-items:center">${icon('sign', 'sm')}</button>`);
           node.title = 'Sign here';
@@ -13009,6 +13180,474 @@ const NICE = {
   dea_number: 'DEA number', dea_expiration_date: 'DEA expiry', board_name: 'Certifying board', practice_name: 'Practice name', practice_address_line1: 'Practice address', practice_city: 'Practice city', practice_state: 'Practice state', practice_zip: 'Practice ZIP', practice_phone: 'Practice phone',
   malpractice_carrier: 'Malpractice carrier', malpractice_policy_number: 'Policy number', malpractice_expiration_date: 'Policy expiry', hospital_name: 'Hospital affiliation', group_npi: 'Group NPI',
 };
+/* ==================================================================
+   Printout reader — understands flattened, already-filled forms
+   (CAQH ProView application printouts, payer applications printed to
+   PDF, any form where the answers are typed text over printed labels).
+
+   Each page's text is split into LABELS (the form's own small print) and
+   VALUES (what was typed in — a different, larger font).  Every value is
+   tied to the label under it or just before it on the same line; an "X"
+   is tied to the option word right after it (YES / NO / MALE …) and to
+   the question it answers.  The sidebar heading it sits under ("Home
+   Address", "Billing Contact", "Work History") becomes its context.
+   ================================================================== */
+(function (root) {
+'use strict';
+const OPTION_WORDS = /^(yes|no|male|female|non-?binary|individual|shared|hmo|ppo|pos|other|internship\/?\s*residency|fellowship|solo practice|single specialty group|multi-specialty group|answering service|voice mail.*|use individual tax id|use group tax id|u\.?s\.? or canadian graduate|fifth pathway graduate|non-u\.?s\.?\/canadian graduate|none|male only|female only|bus|subway|regional train)\*?$/i;
+const NOISE = /^(required response|\*|page \d+|std\. app|implemented in|code lists? (is|are) found|use (license status|provider type) codes|3-digit code|associated 3-digit|in the space provided|a=am|p=pm|start$|end$|-$|,$|\$$|%$|#$)/i;
+
+function norm(s) { return String(s || '').replace(/\s+/g, ' ').trim(); }
+
+/* items of one page -> { values, labels, heads, title } */
+function splitPage(items, H) {
+  const all = items.filter(it => it.str && it.str.trim()).map(it => {
+    const t = it.transform;
+    const h = Math.hypot(t[2], t[3]) || it.height || 0;
+    return { s: norm(it.str), x: t[4], y: H - t[5], h, w: it.width || 0, font: it.fontName || '' };
+  });
+  /* which fonts carry the typed-in answers: not the form's capitalised
+     labels, not its instructions — everything else on the page body */
+  const byFont = new Map();
+  all.forEach(it => { if (!byFont.has(it.font)) byFont.set(it.font, []); byFont.get(it.font).push(it); });
+  const valueFonts = new Set();
+  byFont.forEach((arr, font) => {
+    const B = arr.filter(it => it.y > 40 && it.y < 728 && it.x >= 95);
+    if (!B.length) return;
+    const labelish = B.filter(it => !/[a-z]/.test(it.s) && /[A-Z]{2,}/.test(it.s) && (it.s.length > 5 || / /.test(it.s)) && !/\d/.test(it.s)).length;
+    const prose = B.filter(it => /[a-z]/.test(it.s) && it.s.split(' ').length >= 4 && !/@/.test(it.s)).length;
+    const headish = B.filter(it => it.h >= 8.8 && /[a-z]/.test(it.s) && it.y < 200).length;
+    if (labelish / B.length < 0.3 && prose / B.length < 0.5 && headish < B.length) valueFonts.add(font);
+  });
+  if (!valueFonts.size) return null;
+  const values = [], labels = [], heads = [];
+  let title = '';
+  all.forEach(it => {
+    if (valueFonts.has(it.font) && it.y > 40 && it.y < 728 && it.x >= 95) { values.push(it); return; }
+    if (it.x < 98 && it.h >= 8.8 && it.h < 13 && !/^section \d/i.test(it.s)) { heads.push(it); return; }
+    if (it.x >= 98 && it.h >= 8.8 && it.h < 13 && it.y < 200 && !title && !/^section \d$/i.test(it.s)) { title = it.s; return; }
+    if (it.h < 7.6 && it.x >= 98 && !NOISE.test(it.s)) labels.push(it);
+  });
+  /* two-line sidebar headings ("Office Manager / or Business / Office Staff") */
+  heads.sort((a, b) => a.y - b.y);
+  const H2 = [];
+  heads.forEach(hd => { const p = H2[H2.length - 1]; if (p && hd.y - p.yEnd <= 13.5 && Math.abs(hd.x - p.x) < 4) { p.s += ' ' + hd.s; p.yEnd = hd.y; } else H2.push(Object.assign({}, hd, { yEnd: hd.y })); });
+  /* labels that continue on the next line belong together */
+  labels.sort((a, b) => a.y - b.y || a.x - b.x);
+  const L = [];
+  labels.forEach(lb => {
+    const p = L.slice().reverse().find(q => Math.abs(q.x - lb.x) < 2.5 && lb.y - q.yEnd > 3 && lb.y - q.yEnd <= 8.6);
+    if (p && !OPTION_WORDS.test(p.s) && !OPTION_WORDS.test(lb.s) && !/\*$/.test(p.s)) { p.s = /-$/.test(p.s) ? p.s.slice(0, -1) + lb.s : p.s + ' ' + lb.s; p.yEnd = lb.y; p.w = Math.max(p.w, lb.w); }
+    else L.push(Object.assign({}, lb, { yEnd: lb.y }));
+  });
+  /* values typed as several pieces on one line join up */
+  values.sort((a, b) => a.y - b.y || a.x - b.x);
+  const V = [];
+  values.forEach(v => {
+    const p = V[V.length - 1];
+    if (p && Math.abs(p.y - v.y) < 2.5 && v.x - (p.x + p.w) < 5 && v.x - (p.x + p.w) > -2 && p.s !== 'X' && v.s !== 'X') { p.s += (/[,(]$/.test(p.s) ? '' : ' ') + v.s; p.w = v.x + v.w - p.x; }
+    else V.push(Object.assign({}, v));
+  });
+  return { values: V, labels: L, heads: H2, title };
+}
+
+function headAt(heads, y, carry) {
+  let h = carry || '';
+  heads.forEach(hd => { if (hd.y <= y + 6) h = hd.s; });
+  return h;
+}
+
+/* -> [{ key, value, ctx, page, y, x, kind }] */
+function pairsFromPage(pg, pageNo, carry) {
+  const out = [];
+  const { values, labels, heads, title } = pg;
+  const optionOf = (v) => labels.filter(l => Math.abs(l.y - v.y) < 6.5 && l.x >= v.x + v.w - 1 && l.x - (v.x + v.w) < 26).sort((a, b) => a.x - b.x)[0];
+  const optionSet = new Set();
+  values.forEach(v => { if (v.s === 'X') { const o = optionOf(v); if (o) optionSet.add(o); } });
+  labels.forEach(l => { if (OPTION_WORDS.test(l.s)) optionSet.add(l); });
+  values.forEach(v => {
+    const ctx = headAt(heads, v.y, carry);
+    if (v.s === 'X') {
+      const opt = optionOf(v);
+      /* the question: nearest non-option label on that line, then just above */
+      const cands = labels.filter(l => !optionSet.has(l) && l !== opt && Math.abs(l.yEnd - v.y) < 13 && !/^(\(|code list)/i.test(l.s));
+      let q = null, qd = 1e9;
+      cands.forEach(l => {
+        const dx = l.x > v.x ? l.x - (v.x + v.w) : Math.max(0, v.x - (l.x + l.w));
+        const dy = Math.min(Math.abs(l.yEnd - v.y), Math.abs(l.y - v.y));
+        const d = dx + dy * 6 + (l.x > v.x ? 20 : 0);
+        if (d < qd) { qd = d; q = l; }
+      });
+      if (q && /^\d{1,2}\.?$/.test(q.s)) {
+        const right = labels.filter(l => !optionSet.has(l) && l.x > v.x + v.w && Math.abs(l.y - v.y) < 7 && !/^\d{1,2}\.?$/.test(l.s)).sort((a, b) => a.x - b.x)[0];
+        if (right) q = { s: q.s + ' ' + right.s };
+      }
+      if (opt) out.push({ key: q ? q.s : opt.s, value: opt.s.replace(/\*$/, ''), opt: opt.s, ctx, page: pageNo, y: v.y, x: v.x, kind: 'mark' });
+      else if (q) out.push({ key: q.s, value: 'Yes', ctx, page: pageNo, y: v.y, x: v.x, kind: 'mark' });
+      return;
+    }
+    /* the label under the value… */
+    let lab = null, ld = 1e9;
+    labels.forEach(l => {
+      if (optionSet.has(l)) return;
+      const dy = l.y - v.y;
+      if (dy < 4.5 || dy > 16.5) return;
+      if (l.x < v.x - 14 || l.x > v.x + Math.max(v.w, 24) + 4) return;
+      const d = dy + Math.abs(l.x - v.x) * 0.25;
+      if (d < ld) { ld = d; lab = l; }
+    });
+    /* …or just before it on the same line */
+    let left = null, gd = 1e9;
+    labels.forEach(l => {
+      if (optionSet.has(l)) return;
+      if (Math.abs(l.yEnd - v.y) > 4.5 && Math.abs(l.y - v.y) > 4.5) return;
+      const gap = v.x - (l.x + l.w);
+      if (gap < -2 || gap > 70) return;
+      if (gap < gd) { gd = gap; left = l; }
+    });
+    let pick = left && (gd < 14 || !lab) ? left : lab;
+    if (!pick && ctx && v.s.length <= 40) pick = { s: ctx };
+    if (!pick) return;
+    out.push({ key: pick.s.replace(/\s*\*$/, ''), value: v.s, ctx, title, page: pageNo, y: v.y, x: v.x, kind: 'text' });
+  });
+  return { pairs: out, carry: heads.length ? heads[heads.length - 1].s : carry };
+}
+
+async function readPrintout(pdf, opts) {
+  opts = opts || {};
+  const maxPages = Math.min(pdf.numPages, opts.maxPages || 80);
+  const pairs = [];
+  let carry = '', text = '', valuePages = 0;
+  for (let i = 1; i <= maxPages; i++) {
+    const page = await pdf.getPage(i);
+    const vp = page.getViewport({ scale: 1 });
+    const tc = await page.getTextContent();
+    text += tc.items.map(x => x.str).join(' ') + '\n';
+    const pg = splitPage(tc.items, vp.height);
+    if (!pg || !pg.values.length || !pg.labels.length) continue;
+    valuePages++;
+    const r = pairsFromPage(pg, i, carry);
+    carry = r.carry;
+    r.pairs.forEach(p => pairs.push(p));
+  }
+  return { pairs, text, valuePages, isCaqh: /CAQH\s+Provider\s+ID/i.test(text) && /Std\.?\s*App/i.test(text) };
+}
+
+/* ---------------- CAQH: label + section -> exact meaning ---------------- */
+const C = (ctx, key, concept, extra) => Object.assign({ ctx, key, concept }, extra || {});
+const CAQH_RULES = [
+  /* name & personal */
+  C(/^name$/i, /^last name/i, 'provider_last_name'), C(/^name$/i, /^first name/i, 'provider_first_name'),
+  C(/^name$/i, /^middle name/i, 'provider_middle_name'), C(/^name$/i, /^suffix/i, 'provider_suffix'),
+  C(/^name$/i, /^other last name/i, 'provider_other_name'),
+  C(/./, /practice exclusively within the inpatient/i, 'facility_based'),
+  C(/^provider type/i, /^provider type$/i, 'provider_type_code'),
+  C(/general information/i, /^gender/i, 'provider_gender'), C(/general information/i, /^date of birth/i, 'provider_dob'),
+  C(/general information/i, /^ssn/i, 'provider_ssn'), C(/general information/i, /^city of birth/i, 'provider_birth_city'),
+  C(/general information/i, /^state of birth/i, 'provider_birth_state'), C(/general information/i, /^country of birth/i, 'provider_birth_country'),
+  C(/general information/i, /^language/i, 'provider_languages'),
+  C(/./, /practice exclusively within the inpatient/i, 'facility_based'),
+  C(/./, /ever used another name/i, 'provider_used_other_name'),
+  C(/home address/i, /^(number )?street|^address/i, 'home_address_line1'), C(/home address/i, /^suite/i, 'home_address_line2'),
+  C(/home address/i, /^city/i, 'home_city'), C(/home address/i, /^state/i, 'home_state'), C(/home address/i, /^zip/i, 'home_zip'),
+  C(/home address/i, /^e-?mail/i, 'provider_email'), C(/home address/i, /^telephone/i, 'provider_home_phone'), C(/home address/i, /^fax/i, 'provider_fax'),
+  /* IDs */
+  C(/professional ids/i, /^state license number/i, 'license_number', { anchor: 'license' }), C(/professional ids/i, /^license issuing state/i, 'license_state', { block: 'license' }),
+  C(/professional ids/i, /^license issue date/i, 'license_issue_date', { block: 'license' }), C(/professional ids/i, /^license expiration date/i, 'license_expiration_date', { block: 'license' }),
+  C(/professional ids/i, /^license status/i, 'license_status', { block: 'license' }), C(/professional ids/i, /^license type/i, 'license_type', { block: 'license' }),
+  C(/professional ids/i, /currently practicing in this state/i, 'license_currently_practicing', { block: 'license' }),
+  C(/professional ids/i, /^federal dea number/i, 'dea_number'), C(/professional ids/i, /^dea state/i, 'dea_state'),
+  C(/professional ids/i, /^dea issue date/i, 'dea_issue_date'), C(/professional ids/i, /^dea expiration/i, 'dea_expiration_date'),
+  C(/professional ids/i, /^cds certificate/i, 'cds_number'), C(/professional ids/i, /^cds state/i, 'cds_state'),
+  C(/professional ids/i, /^cds issue/i, 'cds_issue_date'), C(/professional ids/i, /^cds expiration/i, 'cds_expiration_date'),
+  C(/./, /national provider identification|^npi/i, 'provider_npi'), C(/./, /^medicare number/i, 'provider_medicare_ptan'),
+  C(/./, /^medicaid number/i, 'provider_medicaid_number'), C(/./, /^medicaid state/i, 'provider_medicaid_state'),
+  C(/./, /^upin/i, 'provider_upin'), C(/./, /^ecfmg number/i, 'provider_ecfmg_number'), C(/./, /^ecfmg certificate issue/i, 'provider_ecfmg_issue_date'),
+  C(/./, /participating medicare provider/i, 'provider_medicare_enrolled'), C(/./, /participating medicaid provider/i, 'provider_medicaid_enrolled'),
+  C(/./, /^usmle/i, 'provider_usmle_number'), C(/./, /^workers comp/i, 'provider_workers_comp_number'),
+  /* education */
+  C(/undergraduate/i, /^official name|^undergraduate school/i, 'education_school_name', { idxFixed: 1 }),
+  C(/professional school/i, /^name of u\.?s|^official name|^professional\/medical school/i, 'education_school_name', { idxFixed: 0 }),
+  C(/professional school/i, /^start date/i, 'education_start_date', { idxFixed: 0 }), C(/professional school/i, /^end date/i, 'education_end_date', { idxFixed: 0 }),
+  C(/professional school/i, /^degree/i, 'education_degree', { idxFixed: 0 }), C(/professional school/i, /^address/i, 'education_address', { idxFixed: 0 }),
+  C(/professional school/i, /^city/i, 'education_city', { idxFixed: 0 }), C(/professional school/i, /^state/i, 'education_state', { idxFixed: 0 }),
+  C(/professional school/i, /^country/i, 'education_country', { idxFixed: 0 }), C(/professional school/i, /^(zip|postal)/i, 'education_zip', { idxFixed: 0 }),
+  C(/undergraduate/i, /^start date/i, 'education_start_date', { idxFixed: 1 }), C(/undergraduate/i, /^end date/i, 'education_end_date', { idxFixed: 1 }), C(/undergraduate/i, /^degree/i, 'education_degree', { idxFixed: 1 }),
+  C(/^training/i, /^institution/i, 'training_institution', { anchor: 'training' }), C(/^training/i, /^department/i, 'training_specialty', { block: 'training' }),
+  C(/^training/i, /^start date/i, 'training_start_date', { block: 'training' }), C(/^training/i, /^end date/i, 'training_end_date', { block: 'training' }),
+  /* specialty & board */
+  C(/primary specialty/i, /specialty/i, 'specialty_primary'), C(/secondary specialty/i, /specialty/i, 'specialty_secondary'),
+  C(/primary specialty/i, /^board certified/i, 'board_certified'), C(/primary specialty/i, /^certifying board/i, 'board_name'),
+  C(/primary specialty/i, /^initial certification/i, 'board_initial_date'), C(/primary specialty/i, /^recertification/i, 'board_recert_date'), C(/primary specialty/i, /^expiration/i, 'board_expiration_date'),
+  /* contacts */
+  C(/credentialing contact/i, /^last name/i, 'cc_last'), C(/credentialing contact/i, /^first name/i, 'cc_first'),
+  C(/credentialing contact/i, /^e-?mail/i, 'group_contact_email'), C(/credentialing contact/i, /^telephone/i, 'group_contact_phone'), C(/credentialing contact/i, /^fax/i, 'group_contact_fax'),
+  /* practice location */
+  C(/practice location/i, /^physician group|practice name to appear/i, 'practice_name', { loc: true }),
+  C(/practice location/i, /^group \/ corporate name|as it appears on w-?9/i, 'group_legal_name', { loc: true }),
+  C(/practice location/i, /^number|^street/i, 'practice_address_line1', { loc: true }), C(/practice location/i, /^suite/i, 'practice_address_line2', { loc: true }),
+  C(/practice location/i, /^city/i, 'practice_city', { loc: true }), C(/practice location/i, /^state/i, 'practice_state', { loc: true }), C(/practice location/i, /^zip/i, 'practice_zip', { loc: true }),
+  C(/practice location/i, /^telephone/i, 'practice_phone', { loc: true }), C(/practice location/i, /^fax/i, 'practice_fax', { loc: true }),
+  C(/practice location/i, /^office e-?mail/i, 'practice_email', { loc: true }),
+  C(/practice location/i, /^group tax id/i, 'group_tin', { loc: true }),
+  C(/practice location/i, /^individual tax id/i, 'provider_individual_tin', { loc: true }),
+  C(/practice location/i, /^primary tax id/i, 'primary_tin_choice', { loc: true }),
+  C(/practice location/i, /previous or future start date/i, 'practice_start_date', { loc: true }),
+  C(/practice location/i, /currently practicing at this address/i, 'practice_current', { loc: true }),
+  C(/office manager/i, /^last name/i, 'om_last', { loc: true }), C(/office manager/i, /^first name/i, 'om_first', { loc: true }),
+  C(/office manager/i, /^telephone/i, 'practice_contact_phone', { loc: true }), C(/office manager/i, /^fax/i, 'practice_contact_fax', { loc: true }),
+  C(/office manager/i, /^e-?mail/i, 'practice_contact_email', { loc: true }),
+  C(/billing contact/i, /^last name/i, 'bc_last', { loc: true }), C(/billing contact/i, /^first name/i, 'bc_first', { loc: true }),
+  C(/billing contact/i, /^number|^street/i, 'billing_address_line1', { loc: true }), C(/billing contact/i, /^city/i, 'billing_city', { loc: true }),
+  C(/billing contact/i, /^state/i, 'billing_state', { loc: true }), C(/billing contact/i, /^zip/i, 'billing_zip', { loc: true }),
+  C(/billing contact/i, /^telephone/i, 'billing_phone', { loc: true }), C(/billing contact/i, /^e-?mail/i, 'billing_email', { loc: true }),
+  C(/payment and remittance/i, /^check payable to/i, 'payee_name', { loc: true }),
+  C(/payment and remittance/i, /electronic billing/i, 'electronic_claims', { loc: true }),
+  C(/open practice/i, /^accept new patients into/i, 'practice_accepting_new_patients', { loc: true }),
+  C(/services/i, /^additional office procedures/i, 'practice_procedures', { loc: true }),
+  C(/./, /^type of practice/i, 'practice_group_type', { loc: true }),
+  /* hospital */
+  C(/hospital privileges/i, /^hospital name/i, 'hospital_name', { anchor: 'hosp' }), C(/admitting arrangements/i, /hospital privileges/i, 'hospital_has_privileges'),
+  /* insurance */
+  C(/liability insurance/i, /^carrier or self-insured name/i, 'malpractice_carrier', { anchor: 'ins' }),
+  C(/liability insurance/i, /^policy number/i, 'malpractice_policy_number', { block: 'ins' }),
+  C(/liability insurance/i, /^effective date/i, 'malpractice_effective_date', { block: 'ins' }), C(/liability insurance/i, /^original effective/i, 'malpractice_original_effective_date', { block: 'ins' }),
+  C(/liability insurance/i, /^expiration date/i, 'malpractice_expiration_date', { block: 'ins' }),
+  C(/liability insurance/i, /per occurrence/i, 'malpractice_per_occurrence', { block: 'ins' }), C(/liability insurance/i, /aggregate/i, 'malpractice_aggregate', { block: 'ins' }),
+  C(/liability insurance/i, /^number|^street/i, 'malpractice_carrier_address', { block: 'ins' }), C(/liability insurance/i, /^city/i, 'malpractice_carrier_city', { block: 'ins' }),
+  C(/liability insurance/i, /^state/i, 'malpractice_carrier_state', { block: 'ins' }), C(/liability insurance/i, /^zip/i, 'malpractice_carrier_zip', { block: 'ins' }),
+  C(/liability insurance/i, /^type of coverage/i, 'malpractice_coverage_type', { block: 'ins' }),
+  /* work history, gaps, references */
+  C(/work history/i, /^practice \/ employer name/i, 'employer_name', { anchor: 'emp' }),
+  C(/work history/i, /^number|^street/i, 'employer_address', { block: 'emp' }), C(/work history/i, /^city/i, 'employer_city', { block: 'emp' }),
+  C(/work history/i, /^state/i, 'employer_state', { block: 'emp' }), C(/work history/i, /^zip/i, 'employer_zip', { block: 'emp' }),
+  C(/work history/i, /^country/i, 'employer_country', { block: 'emp' }), C(/work history/i, /^start date/i, 'employment_start_date', { block: 'emp' }),
+  C(/work history/i, /^end date/i, 'employment_end_date', { block: 'emp' }), C(/work history/i, /^telephone/i, 'employer_phone', { block: 'emp' }),
+  C(/work history/i, /^fax/i, 'employer_fax', { block: 'emp' }), C(/work history/i, /^reason for departure/i, 'employment_leave_reason', { block: 'emp' }),
+  C(/military/i, /active military duty/i, 'provider_military_active'),
+  C(/gaps/i, /^gap start/i, 'gap_start_date', { anchor: 'gap' }), C(/gaps/i, /^gap end/i, 'gap_end_date', { block: 'gap' }), C(/gaps/i, /^please explain/i, 'gap_explanation', { block: 'gap' }),
+];
+/* CAQH provider-type codes (page 36 of the Standard Application) -> who they are */
+const PROVIDER_TYPES = {
+  MD: ['Medical Doctor', 'physician'], DO: ['Doctor of Osteopathy', 'physician'], NP: ['Nurse Practitioner', 'midlevel'], CNP: ['Certified Nurse Practitioner', 'midlevel'],
+  APRN: ['Advanced Practice Registered Nurse', 'midlevel'], PA: ['Physician Assistant', 'midlevel'], CNS: ['Clinical Nurse Specialist', 'midlevel'], CNM: ['Certified Nurse Midwife', 'midlevel'],
+  CRNA: ['Certified Registered Nurse Anesthetist', 'midlevel'], PC: ['Professional Counselor', 'bh'], LPC: ['Licensed Professional Counselor', 'bh'], LPCC: ['Licensed Professional Clinical Counselor', 'bh'],
+  LCPC: ['Licensed Clinical Professional Counselor', 'bh'], LMHC: ['Licensed Mental Health Counselor', 'bh'], LCMHC: ['Licensed Clinical Mental Health Counselor', 'bh'], MHC: ['Mental Health Counselor', 'bh'],
+  SW: ['Social Worker', 'bh'], LCSW: ['Licensed Clinical Social Worker', 'bh'], LICSW: ['Licensed Independent Clinical Social Worker', 'bh'], LMSW: ['Licensed Master Social Worker', 'bh'], CSW: ['Clinical Social Worker', 'bh'],
+  MFT: ['Marriage and Family Therapist', 'bh'], LMFT: ['Licensed Marriage and Family Therapist', 'bh'], PSY: ['Psychologist', 'bh'], PHD: ['Psychologist', 'bh'], PSYD: ['Doctor of Psychology', 'bh'],
+  BCBA: ['Board Certified Behavior Analyst', 'bh'], BCABA: ['Board Certified Assistant Behavior Analyst', 'bh'], LBA: ['Licensed Behavior Analyst', 'bh'],
+  CADC: ['Certified Alcohol and Drug Counselor', 'sud'], LADC: ['Licensed Alcohol and Drug Counselor', 'sud'], LCADC: ['Licensed Clinical Alcohol and Drug Counselor', 'sud'], CASAC: ['Credentialed Alcoholism and Substance Abuse Counselor', 'sud'],
+  PMHNP: ['Psychiatric Mental Health Nurse Practitioner', 'bh-midlevel'], DDS: ['Dentist', 'specialist'], DMD: ['Dentist', 'specialist'], OD: ['Optometrist', 'specialist'], DPM: ['Podiatrist', 'specialist'],
+  DC: ['Chiropractor', 'specialist'], PT: ['Physical Therapist', 'specialist'], OT: ['Occupational Therapist', 'specialist'], SLP: ['Speech-Language Pathologist', 'specialist'], AUD: ['Audiologist', 'specialist'],
+  RD: ['Registered Dietitian', 'specialist'], LAC: ['Licensed Acupuncturist', 'specialist'], RN: ['Registered Nurse', 'midlevel'],
+};
+const BH_SPECIALTY = /counsel|psycholog|psychiatr|social work|marriage|family therap|behavior|mental health|substance|addiction|chemical dependency|alcohol|drug/i;
+const PCP_SPECIALTY = /family (medicine|practice)|internal medicine|general practice|pediatric(s)?$|primary care|geriatric/i;
+
+const MARK_CONCEPTS = new Set(['facility_based', 'provider_used_other_name', 'license_currently_practicing', 'provider_medicare_enrolled', 'provider_medicaid_enrolled', 'board_certified', 'practice_current', 'electronic_claims', 'practice_accepting_new_patients', 'hospital_has_privileges', 'provider_military_active', 'primary_tin_choice', 'malpractice_coverage_type', 'practice_group_type', 'provider_gender']);
+function caqhFacts(res) {
+  const facts = [];                                           /* { c, i, v, why } */
+  const put = (c, i, v, why) => { if (v == null || String(v).trim() === '') return; facts.push({ c, i: i || 0, v: String(v).trim(), why }); };
+  const blocks = {};                                          /* anchor name -> current index */
+  const seen = {};
+  const pageLoc = {};                                         /* page -> practice location index */
+  res.pairs.forEach(p => { if (/location/i.test(p.key) && /^\d{1,2}$/.test(p.value)) pageLoc[p.page] = Math.max(0, +p.value - 1); });
+  const parts = {};
+  const txt = res.text;
+  const id = /CAQH\s+Provider\s+ID\s*:\s*(\d{5,10})/i.exec(txt); if (id) put('provider_caqh_id', 0, id[1], 'CAQH Provider ID');
+  const att = /Last\s+Attestation\s*(?:Date)?\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i.exec(txt); if (att) put('provider_caqh_attestation_date', 0, att[1], 'Last attestation');
+  const pairs = res.pairs.slice().sort((a, b) => a.page - b.page || a.y - b.y || a.x - b.x);
+  for (const p of pairs) {
+    /* supplemental practice location pages say which location they are */
+    if (/location/i.test(p.key) && /^\d{1,2}$/.test(p.value)) continue;
+    const ctx = p.ctx || '';
+    const r = CAQH_RULES.find(x => x.ctx.test(ctx) && x.key.test(p.key) && (MARK_CONCEPTS.has(x.concept) ? p.kind === 'mark' || /^(yes|no)$/i.test(p.value) : p.kind === 'text' && !OPTION_WORDS.test(p.value)) && (x.concept !== 'provider_type_code' || /^[A-Z]{1,6}$/.test(p.value)));
+    if (!r) continue;
+    let i = 0;
+    if (r.anchor) { blocks[r.anchor] = blocks[r.anchor] == null ? 0 : blocks[r.anchor] + 1; i = blocks[r.anchor]; }
+    else if (r.block) i = blocks[r.block] || 0;
+    else if (r.idxFixed != null) i = r.idxFixed;
+    else if (r.loc) i = pageLoc[p.page] || 0;
+    let v = p.value;
+    if (/^\(?(continued|cont\.?)\)?$/i.test(v) || /^page \d/i.test(v)) continue;
+    if (p.kind === 'mark') {
+      if (/^(yes|no)$/i.test(v)) v = /^y/i.test(v) ? 'Yes' : 'No';
+      else if (r.concept === 'provider_gender') v = /^f/i.test(v) ? 'Female' : 'Male';
+    }
+    const k = r.concept + '#' + i;
+    if (seen[k] && r.concept !== 'provider_languages') continue;
+    seen[k] = 1;
+    if (/^(cc|om|bc)_(first|last)$/.test(r.concept)) { (parts[r.concept.slice(0, 2) + '#' + i] = parts[r.concept.slice(0, 2) + '#' + i] || {})[r.concept.slice(3)] = v; continue; }
+    if (r.concept === 'provider_type_code') {
+      put('provider_type_code', 0, v, 'Provider type');
+      const t = PROVIDER_TYPES[v.toUpperCase().replace(/[^A-Z]/g, '')];
+      if (t) put('provider_type', 0, t[0], 'Provider type ' + v);
+      continue;
+    }
+    if (r.concept === 'payee_name') { put('group_legal_name', i, v, 'Check payable to'); continue; }
+    put(r.concept, i, v, p.key);
+  }
+  Object.keys(parts).forEach(k => {
+    const [who, i] = k.split('#'), n = parts[k];
+    const full = [n.first, n.last].filter(Boolean).join(' ');
+    if (!full) return;
+    put(who === 'cc' ? 'group_contact_name' : who === 'om' ? 'practice_contact_name' : 'billing_contact_name', +i, full, who === 'cc' ? 'Credentialing contact' : who === 'om' ? 'Office manager' : 'Billing contact');
+  });
+  /* the person behind the numbers */
+  const lic = facts.find(f => f.c === 'license_type' && f.i === 0);
+  if (lic) { const t = PROVIDER_TYPES[lic.v.toUpperCase().replace(/[^A-Z]/g, '')]; if (t) { put('provider_degree', 0, lic.v.toUpperCase(), 'License type'); if (!facts.some(f => f.c === 'provider_type')) put('provider_type', 0, t[0], 'License type ' + lic.v); } }
+  if (/telehealth|telemedicine|virtual/i.test(txt)) put('practice_telehealth', 0, 'Yes', 'Practice services mention telehealth');
+  return facts;
+}
+
+/* categories a provider falls into — used to tick "Provider type" boxes */
+function providerCategories(get) {
+  const cats = new Set();
+  const code = String(get('provider_type_code') || '').toUpperCase().replace(/[^A-Z]/g, '');
+  const deg = String(get('provider_degree') || get('license_type') || '').toUpperCase().replace(/[^A-Z]/g, '');
+  const spec = String(get('specialty_primary') || '') + ' ' + String(get('specialty_secondary') || '') + ' ' + String(get('provider_type') || '');
+  [code, deg].forEach(c => { const t = PROVIDER_TYPES[c]; if (!t) return; t[1].split('-').forEach(x => cats.add(x)); });
+  if (BH_SPECIALTY.test(spec)) cats.add('bh');
+  if (/substance|addiction|alcohol|drug|chemical dependency/i.test(spec)) cats.add('sud');
+  if (cats.has('bh') || cats.has('sud')) { cats.add('mhsud'); cats.add('bh'); }
+  if (cats.has('physician') && PCP_SPECIALTY.test(spec)) cats.add('pcp');
+  if (cats.has('physician') && !cats.has('pcp') && !cats.has('bh')) cats.add('specialist');
+  if (/hospitalist/i.test(spec)) cats.add('hospitalist');
+  if (/urgent care/i.test(spec)) cats.add('urgent');
+  if (/^(yes|y|true)$/i.test(String(get('practice_telehealth') || ''))) cats.add('telehealth');
+  return cats;
+}
+const CATEGORY_BOX = [
+  [/behavioral health|\bbh\b|behavioural health/i, 'bh'],
+  [/mental health|substance use|\bmh\s*\/?\s*sud\b|\bsud\b/i, 'mhsud'],
+  [/primary care|\bpcp\b/i, 'pcp'], [/^specialist$|\bspecialist\b(?!.*urgent)/i, 'specialist'],
+  [/mid-?level|nurse practitioner|physician assistant|\bapp\b|advanced practice/i, 'midlevel'],
+  [/hospitalist/i, 'hospitalist'], [/urgent care/i, 'urgent'], [/telehealth|telemedicine/i, 'telehealth'],
+];
+
+root.ZPPrintout = { readPrintout, caqhFacts, providerCategories, CATEGORY_BOX, PROVIDER_TYPES, splitPage, pairsFromPage };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+
+/* what a value must look like for the kind of box it goes in */
+const AF_FORMAT_CHECK = [
+  [/(^|\b)(fax)\b/i, 'phone'], [/(^|\b)(phone|telephone|tel|mobile|cell)\b/i, 'phone'],
+  [/e-?mail/i, 'email'], [/\bnpi\b/i, 'npi'], [/date of birth|\bdob\b|\bdate\b/i, 'date'],
+  [/tax id|\btin\b|\bein\b/i, 'tin'], [/\bzip\b|postal code/i, 'zip'],
+];
+function afValueOk(kind, v) {
+  const s = String(v == null ? '' : v).trim();
+  if (!s) return true;
+  const d = s.replace(/\D/g, '');
+  switch (kind) {
+    case 'phone': return !/@/.test(s) && d.length >= 7 && d.length <= 15 && !/[a-z]{4,}/i.test(s.replace(/\b(ext|x)\b/gi, ''));
+    case 'email': return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(s);
+    case 'npi': return d.length === 10 && !/[a-z]/i.test(s);
+    case 'tin': return d.length === 9 && !/@/.test(s);
+    case 'zip': return /^\d{5}(-?\d{4})?$/.test(s) || /^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i.test(s) || /^\d{6}$/.test(s);
+    case 'date': return /\d/.test(s) && !/@/.test(s);
+    default: return true;
+  }
+}
+function afFieldKind(f, cl) {
+  const fmt = cl && cl.fmt;
+  if (fmt === 'phone' || fmt === 'email' || fmt === 'npi' || fmt === 'tin' || fmt === 'zip') return fmt;
+  const lab = [(f.labels || [])[0], f.tip, f.name].filter(Boolean).join(' ');
+  for (const [re, k] of AF_FORMAT_CHECK) if (re.test(lab)) return k === 'date' && !/birth|dob|date/i.test(lab) ? null : k;
+  return null;
+}
+const AF_SAME = (a, b) => String(a == null ? '' : a).trim().toLowerCase().replace(/\s+/g, ' ') === String(b == null ? '' : b).trim().toLowerCase().replace(/\s+/g, ' ');
+
+/* ---------- what Autofill learns from your fixes, kept safely ----------
+   Per form (recognised by its fields): which answer goes in which box,
+   boxes to leave alone, and literal values you typed — per person, and
+   for every person once you've typed the same thing twice.  Stored in
+   the browser's database, mirrored as a backup copy, and exportable. */
+const AFMem = Z.AFMem = {
+  BACKUP: 'zp8-afmem-backup',
+  norm(m) {
+    if (!m || typeof m !== 'object') return { v: 2, fields: {}, values: {}, constants: {}, name: '', updated: 0 };
+    if (m.v === 2) { m.fields = m.fields || {}; m.values = m.values || {}; m.constants = m.constants || {}; return m; }
+    return { v: 2, fields: Object.assign({}, m), values: {}, constants: {}, name: '', updated: 0 };   /* older memory */
+  },
+  async get(fp) {
+    let m = await KV.get(fp);
+    if (!m) { try { const b = JSON.parse(localStorage.getItem(this.BACKUP) || '{}'); if (b[fp]) m = b[fp]; } catch (_) {} }
+    return this.norm(m);
+  },
+  async set(fp, m) {
+    m.updated = Date.now();
+    await KV.set(fp, m);
+    const idx = (await KV.get('mem:index')) || {};
+    idx[fp] = { name: m.name || '', updated: m.updated, n: Object.keys(m.fields).length + Object.keys(m.constants).length + Object.values(m.values).reduce((s, x) => s + Object.keys(x || {}).length, 0) };
+    await KV.set('mem:index', idx);
+    try { const b = JSON.parse(localStorage.getItem(this.BACKUP) || '{}'); b[fp] = m; localStorage.setItem(this.BACKUP, JSON.stringify(b)); } catch (_) {}
+    Store.persist();
+  },
+  async all() {
+    const out = {};
+    const idx = (await KV.get('mem:index')) || {};
+    for (const fp of Object.keys(idx)) { const m = await KV.get(fp); if (m) out[fp] = this.norm(m); }
+    try { const b = JSON.parse(localStorage.getItem(this.BACKUP) || '{}'); Object.keys(b).forEach(fp => { if (!out[fp]) out[fp] = this.norm(b[fp]); }); } catch (_) {}
+    return out;
+  },
+  async clear() {
+    const db = await KV.db().catch(() => null);
+    if (db) {
+      const tx = db.transaction('kv', 'readwrite'); const st = tx.objectStore('kv');
+      const keys = await new Promise(r => { const q = st.getAllKeys(); q.onsuccess = () => r(q.result); q.onerror = () => r([]); });
+      keys.filter(k => /^mem:/.test(k)).forEach(k => st.delete(k));
+    }
+    try { localStorage.removeItem(this.BACKUP); } catch (_) {}
+  },
+  /* learn: { fields: {name: {c,i,p}|'__skip__'}, values: {name: v} } for one person */
+  async learn(fp, name, person, learn) {
+    if (!learn) return;
+    const m = await this.get(fp);
+    if (name && !m.name) m.name = name;
+    Object.assign(m.fields, learn.fields || {});
+    const vals = learn.values || {};
+    if (Object.keys(vals).length) {
+      const pk = person || '_';
+      m.values[pk] = Object.assign(m.values[pk] || {}, vals);
+      Object.keys(vals).forEach(fn => {
+        const same = Object.keys(m.values).filter(p => m.values[p] && AF_SAME(m.values[p][fn], vals[fn])).length;
+        if (same >= 2) m.constants[fn] = vals[fn];
+      });
+    }
+    (learn.forget || []).forEach(fn => { delete m.constants[fn]; Object.keys(m.values).forEach(p => { if (m.values[p]) delete m.values[p][fn]; }); });
+    await this.set(fp, m);
+  },
+  async exportAll() {
+    const data = { app: 'ZenPDF', kind: 'autofill-backup', version: 1, exported: new Date().toISOString(), profiles: await Profiles.list(), memory: await this.all() };
+    const d = new Date(), p = (n) => String(n).padStart(2, '0');
+    downloadBlob(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }), 'ZenPDF autofill backup ' + d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + '.json');
+    return data;
+  },
+  async importFile(file) {
+    let data;
+    try { data = JSON.parse(await file.text()); } catch (_) { throw new Error('That file isn’t a ZenPDF autofill backup'); }
+    if (!data || data.kind !== 'autofill-backup') throw new Error('That file isn’t a ZenPDF autofill backup');
+    let np = 0, nm = 0;
+    const list = await Profiles.list();
+    for (const p of (data.profiles || [])) {
+      if (!p || !p.name || !p.facts) continue;
+      const ex = list.find(x => x.name.toLowerCase() === String(p.name).toLowerCase());
+      await Profiles.save(Object.assign(ex || {}, { name: p.name, facts: Object.assign({}, ex ? ex.facts : {}, p.facts) }));
+      np++;
+    }
+    for (const fp of Object.keys(data.memory || {})) {
+      if (!/^mem:/.test(fp)) continue;
+      const cur = await this.get(fp), inc = this.norm(data.memory[fp]);
+      Object.assign(cur.fields, inc.fields); Object.assign(cur.constants, inc.constants);
+      Object.keys(inc.values).forEach(pk => { cur.values[pk] = Object.assign(cur.values[pk] || {}, inc.values[pk]); });
+      if (!cur.name) cur.name = inc.name;
+      await this.set(fp, cur); nm++;
+    }
+    return { profiles: np, forms: nm };
+  },
+};
+
 const Autofill = Z.Autofill = {
   ready: false,
   ensureKB() {
@@ -13027,6 +13666,147 @@ const Autofill = Z.Autofill = {
     return 'mem:' + hash32(s) + ':' + fields.length;
   },
 
+
+  /* tables put the meaning of a block in a left-hand cell ("Credentialing
+     Contact Information:") — attach that heading to every box beside it */
+  async rowHeads(pdf, fields) {
+    const byPage = new Map();
+    fields.forEach(f => { if (f.page) { if (!byPage.has(f.page)) byPage.set(f.page, []); byPage.get(f.page).push(f); } });
+    for (const [pn, fs] of byPage) {
+      try {
+        const page = await pdf.getPage(pn), vp = page.getViewport({ scale: 1 }), tc = await page.getTextContent();
+        const minX = Math.min.apply(null, fs.map(f => f.x || 0));
+        const items = tc.items.filter(it => it.str && it.str.trim()).map(it => { const [x, y] = vp.convertToViewportPoint(it.transform[4], it.transform[5]); return { s: it.str.trim(), x, y, r: x + (it.width || 0) }; })
+          .filter(it => it.r < minX - 3 && it.x < vp.width * 0.4).sort((a, b) => a.y - b.y);
+        const blocks = [];
+        items.forEach(it => { const b = blocks[blocks.length - 1]; if (b && it.y - b.bot <= 15 && Math.abs(it.x - b.x) < 40) { b.s += ' ' + it.s; b.bot = it.y; } else blocks.push({ s: it.s, x: it.x, top: it.y, bot: it.y }); });
+        fs.forEach(f => {
+          const cy = (f.y || 0) + (f.h || 0) / 2;
+          let best = null, bd = 1e9;
+          blocks.forEach(b => { const d = cy < b.top - 12 ? b.top - 12 - cy : cy > b.bot + 12 ? cy - b.bot - 12 : 0; if (d < bd) { bd = d; best = b; } });
+          if (best && bd < 70) f.rowHead = best.s.replace(/\s+/g, ' ').trim();
+        });
+      } catch (_) {}
+    }
+  },
+  /* who the answers belong to — fixes you type are remembered per person */
+  personKey(F) {
+    const g = (c) => { const r = F.raw(c, 0); return r && String(r.v).trim(); };
+    const npi = g('provider_npi'); if (npi && /^\d{10}$/.test(npi.replace(/\D/g, ''))) return 'npi:' + npi.replace(/\D/g, '');
+    const caqh = g('provider_caqh_id'); if (caqh) return 'caqh:' + caqh.replace(/\D/g, '');
+    const fn = g('provider_first_name'), ln = g('provider_last_name');
+    const full = (fn && ln) ? fn + ' ' + ln : g('provider_full_name');
+    return full ? 'name:' + full.toLowerCase().replace(/\s+/g, ' ') : '';
+  },
+  /* a corrected value: if it is one of the source's own answers, learn
+     where that answer goes; otherwise remember the words themselves */
+  learnValue(learn, field, v, F) {
+    if (field.kind !== 'check' && typeof v === 'string' && v.trim()) {
+      let hit = null;
+      F.m.forEach((x, k) => { if (!hit && AF_SAME(x.v, v)) hit = k; });
+      if (hit && !/^__/.test(hit)) { const [c, i] = hit.split('#'); if (KB_has(c)) learn.fields[field.name] = { c, i: +i || 0, p: null }; }
+    }
+    /* the exact words always win for this person; the mapping helps others */
+    learn.values[field.name] = v;
+  },
+  /* generic boxes ("Name", "Email", "Phone #") take their meaning from
+     the block they sit in on this form */
+  contextRules(fields) {
+    const out = {};
+    const GEN = /^(name|full name|e-?mail( address)?|email \d|phone( number| #)?|phone \d|telephone|tel|fax( number| #)?|fax \d)$/i;
+    fields.forEach(f => {
+      if (!f.name) return;
+      const lab = String((f.labels || [])[0] || f.tip || f.name).replace(/[:#*]+$/, '').replace(/\s+\d+$/, '').trim();
+      if (!GEN.test(lab) && !GEN.test(String(f.name).replace(/\s+\d+$/, ''))) return;
+      const ctx = (f.rowHead || '') + ' ' + [].concat(f.ctx || []).join(' ') + ' ' + (f.labels || []).slice(1).join(' ');
+      const kind = /mail/i.test(lab) ? 'email' : /fax/i.test(lab) ? 'fax' : /phone|tel/i.test(lab) ? 'phone' : 'name';
+      let c = null;
+      if (/credential/i.test(ctx)) c = { name: 'group_contact_name', email: 'group_contact_email', phone: 'group_contact_phone', fax: 'group_contact_fax' }[kind];
+      else if (/manager|office contact/i.test(ctx)) c = { name: 'practice_contact_name', email: 'practice_contact_email', phone: 'practice_contact_phone', fax: 'practice_contact_fax' }[kind];
+      else if (/billing|pay.?to|remit/i.test(ctx)) c = { name: 'billing_contact_name', email: 'billing_email', phone: 'billing_phone', fax: 'billing_fax' }[kind];
+      else if (/physical|office location|practice location|service location|practice information|location information/i.test(ctx)) c = { email: 'practice_email', phone: 'practice_phone', fax: 'practice_fax' }[kind];
+      if (c && KB_has(c)) out[f.name] = { c, i: 0, p: null };
+    });
+    return out;
+  },
+  /* healthcare know-how on top of matching: provider-type boxes, things
+     a form asks you to decide yourself, and attachments */
+  medicalRules(plan, F) {
+    const get = (c) => { const r = F.raw(c, 0) || (KB_has(c) ? ZPMatch.lookup(F, c, 0) : null); return r ? r.v : ''; };
+    const cats = ZPPrintout.providerCategories(get);
+    const who = get('provider_degree') || get('license_type') || get('provider_type_code') || '';
+    const NICE_CAT = { bh: 'behavioral health', mhsud: 'mental health / substance use', pcp: 'primary care', specialist: 'specialist', midlevel: 'mid-level practitioner', hospitalist: 'hospitalist', urgent: 'urgent care', telehealth: 'telehealth' };
+    plan.forEach(r => {
+      const f = r.field;
+      const lab = [f.boxLabel, (f.labels || [])[0], f.question, f.tip, f.name].filter(Boolean).join(' ');
+      const ctx = (f.rowHead || '') + ' ' + [].concat(f.ctx || []).join(' ');
+      if (r.cl && r.cl.fromMemory) return;
+      if (f.kind === 'check' || f.kind === 'radio') {
+        /* choices only you can make for this application */
+        if (/line of business|contract status|contract (established|pending)|medi-?cal|triwest|requested (line|product)|network participation/i.test(lab + ' ' + ctx)) { r.val = null; r.on = false; return; }
+        /* attachments: never tick on your behalf */
+        if (/curriculum|resume|\bcv\b|certificate|agreement|acceptance letter|copy of|attached|attachment|cppa|npmp|ahpa|facility site review/i.test(lab)) { r.val = null; r.on = false; return; }
+        const box = ZPPrintout.CATEGORY_BOX.find(([re]) => re.test(f.boxLabel || (f.labels || [])[0] || f.name));
+        const typeQ = /provider type|practitioner type|type of provider|specialty type|provider category|telehealth|behavioral|mental health|primary care|specialist|mid-?level|hospitalist|urgent care/i.test(lab + ' ' + ctx);
+        if (box && typeQ && cats.size) {
+          const on = cats.has(box[1]);
+          if (on) { r.val = true; r.show = 'Ticked'; r.conf = 0.9; r.on = true; r.from = who ? who + ' — ' + NICE_CAT[box[1]] : NICE_CAT[box[1]]; r.derived = 'from the provider type'; }
+          else if (r.val === true && r.cl && /provider_type|specialty_pcp|provider_qualification|practice_telehealth/.test(r.cl.concept || '')) { r.val = null; r.on = false; }
+        } else if (typeQ && r.val === true && r.cl && /provider_type|specialty_pcp|provider_qualification|practice_telehealth/.test(r.cl.concept || '') && !(f.boxLabel && box)) { r.val = null; r.on = false; }
+      }
+    });
+  },
+  applyMemory(plan, m, person) {
+    const vals = Object.assign({}, m.constants || {}, (m.values && m.values[person || '_']) || {});
+    plan.forEach(r => {
+      const n = r.field.name;
+      if (!n || !Object.prototype.hasOwnProperty.call(vals, n)) return;
+      const v = vals[n];
+      if (r.field.kind === 'check') { r.val = v === true || /^(true|yes|on|1)$/i.test(String(v)); r.show = r.val ? 'Ticked' : 'Not ticked'; }
+      else { r.val = v; r.show = String(v); }
+      r.conf = 0.99; r.on = true; r.from = 'your correction last time'; r.derived = 'remembered';
+    });
+  },
+  /* never put an email in a fax box — and point out boxes already holding
+     something that cannot be right */
+  checkValues(plan, ed) {
+    const cur = (ed && ed.edits && ed.edits.form) || {};
+    plan.forEach(r => {
+      const f = r.field;
+      if (f.kind === 'check' || f.kind === 'radio') return;
+      const kind = afFieldKind(f, r.cl);
+      if (r.val != null && r.val !== '' && kind && !afValueOk(kind, r.val) && r.from !== 'your correction last time') { r.val = null; r.on = false; }
+      const now = Object.prototype.hasOwnProperty.call(cur, f.name) ? cur[f.name] : f.value;
+      const has = now != null && String(now).trim() !== '';
+      if (!has) return;
+      const bad = kind && !afValueOk(kind, now);
+      if (r.val != null && r.val !== '') {
+        if (AF_SAME(now, r.val)) { r.on = false; r.derived = 'already filled in'; return; }
+        r.on = bad || r.from === 'your correction last time';
+        r.derived = (bad ? 'fixes “' : 'replaces “') + String(now).slice(0, 40) + '”' + (bad ? ' (not a valid ' + kind + ')' : '');
+      } else if (bad) {
+        r.val = ''; r.show = '(empty)'; r.on = false; r.conf = 0.6; r.from = 'a check of this form';
+        r.derived = '“' + String(now).slice(0, 40) + '” isn’t a valid ' + kind + ' — turn on to clear it';
+        r.clear = true;
+      }
+    });
+  },
+  /* you changed a box Autofill filled: remember the fix for next time */
+  noteEdit(ed, name, value) {
+    const L = this.last;
+    if (!L || !ed || !ed.f || ed.f.id !== L.fileId || !Object.prototype.hasOwnProperty.call(L.filled, name)) return;
+    if (AF_SAME(L.filled[name], value)) return;
+    L.pending = L.pending || {};
+    L.pending[name] = value;
+    clearTimeout(L.t);
+    L.t = setTimeout(async () => {
+      const learn = { fields: {}, values: {}, forget: [] };
+      Object.keys(L.pending).forEach(n => { const v = L.pending[n]; if (v === '' || v == null) { learn.fields[n] = '__skip__'; learn.forget.push(n); } else this.learnValue(learn, { name: n, kind: typeof v === 'boolean' ? 'check' : 'text' }, v, L.F); L.filled[n] = v; });
+      L.pending = {};
+      try { await AFMem.learn(L.fp, ed.f && ed.f.name, L.person, learn); } catch (_) {}
+    }, 900);
+  },
+
   /* ---------- the form being filled ---------- */
   async targetFields(ed, P) {
     const pdf = ed.pdf;
@@ -13038,6 +13818,7 @@ const Autofill = Z.Autofill = {
       fields = await window.zpFindBlanks(pdf, { onPage: (i, n) => P && P.pct(0.4 + 0.3 * i / n) });
       flat = true;
     }
+    if (!flat) await this.rowHeads(pdf, fields);
     return { fields, flat };
   },
   async formText(ed, fields) {
@@ -13052,7 +13833,7 @@ const Autofill = Z.Autofill = {
     const name = file.name || 'file';
     const ext = extOf(name);
     const u8 = new Uint8Array(await file.arrayBuffer());
-    let pairs = [], text = '', exact = null;
+    let pairs = [], text = '', exact = null, printout = null;
     const L = PL();
     if (isPdfBytes(u8)) {
       P && P.sub('Reading ' + name + '…');
@@ -13091,6 +13872,15 @@ const Autofill = Z.Autofill = {
           parts.push(line);
         }
         text = parts.join('\n');
+        /* a filled form printed to PDF (CAQH ProView etc.): read it by layout */
+        if (!Object.keys(exact || {}).length) {
+          try {
+            P && P.sub('Reading the answers on ' + name + '…');
+            printout = await ZPPrintout.readPrintout(pdf, { maxPages: 80 });
+            if (printout && (printout.isCaqh || (printout.pairs.length >= 8 && printout.valuePages >= 1))) printout.pairs.forEach(p => pairs.push({ key: p.key, value: p.value, ctx: p.ctx }));
+            else printout = null;
+          } catch (e) { console.warn('[ZenPDF] printout', e); printout = null; }
+        }
         if (text.replace(/\s/g, '').length < 30 && !pairs.length) {
           P && P.sub('This looks scanned — reading it with OCR…');
           const r = await ocrPdf(u8, { lang: 'eng', pages: [0, 1, 2].filter(i => i < pdf.numPages) }, P);
@@ -13139,9 +13929,15 @@ const Autofill = Z.Autofill = {
       const junk = (sample.match(/[�\u0000-\u0008\u000E-\u001F]/g) || []).length;
       if (sample.length > 40 && junk / sample.length > 0.05) { if (!pairs.length) throw new Error(name + ' does not contain readable text'); text = ''; }
     }
-    if (text) ZPMatch.textPairs(text).forEach(p => pairs.push(p));
-    const F = ZPMatch.factsFromPairs(pairs, { name });
-    ZPMatch.factsFromPatterns(text, F, name);
+    if (text && !(printout && printout.isCaqh)) ZPMatch.textPairs(text).forEach(p => pairs.push(p));
+    let F = ZPMatch.factsFromPairs(pairs, { name });
+    if (!(printout && printout.isCaqh)) ZPMatch.factsFromPatterns(text, F, name);
+    if (printout && printout.isCaqh) {
+      const keep = F.pairs; F = ZPMatch.factsFromPairs([], { name }); F.pairs = keep;
+      /* CAQH printouts are read by meaning, not by guessing — these win */
+      ZPPrintout.caqhFacts(printout).forEach(x => F.m.set(x.c + '#' + x.i, { v: x.v, from: '“' + x.why + '” in ' + name, conf: 0.99 }));
+      F.caqh = true;
+    }
     if (exact && Object.keys(exact).length) { F.exact = exact; F.exactName = name; }
     F.text = text;
     return F;
@@ -13169,13 +13965,20 @@ const Autofill = Z.Autofill = {
       else if (src.file) F = await this.readFacts(src.file, P2);
       else if (src.text) { F = ZPMatch.factsFromPairs(ZPMatch.textPairs(src.text), { name: 'pasted text' }); ZPMatch.factsFromPatterns(src.text, F, 'pasted text'); }
       if (F.exact) { const hits = target.fields.filter(f => Object.prototype.hasOwnProperty.call(F.exact, f.name)).length; if (hits < Math.max(2, target.fields.length * 0.3)) delete F.exact; }
-      memory = (await KV.get(this.fingerprint(target.fields))) || {};
-      plan = ZPMatch.planForm(target.fields, F, { memory });
+      const fp = this.fingerprint(target.fields);
+      memory = await AFMem.get(fp);
+      plan = ZPMatch.planForm(target.fields, F, { memory: Object.assign({}, this.contextRules(target.fields), memory.fields) });
+      this.medicalRules(plan, F);
+      this.applyMemory(plan, memory, this.personKey(F));
+      this.checkValues(plan, ed);
     } catch (e) { P2.done(); if (isCancel(e)) return; fail(e, 'Autofill'); return; }
     P2.done();
     const res = await this.review(plan, F, target, src);
     if (!res) return;
-    if (Object.keys(res.learn).length) { const k = this.fingerprint(target.fields); const cur = (await KV.get(k)) || {}; Object.assign(cur, res.learn); KV.set(k, cur); }
+    const fpk = this.fingerprint(target.fields), person = this.personKey(F);
+    try { await AFMem.learn(fpk, ed.f.name, person, res.learn); } catch (e) { console.warn('[ZenPDF] memory', e); }
+    this.last = { fileId: ed.f.id, fp: fpk, person, F, filled: {} };
+    res.rows.forEach(r => { if (r.field.name) this.last.filled[r.field.name] = r.val; });
     if (res.save) await this.saveProfile(res.save, res.saveFacts);
     if (!res.rows.length) return;
     const n = this.apply(ed, res.rows, target.flat);
@@ -13206,8 +14009,8 @@ const Autofill = Z.Autofill = {
     return sheet({ title: 'Paste your details', body, size: 'wide', foot: [{ label: 'Cancel' }, { label: 'Use this text', kind: 'primary', click: (a) => { if (!txt.trim()) { toast('Paste some text first', 'warn'); return false; } a.close(txt); return false; } }] }).result;
   },
   review(plan, F, target, src) {
-    const rows = plan.filter(r => r.val != null && r.val !== '' && !(r.field.kind === 'check' && r.val === false && !r.field.boxLabel));
-    const missing = plan.filter(r => r.val == null || r.val === '');
+    const rows = plan.filter(r => (r.val != null && r.val !== '' && !(r.field.kind === 'check' && r.val === false && !r.field.boxLabel)) || r.clear);
+    const missing = plan.filter(r => (r.val == null || r.val === '') && !r.clear && !(r.field.kind === 'check' && r.field.boxLabel && r.val === false));
     const state = rows.map(r => ({ on: !!r.on, val: r.val }));
     const groups = new Map();
     rows.forEach((r, i) => { const g = r.cl && GROUP_NAMES[r.cl.ent] ? r.cl.ent : 'other'; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(i); });
@@ -13224,12 +14027,13 @@ const Autofill = Z.Autofill = {
     const body = h(`<div>
       <div class="af-sum"><span class="badge green">${rows.length} of ${plan.length} ready</span>${rows.filter(r => r.conf < 0.7).length ? `<span class="badge orange">${rows.filter(r => r.conf < 0.7).length} to check</span>` : ''}<span class="badge gray">${esc(src.name || 'source')}</span></div>
       ${rows.length ? '' : `<div class="note warn">${icon('alert')}<div>Nothing in that source matches this form. Try another profile or document.</div></div>`}
-      ${gk.map(g => `<div class="af-group"><b>${esc(GROUP_NAMES[g] || 'Other')}</b>${groups.get(g).map(i => { const r = rows[i]; const lab = r.field.labels && r.field.labels[0] || r.field.question || r.field.tip || r.field.name; return `<div class="af-row ${state[i].on ? '' : 'off'}" data-row="${i}"><label class="switch sm"><input type="checkbox" data-on="${i}" ${state[i].on ? 'checked' : ''}><i></i></label><div class="lab ell">${esc(String(lab).slice(0, 60))}<small title="${attr(r.from + (r.derived ? ' · ' + r.derived : ''))}">${r.cl && r.cl.concept && r.cl.concept !== '__direct' ? esc(this.label(r.cl.concept)) + ' · ' : ''}${esc((r.derived || r.from || '').replace(/^"|"$/g, '').slice(0, 60))}${target.flat ? ' · page ' + r.field.page : ''}</small></div><div class="val">${valInput(r, i)}</div>${pill(r.conf || 0)}</div>`; }).join('')}</div>`).join('')}
-      ${missing.length ? `<details style="margin-top:6px"><summary class="muted" style="cursor:pointer;font-size:13px">${missing.length} field${missing.length === 1 ? '' : 's'} left empty</summary><div class="muted" style="font-size:12.5px;margin-top:8px;line-height:1.6">${missing.slice(0, 80).map(r => esc((r.field.labels && r.field.labels[0]) || r.field.question || r.field.name)).join(' · ')}</div></details>` : ''}
+      ${gk.map(g => `<div class="af-group"><b>${esc(GROUP_NAMES[g] || 'Other')}</b>${groups.get(g).map(i => { const r = rows[i]; const lab = (r.field.kind === 'check' && r.field.boxLabel) || r.field.labels && r.field.labels[0] || r.field.question || r.field.tip || r.field.name; return `<div class="af-row ${state[i].on ? '' : 'off'}" data-row="${i}"><label class="switch sm"><input type="checkbox" data-on="${i}" ${state[i].on ? 'checked' : ''}><i></i></label><div class="lab ell">${esc(String(lab).slice(0, 60))}<small title="${attr(r.from + (r.derived ? ' · ' + r.derived : ''))}">${r.cl && r.cl.concept && r.cl.concept !== '__direct' ? esc(this.label(r.cl.concept)) + ' · ' : ''}${esc((r.derived || r.from || '').replace(/^"|"$/g, '').slice(0, 60))}${target.flat ? ' · page ' + r.field.page : ''}</small></div><div class="val">${valInput(r, i)}</div>${pill(r.conf || 0)}</div>`; }).join('')}</div>`).join('')}
+      ${missing.length ? `<details style="margin-top:6px" class="af-missing"><summary class="muted" style="cursor:pointer;font-size:13px">${missing.length} field${missing.length === 1 ? '' : 's'} left empty — tap to fill them in yourself (Autofill remembers)</summary><div class="af-mlist">${missing.slice(0, 80).map((r, i) => { const lab = r.field.labels && r.field.labels[0] || r.field.question || r.field.tip || r.field.name; return `<label class="af-mrow"><span class="ell">${esc(String(lab).slice(0, 70))}</span>${r.field.kind === 'check' ? `<input type="checkbox" data-m="${i}">` : `<input class="input sm" data-m="${i}" placeholder="${r.field.kind === 'radio' ? 'Option' : 'Type the answer'}">`}</label>`; }).join('')}</div><div class="muted" style="font-size:12.5px;margin-top:8px;line-height:1.6">${missing.slice(0, 80).map(r => esc((r.field.labels && r.field.labels[0]) || r.field.question || r.field.name)).join(' · ')}</div></details>` : ''}
       ${!src.profile && rows.length >= 3 ? `<div class="cell" style="padding:12px 0 0;margin-top:10px;border-top:.5px solid var(--line)"><div class="c-main"><div class="c-title">Save these answers as a profile</div><div class="c-sub">Reuse them on any other form, matched by meaning</div></div>${switchHtml('af-save', false)}</div><input class="input hide" id="af-pname" placeholder="Profile name" style="margin-top:8px" value="${attr((F.raw && F.raw('provider_full_name') && String(F.raw('provider_full_name').v)) || baseName(src.name || 'My details'))}">` : ''}
     </div>`);
     body.addEventListener('change', (e) => {
       const on = e.target.closest('[data-on]'); if (on) { const i = +on.dataset.on; state[i].on = on.checked; on.closest('.af-row').classList.toggle('off', !on.checked); upd(); return; }
+      if (e.target.closest('[data-m]')) return;
       const v = e.target.closest('[data-v]'); if (v) { const i = +v.dataset.v; state[i].val = v.type === 'checkbox' ? v.checked : v.value; state[i].edited = true; if (!state[i].on) { state[i].on = true; $('[data-on="' + i + '"]', body).checked = true; v.closest('.af-row').classList.remove('off'); upd(); } }
       if (e.target.id === 'af-save') $('#af-pname', body).classList.toggle('hide', !e.target.checked);
     });
@@ -13237,11 +14041,23 @@ const Autofill = Z.Autofill = {
     let api;
     const upd = () => { const n = state.filter(s => s.on).length; const b = api && api.btn('go'); if (b) { b.disabled = !n; b.textContent = n ? 'Fill ' + plural(n, 'field') : 'Fill'; } };
     api = sheet({ title: 'Review before filling', sub: 'Turn off anything you don’t want, or fix a value.', body, size: 'xwide', foot: [{ label: 'Cancel', value: null }, { label: 'Fill', kind: 'primary', id: 'go', click: (a) => {
-      const out = [], learn = {};
+      const out = [], learn = { fields: {}, values: {}, forget: [] };
+      const real = (f) => f.name && !/^__blank_/.test(f.name);
       rows.forEach((r, i) => {
         if (state[i].on) out.push(Object.assign({}, r, { val: state[i].val }));
-        if (!state[i].on && r.on && r.field.name && !/^__blank_/.test(r.field.name)) learn[r.field.name] = '__skip__';
-        else if (state[i].on && !r.on && r.cl && r.cl.concept && KB_has(r.cl.concept)) learn[r.field.name] = { c: r.cl.concept, i: r.field.idx || 0, p: r.field.part || null };
+        if (!real(r.field)) return;
+        if (r.clear) return;
+        if (!state[i].on && r.on) { learn.fields[r.field.name] = '__skip__'; learn.forget.push(r.field.name); }
+        else if (state[i].on && !r.on && r.cl && r.cl.concept && KB_has(r.cl.concept)) learn.fields[r.field.name] = { c: r.cl.concept, i: r.field.idx || 0, p: r.field.part || null };
+        if (state[i].on && state[i].edited && !AF_SAME(state[i].val, r.val)) Autofill.learnValue(learn, r.field, state[i].val, F);
+      });
+      /* blanks you filled in yourself */
+      $$('[data-m]', body).forEach(inp => {
+        const r = missing[+inp.dataset.m]; if (!r) return;
+        const v = inp.type === 'checkbox' ? inp.checked : inp.value.trim();
+        if (v === '' || v === false) return;
+        out.push(Object.assign({}, r, { val: v, show: String(v), conf: 1, on: true }));
+        if (real(r.field)) Autofill.learnValue(learn, r.field, v, F);
       });
       const sv = $('#af-save', body);
       let save = null, saveFacts = null;
