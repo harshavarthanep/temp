@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Great+Vibes&family=Dancing+Script:wght@600&family=Homemade+Apple&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Great+Vibes&family=Dancing+Script:wght@600&family=Homemade+Apple&family=Caveat:wght@600&family=Mrs+Saint+Delafield&family=Herr+Von+Muellerhoff&family=La+Belle+Aurore&family=Sacramento&family=Allura&family=Alex+Brush&family=Meddon&family=Kristi&family=Reenie+Beanie&family=Yellowtail&display=swap" rel="stylesheet">
 <script>
 /* theme before first paint — no flash */
 (function () {
@@ -985,6 +985,53 @@ body.full #tabbar { display: none !important; }
 .dlp-spin { width: 26px; height: 26px; margin: 40px auto; border-radius: 50%; border: 2.5px solid var(--line-2); border-top-color: var(--accent); animation: spin .8s linear infinite; }
 .dlp-meta { font-size: 12.5px; color: var(--text-2); margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 @media (max-width: 720px) { .dlp { grid-template-columns: 1fr; } .dlp-list { flex-direction: row; overflow-x: auto; max-height: none; } .dlp-list button { flex: none; max-width: 180px; } }
+/* editor header: a fixed slot for the name so arrows never jump */
+.doc-switch { width: min(460px, 46vw); flex: 0 0 auto; justify-content: center; }
+.doc-pill { flex: 1 1 auto; justify-content: center; max-width: calc(100% - 72px); }
+.doc-pill b { min-width: 0; flex: 0 1 auto; }
+.doc-pill .n { white-space: nowrap; flex: none; line-height: 18px; }
+.save-state { min-width: 74px; justify-content: flex-end; }
+@media (max-width: 720px) { .doc-switch { width: auto; flex: 1 1 auto; } }
+/* "Hide form fields" keeps your answers on the page, just without the boxes */
+body.forms-off .pg .l-form { display: block !important; pointer-events: none; }
+body.forms-off .pg .l-form .fw { background: transparent !important; box-shadow: none !important; border-color: transparent !important; outline: none !important; }
+body.forms-off .pg .l-form .fw:not(.filled):not(.on) { visibility: hidden; }
+body.forms-off .pg .l-form .fw input, body.forms-off .pg .l-form .fw textarea, body.forms-off .pg .l-form .fw select { background: transparent !important; border: 0 !important; box-shadow: none !important; -webkit-appearance: none; appearance: none; }
+/* find: highlights that sit exactly on the words */
+.l-find .hit { border-radius: 2px; mix-blend-mode: multiply; }
+/* files: bigger previews, readable badges, an always-visible menu */
+.files-row { grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); gap: 18px; }
+@media (max-width: 720px) { .files-row { grid-template-columns: repeat(auto-fill, minmax(146px, 1fr)); gap: 12px; } }
+.fcard .f-thumb .flag { top: auto; bottom: 7px; left: 7px; flex-wrap: wrap; max-width: calc(100% - 50px); }
+.fcard .f-thumb .flag > * { height: 19px !important; font-size: 10.5px !important; padding: 0 7px !important; border-radius: 99px !important; background: rgba(20, 20, 24, .78) !important; color: #fff !important; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); font-weight: 650; display: inline-flex; align-items: center; }
+.fcard .f-more { opacity: 1 !important; width: 32px; height: 32px; background: rgba(255, 255, 255, .96) !important; color: #1d1d1f; box-shadow: 0 1px 3px rgba(0,0,0,.22), 0 0 0 .5px rgba(0,0,0,.12) !important; }
+.fcard .f-more svg.i { width: 18px; height: 18px; stroke-width: 2.4; }
+/* previews use the whole screen */
+.sheet.xfull { width: min(1400px, 96vw) !important; max-width: 96vw !important; height: 94vh; max-height: 94vh !important; }
+.sheet.xfull .sh-body, .sheet.xfull .sheet-body { flex: 1 1 auto; }
+.sheet.xfull .dlp-view { max-height: calc(94vh - 230px); }
+.sheet.xfull .dlp { min-height: calc(94vh - 230px); }
+@media (max-width: 720px) { .sheet.xfull { width: 100vw !important; max-width: 100vw !important; height: 100%; max-height: 100% !important; border-radius: 0 !important; } }
+/* form check in the preview */
+.audit { border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; background: var(--surface); box-shadow: inset 0 0 0 .5px var(--line-2); }
+.audit-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.audit-score { font-size: 22px; font-weight: 750; letter-spacing: -.02em; }
+.audit-bar { flex: 1 1 160px; height: 7px; border-radius: 99px; background: var(--fill-2); overflow: hidden; }
+.audit-bar i { display: block; height: 100%; border-radius: 99px; background: var(--ok); }
+.audit-bar i.mid { background: var(--warn); } .audit-bar i.low { background: var(--danger); }
+.audit ul { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; max-height: 150px; overflow: auto; }
+.audit li { font-size: 13px; line-height: 1.4; display: flex; gap: 8px; }
+.audit li b { font-weight: 650; }
+.audit li .k { flex: none; width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; background: var(--warn); }
+.audit li .k.err { background: var(--danger); } .audit li .k.info { background: var(--accent); }
+/* help */
+.help-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.help-card { border-radius: 14px; background: var(--surface); box-shadow: inset 0 0 0 .5px var(--line-2); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.help-card .art { height: 92px; border-radius: 10px; background: var(--surface-2); display: grid; place-items: center; overflow: hidden; }
+.help-card .art svg { width: 100%; height: 100%; }
+.help-card b { font-size: 14.5px; } .help-card p { margin: 0; font-size: 13px; color: var(--text-2); line-height: 1.45; }
+.help-card kbd { font: 600 11px/1 ui-monospace, Menlo, monospace; padding: 2px 5px; border-radius: 5px; background: var(--fill-2); }
+.help-search { margin-bottom: 12px; }
 </style>
 </head>
 <body>
@@ -5179,6 +5226,8 @@ class Job {
   cancel() { if (this.cancelled) return; this.cancelled = true; this.listeners.forEach(f => { try { f(); } catch (_) {} }); }
   check() { if (this.cancelled) throw new Cancelled(); }
   onCancel(f) { this.listeners.push(f); }
+  /* Cancel works even while a step is still running */
+  race(p) { if (this.cancelled) return Promise.reject(new Cancelled()); return Promise.race([p, new Promise((_, rej) => this.onCancel(() => rej(new Cancelled())))]); }
 }
 const isCancel = (e) => !!(e && (e.cancelled || e.name === 'Cancelled' || e.message === '__cancelled__'));
 
@@ -6340,14 +6389,14 @@ function jpegOrientation(u8) {
 }
 async function decodeImage(blob, isSvg) {
   if (!isSvg && window.createImageBitmap) {
-    try { return await createImageBitmap(blob, { imageOrientation: 'from-image' }); } catch (_) {}
+    try { return await withTimeout(createImageBitmap(blob, { imageOrientation: 'from-image' }), 45000, 'image decoder'); } catch (_) {}
   }
   const url = URL.createObjectURL(blob);
   try {
     const img = new Image();
     img.decoding = 'async';
     img.src = url;
-    await img.decode();
+    await withTimeout(img.decode(), 45000, 'image decoder');
     if (isSvg && !img.naturalWidth) { img.width = 1200; img.height = 1200; }
     return img;
   } finally { setTimeout(() => URL.revokeObjectURL(url), 2000); }
@@ -6390,8 +6439,9 @@ async function imagesToPdf(items, o, P) {
   const out = await PDFDocument.create();
   for (let n = 0; n < items.length; n++) {
     P && P.check();
-    const { u8, fmt, name } = items[n];
-    P && P.sub('Placing ' + name).pct(n / items.length);
+    const { fmt, name } = items[n];
+    P && P.sub('Placing ' + name + (items.length > 1 ? ' (' + (n + 1) + ' of ' + items.length + ')' : '')).pct(n / items.length);
+    const u8 = items[n].u8 || new Uint8Array(await items[n].file.arrayBuffer());
     let emb = null, wPx = 0, hPx = 0;
     const needCanvas = o.enhance && o.enhance !== 'none';
     try {
@@ -6498,7 +6548,12 @@ async function unicodeTextToPdf(text, o) {
 
 /* ---------------- HTML ---------------- */
 async function htmlToPdf(html) {
-  if (COMPLEX_RE.test(String(html).replace(/<[^>]+>/g, ''))) { try { return await domToPdf(html); } catch (e) { console.warn('[ZenPDF] dom layout', e); } }
+  /* lay the page out as a browser would — its own styles, colours and
+     tables — and only fall back to plain text layout when that fails */
+  const body = String(html);
+  const visible = body.replace(/<(script|style|template|noscript)[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').trim();
+  if (!visible) throw new Error('This page has no text of its own — it is built by scripts when opened in a browser. Print it to PDF from the browser instead.');
+  try { const out = await domToPdf(html, { keepStyles: true }); if (out) return out; } catch (e) { console.warn('[ZenPDF] dom layout', e); }
   await need('jspdf', 'autotable');
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
@@ -6610,10 +6665,29 @@ async function domToPdf(html, o) {
   host.className = 'zp-doc';
   host.style.cssText = 'position:fixed;left:-20000px;top:0;width:' + W + 'px;background:#fff';
   const d = new DOMParser().parseFromString(String(html), 'text/html');
-  d.querySelectorAll('script,style,link,iframe,object,embed,noscript').forEach(n => n.remove());
+  let own = '';
+  if (o.keepStyles) {
+    /* the page's own CSS, minus anything that would reach the network or
+       pin the layout to the screen */
+    d.querySelectorAll('style').forEach(st => { own += '\n' + st.textContent; });
+    own = own.replace(/@import[^;]+;/gi, '').replace(/url\((?!\s*['"]?data:)[^)]*\)/gi, 'none').replace(/position\s*:\s*(fixed|sticky)/gi, 'position:relative').replace(/(height|min-height)\s*:\s*100(vh|%)/gi, '$1:auto').replace(/overflow(-y)?\s*:\s*(hidden|auto|scroll)/gi, 'overflow:visible');
+    d.querySelectorAll('[style]').forEach(n => { n.setAttribute('style', n.getAttribute('style').replace(/url\((?!\s*['"]?data:)[^)]*\)/gi, 'none').replace(/position\s*:\s*fixed/gi, 'position:relative')); });
+  }
+  d.querySelectorAll('script,style,link,iframe,object,embed,noscript,template,video,audio,canvas').forEach(n => n.remove());
   d.querySelectorAll('img').forEach(im => { if (!/^data:/i.test(im.getAttribute('src') || '')) im.remove(); });
-  host.innerHTML = '<style>' + css + '</style>' + (d.body ? d.body.innerHTML : '');
+  d.querySelectorAll('*').forEach(n => Array.from(n.attributes).forEach(a => { if (/^on/i.test(a.name)) n.removeAttribute(a.name); }));
+  const bodyStyle = d.body ? (d.body.getAttribute('style') || '') : '';
+  host.innerHTML = '<style>' + css + '</style>' + (own ? '<style>' + own.replace(/(^|[},\s])(html|body)(?=[\s{,.:#\[])/g, '$1div.zp-doc.zp-doc') + '</style>' : '') + '<div style="' + attr(bodyStyle) + '">' + (d.body ? d.body.innerHTML : '') + '</div>';
   document.body.appendChild(host);
+  /* the page's own background (dark themes stay dark, text stays readable) */
+  let pageBg = '#fff';
+  if (o.keepStyles) {
+    host.style.background = '';
+    const inner = host.lastElementChild;
+    const pick = (el) => { if (!el) return null; const c = getComputedStyle(el).backgroundColor; return c && !/rgba\(0, 0, 0, 0\)|transparent/.test(c) ? c : null; };
+    pageBg = pick(host) || pick(inner) || '#fff';
+    host.style.background = pageBg;
+  }
   try {
     try { await document.fonts.ready; } catch (_) {}
     await Promise.all(Array.from(host.querySelectorAll('img')).map(im => im.decode ? im.decode().catch(() => {}) : null));
@@ -6631,7 +6705,7 @@ async function domToPdf(html, o) {
     }
     const ser = new XMLSerializer();
     const clone = host.cloneNode(true);
-    clone.style.cssText = 'width:' + W + 'px;background:#fff';
+    clone.style.cssText = 'width:' + W + 'px;background:' + pageBg;
     const xhtml = ser.serializeToString(clone);
     const { PDFDocument } = PL();
     const out = await PDFDocument.create();
@@ -7027,7 +7101,7 @@ async function ingest(list, o) {
       let u8;
       try { u8 = new Uint8Array(await f.arrayBuffer()); } catch (e) { problems.push([f.name, 'it could not be read']); continue; }
       const sn = await sniff(f, u8);
-      if (sn.kind === 'image') { images.push({ f, u8, sn }); continue; }
+      if (sn.kind === 'image') { images.push({ f, u8: files.length > 6 ? null : u8, sn }); continue; }
       if (sn.kind === 'zip') { problems.push([f.name, 'the archive has nothing this app can open']); continue; }
       sniffed.push({ f, u8, sn });
     }
@@ -7047,7 +7121,7 @@ async function ingest(list, o) {
       P.check();
       P.title('Converting').sub(g.length > 1 ? 'Making one PDF from ' + g.length + ' images' : 'Converting ' + g[0].f.name).pct(0.3 + 0.7 * done / total);
       try {
-        const bytes = await imagesToPdf(g.map(x => ({ u8: x.u8, fmt: x.sn.fmt, name: x.f.name })), o.image || {}, g.length > 3 ? P : null);
+        const bytes = await P.job.race(imagesToPdf(g.map(x => ({ u8: x.u8, file: x.f, fmt: x.sn.fmt, name: x.f.name })), o.image || {}, P));
         const name = g.length > 1 ? (o.groupName || 'Images ' + new Date().toLocaleDateString().replace(/\//g, '-')) + '.pdf' : baseName(g[0].f.name) + '.pdf';
         added.push(await Docs.add(name, bytes, { pages: g.length }));
       } catch (e) { if (isCancel(e)) throw e; problems.push([g.length > 1 ? g.length + ' images' : g[0].f.name, errMsg(e)]); }
@@ -7062,7 +7136,7 @@ async function ingest(list, o) {
           const dup = Docs.files.find(x => x._fp === fp || (x.size === u8.length && x.name === safeName(f.name, 'pdf')));
           if (dup) { toast('“' + esc(f.name) + '” is already in your files', { type: 'info', action: { label: 'Open', fn: () => Z.openEditor(dup.id) } }); added.push(dup); done++; continue; }
         }
-        const r = await convertOne(f, u8, sn, P, o);
+        const r = await P.job.race(convertOne(f, u8, sn, P, o));
         const nf = await Docs.add(sn.kind === 'pdf' ? f.name : baseName(f.name) + '.pdf', r.bytes, { pages: r.pages });
         nf._fp = sn.kind === 'pdf' ? await fingerprintBytes(u8) : null;
         added.push(nf);
@@ -7286,6 +7360,64 @@ function dedupeDoc(doc) {
   return total;
 }
 
+/* PDF watermarks: the marked "Watermark" layers PDF tools add, watermark
+   annotations, and — if you name it — a repeated stamp text on every page */
+Z.removeWatermarks = (...a) => removeWatermarks(...a);
+Z.auditForm = (...a) => auditForm(...a);
+async function removeWatermarks(bytes, o, P) {
+  o = o || {};
+  const L = PL();
+  const d = await loadPdf(bytes);
+  const pages = d.getPages();
+  let removed = 0;
+  const words = String(o.text || '').trim();
+  const esc2 = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  for (let i = 0; i < pages.length; i++) {
+    P && P.check(); P && P.pct(i / pages.length).sub('Page ' + (i + 1) + ' of ' + pages.length);
+    const pg = pages[i], node = pg.node;
+    /* 1) watermark annotations */
+    const annots = node.Annots && node.Annots();
+    if (annots) {
+      const keep = [];
+      for (let k = 0; k < annots.size(); k++) { const a = d.context.lookup(annots.get(k)); const st = a && a.get && a.get(L.PDFName.of('Subtype')); if (st && String(st) === '/Watermark') removed++; else keep.push(annots.get(k)); }
+      if (keep.length !== annots.size()) node.set(L.PDFName.of('Annots'), d.context.obj(keep));
+    }
+    /* 2) marked-content watermark artifacts and named stamps in the page content */
+    const contents = node.get(L.PDFName.of('Contents'));
+    if (!contents) continue;
+    const refs = contents instanceof L.PDFArray ? contents.asArray() : [contents];
+    for (const ref of refs) {
+      const st = d.context.lookup(ref);
+      if (!st || !(st instanceof L.PDFRawStream || st.contents)) continue;
+      let raw;
+      try { raw = st instanceof L.PDFRawStream ? L.decodePDFRawStream(st).decode() : st.getContents(); } catch (_) { continue; }
+      let text = new TextDecoder('latin1').decode(raw);
+      const before = text.length;
+      text = text.replace(/\/Artifact\s*<<[^>]*\/(Subtype|Type)\s*\/(Watermark|Pagination\s*\/Subtype\s*\/Watermark)[^>]*>>\s*BDC[\s\S]*?EMC/g, () => { removed++; return ''; });
+      text = text.replace(/\/Watermark\s*<<[^>]*>>\s*BDC[\s\S]*?EMC/g, () => { removed++; return ''; });
+      if (words) {
+        /* a text block whose strings (literal or hex) spell the stamp */
+        const want = words.toLowerCase().replace(/\s+/g, '');
+        text = text.replace(/\bBT\b[\s\S]*?\bET\b/g, (blk) => {
+          let str = '';
+          blk.replace(/\(((?:[^()\\]|\\.)*)\)|<([0-9A-Fa-f\s]+)>/g, (m, lit, hex) => {
+            if (lit != null) str += lit.replace(/\\(.)/g, '$1');
+            else { const hx = hex.replace(/\s/g, ''); for (let q = 0; q + 1 < hx.length; q += 2) str += String.fromCharCode(parseInt(hx.slice(q, q + 2), 16)); }
+            return m;
+          });
+          if (str && str.toLowerCase().replace(/\s+/g, '').indexOf(want) >= 0) { removed++; return ''; }
+          return blk;
+        });
+      }
+      if (text.length !== before) {
+        const enc = new Uint8Array(text.length); for (let c = 0; c < text.length; c++) enc[c] = text.charCodeAt(c) & 255;
+        d.context.assign(ref, d.context.flateStream(enc));
+      }
+    }
+    if (i % 25 === 0) await yieldUi();
+  }
+  return { bytes: await savePdf(d), removed };
+}
 /* ---------- merge ---------- */
 async function merge(items, o, P) {
   o = o || {};
@@ -8902,6 +9034,63 @@ async function exportAs(bytes, fmt, o, P) {
   }
   throw new Error('Unknown format');
 }
+/* checks a filled form: how complete it is and anything that looks wrong
+   (an NPI with a digit missing, letters in a number box, a bad date…) */
+function npiCheck(v) { const d = String(v).replace(/\D/g, ''); if (d.length !== 10) return false; let s = 24; for (let i = 8; i >= 0; i--) { let n = +d[i]; if ((8 - i) % 2 === 0) { n *= 2; if (n > 9) n -= 9; } s += n; } return (10 - (s % 10)) % 10 === +d[9]; }
+async function auditForm(bytes) {
+  const L = PL();
+  let d;
+  try { d = await loadPdf(bytes); } catch (_) { return null; }
+  let fields;
+  try { fields = d.getForm().getFields(); } catch (_) { return null; }
+  if (!fields.length) return null;
+  const issues = [];
+  let total = 0, filled = 0;
+  const add = (sev, name, msg) => { if (issues.length < 60) issues.push({ sev, name, msg }); };
+  const dateOk = (v) => { const m = /^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})$/.exec(v) || /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(v); if (!m) return /^\d{1,2}\/\d{4}$/.test(v) || /[a-z]{3,}\s+\d{1,2},?\s+\d{4}/i.test(v); return true; };
+  for (const f of fields) {
+    const name = f.getName();
+    const lab = name.replace(/[_.]/g, ' ');
+    if (f instanceof L.PDFTextField) {
+      total++;
+      let v = ''; try { v = (f.getText() || '').trim(); } catch (_) {}
+      if (!v) continue;
+      filled++;
+      const digits = v.replace(/\D/g, '');
+      if (/\bnpi\b/i.test(lab)) { if (/[a-z]/i.test(v)) add('err', name, '“' + v + '” has letters — an NPI is 10 digits'); else if (digits.length !== 10) add('err', name, 'NPI has ' + digits.length + ' digits — it needs exactly 10'); else if (!npiCheck(v)) add('warn', name, 'NPI ' + v + ' fails the NPI check digit — one digit may be wrong'); }
+      else if (/\bfax\b|phone|telephone|\btel\b|mobile|cell/i.test(lab)) { if (/@/.test(v)) add('err', name, 'An email address is in a ' + (/fax/i.test(lab) ? 'fax' : 'phone') + ' box'); else if (digits.length < 10 || digits.length > 15) add('warn', name, '“' + v + '” doesn’t look like a full phone number'); }
+      else if (/e-?mail/i.test(lab)) { if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v)) add('err', name, '“' + v + '” isn’t a valid email address'); }
+      else if (/\bdob\b|date of birth|birth ?date/i.test(lab)) { if (!dateOk(v)) add('warn', name, '“' + v + '” isn’t a clear date (MM/DD/YYYY)'); else { const y = +(v.match(/(\d{4})/) || [])[1]; if (y && (y < 1900 || y > new Date().getFullYear() - 16)) add('warn', name, 'Birth year ' + y + ' looks unlikely'); } }
+      else if (/\bdate\b|expir|effective/i.test(lab)) { if (!dateOk(v)) add('warn', name, '“' + v + '” isn’t a clear date'); }
+      else if (/tax id|\btin\b|\bein\b/i.test(lab)) { if (digits.length !== 9) add('err', name, 'A tax ID has 9 digits — this has ' + digits.length); }
+      else if (/\bssn\b|social security/i.test(lab)) { if (digits.length !== 9) add('err', name, 'An SSN has 9 digits — this has ' + digits.length); }
+      else if (/\bcaqh\b/i.test(lab)) { if (/[a-z]/i.test(v) || digits.length < 5 || digits.length > 10) add('warn', name, 'A CAQH ID is a 5–10 digit number'); }
+      else if (/\bzip\b|postal/i.test(lab) && !/city/i.test(lab)) { if (!/^\d{5}(-?\d{4})?$/.test(v) && !/^\d{6}$/.test(v)) add('warn', name, '“' + v + '” isn’t a ZIP / PIN code'); }
+      else if (/\bpan\b/i.test(lab)) { if (!/^[A-Z]{5}\d{4}[A-Z]$/i.test(v)) add('err', name, 'A PAN looks like ABCDE1234F'); }
+      else if (/\bifsc\b/i.test(lab)) { if (!/^[A-Z]{4}0[A-Z0-9]{6}$/i.test(v)) add('err', name, 'An IFSC is 11 characters like HDFC0001234'); }
+      else if (/\bgstin?\b/i.test(lab)) { if (!/^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/i.test(v)) add('err', name, 'A GSTIN is 15 characters like 29ABCDE1234F1Z5'); }
+      else if (/aadhaa?r/i.test(lab)) { if (digits.length !== 12) add('err', name, 'An Aadhaar number has 12 digits'); }
+      else if (/\bdea\b/i.test(lab)) { if (!/^[A-Z][A-Z9]\d{7}$/i.test(v.replace(/\s/g, ''))) add('warn', name, 'A DEA number is 2 letters + 7 digits'); }
+      if (/^\s|\s{2,}|\s$/.test(f.getText() || '')) add('info', name, 'Extra spaces around the answer');
+    } else if (f instanceof L.PDFCheckBox || f instanceof L.PDFRadioGroup || f instanceof L.PDFDropdown) {
+      total++;
+      try { if (f instanceof L.PDFCheckBox ? f.isChecked() : (f.getSelected() || []).length) filled++; } catch (_) {}
+    }
+  }
+  const textTotal = fields.filter(f => f instanceof L.PDFTextField).length;
+  const textFilled = fields.filter(f => { try { return f instanceof L.PDFTextField && (f.getText() || '').trim(); } catch (_) { return false; } }).length;
+  const errs = issues.filter(i => i.sev === 'err').length, warns = issues.filter(i => i.sev === 'warn').length;
+  const completeness = textTotal ? textFilled / textTotal : filled / Math.max(1, total);
+  const score = Math.max(0, Math.round(100 * completeness - errs * 8 - warns * 3));
+  return { total, filled, textTotal, textFilled, issues, score, errs, warns };
+}
+function auditHtml(a) {
+  if (!a) return '';
+  const cls = a.score >= 85 ? '' : a.score >= 60 ? 'mid' : 'low';
+  const label = a.errs ? plural(a.errs, 'problem') + ' to fix' : a.warns ? plural(a.warns, 'thing') + ' to check' : 'Looks good';
+  return `<div class="audit"><div class="audit-head"><div class="audit-score">${a.score}%</div><div style="font-size:13px;line-height:1.35"><b>Form check · ${label}</b><div class="muted">${a.textFilled} of ${a.textTotal} text boxes filled · ${a.filled} of ${a.total} fields answered</div></div><div class="audit-bar"><i class="${cls}" style="width:${a.score}%"></i></div></div>
+    ${a.issues.length ? `<ul>${a.issues.map(i => `<li><span class="k ${i.sev}"></span><span><b>${esc(i.name.slice(0, 60))}</b> — ${esc(i.msg)}</span></li>`).join('')}</ul>` : ''}</div>`;
+}
 /* see exactly what will be downloaded before it is saved */
 async function previewDownload(items, o) {
   o = o || {};
@@ -8986,8 +9175,11 @@ async function previewDownload(items, o) {
   const foot = [{ label: o.back ? 'Back' : 'Cancel', value: null }];
   if (o.share && canShareFiles()) foot.push({ label: 'Share', icon: 'share', value: 'share' });
   foot.push({ label: items.length > 1 ? 'Download all' : 'Download', icon: 'download', kind: 'primary', id: 'dl', value: 'download' });
-  const s = sheet({ title: o.title || 'Preview', sub: items.length === 1 ? esc(items[0].name) + ' · ' + fmtBytes(sizeOf(items[0])) : 'Check everything before it is saved', body, foot, size: 'xwide', enter: 'dl' });
+  const s = sheet({ title: o.title || 'Preview', sub: items.length === 1 ? esc(items[0].name) + ' · ' + fmtBytes(sizeOf(items[0])) : 'Check everything before it is saved', body, foot, size: 'xwide', cls: 'xfull', enter: 'dl' });
   setTimeout(() => show(0), 60);
+  /* a filled form gets checked for completeness and mistakes */
+  const pdfs = items.filter(it => kindOf(it.name) === 'pdf');
+  if (pdfs.length === 1) bytesOf(pdfs[0]).then(b => auditForm(b.slice())).then(a => { if (a && a.total) { const m = $('.dlp-meta', body); if (m) m.insertAdjacentHTML('afterend', auditHtml(a)); } }).catch(() => {});
   const r = await s.result;
   token++;
   return r;
@@ -9449,6 +9641,16 @@ tool({ id: 'flatten', cat: 'optimize', title: 'Flatten PDF', icon: 'layers', des
     const results = []; let fields = 0, ann = 0;
     for (const f of T.files) { const r = await flatten(await Docs.bytes(f), T.opts); fields += r.fields; ann += r.annots; results.push(await pdfResult(f.name, r.bytes)); }
     return { results, headline: 'Flattened', detail: plural(fields, 'field') + ' and ' + plural(ann, 'annotation') + ' locked in', replace: T.files.length === 1 ? T.files[0].id : null };
+  } });
+tool({ id: 'nowatermark', cat: 'optimize', title: 'Remove watermark', icon: 'eraser', desc: 'Take off watermarks that PDF software added to your own documents — “DRAFT”, “CONFIDENTIAL”, logos.', kw: 'watermark remove draft confidential stamp sample background',
+  input: 'pdf', opts: { text: '' }, cta: () => 'Remove watermark',
+  side: (T) => optBlock('Watermark text (optional)', `<input class="input" id="o-wt" placeholder="e.g. DRAFT, CONFIDENTIAL, SAMPLE" value="${attr(T.opts.text)}" autocomplete="off"><div class="hint" style="margin-top:6px">Watermarks marked as watermarks are found automatically. Type the words of a stamp to remove that text too.</div>`)
+    + `<div class="note" style="margin-top:10px">${icon('info')}<div>For documents you own or have the right to change. Watermarks drawn into scanned pictures can’t be removed — cover them with <b>Whiteout</b> in the editor instead.</div></div>`,
+  bind: (T, r) => { $('#o-wt', r).oninput = (e) => T.opts.text = e.target.value; },
+  run: async (T, P) => {
+    const results = []; let n = 0;
+    for (const f of T.files) { const r = await removeWatermarks(await Docs.bytes(f), T.opts, P); n += r.removed; results.push(await pdfResult(f.name, r.bytes)); }
+    return { results, headline: n ? 'Watermark removed' : 'No watermark found', detail: n ? plural(n, 'watermark layer') + ' removed' : 'Nothing was marked as a watermark' + (T.opts.text ? ' and “' + esc(T.opts.text) + '” wasn’t found as text' : '') + '. Try typing the watermark’s words, or cover it with Whiteout.', replace: T.files.length === 1 ? T.files[0].id : null };
   } });
 tool({ id: 'grayscale', cat: 'optimize', title: 'Grayscale PDF', icon: 'droplet', desc: 'Convert colour documents to black & white for printing.', kw: 'black white monochrome gray grey print ink',
   input: 'pdf', opts: { how: 'images', dpi: 200 }, cta: () => 'Convert to grayscale',
@@ -11143,6 +11345,7 @@ const Editor = Z.Editor = {
           <button class="ibtn" data-a="undo" title="Undo">${icon('undo')}</button>
           <button class="ibtn" data-a="redo" title="Redo">${icon('redo')}</button>
           <button class="ibtn" data-a="find" title="Find">${icon('search')}</button>
+          <button class="ibtn hide-m" data-a="help" title="Help">${icon('info')}</button>
           <button class="ibtn" data-a="more" title="More">${icon('more')}</button>
           <button class="btn primary sm" data-a="download" style="margin-left:4px">${icon('download', 'sm')}<span class="hide-m">Download</span></button>
         </div>
@@ -12069,12 +12272,16 @@ const Editor = Z.Editor = {
   },
   fontFor(P, s) {
     let name = s.font || '';
-    try { if (P.page && P.page.commonObjs.has(s.font)) { const fo = P.page.commonObjs.get(s.font); if (fo && fo.name) name = fo.name; } } catch (_) {}
+    let flagBold = false, flagItalic = false;
+    try { if (P.page && P.page.commonObjs.has(s.font)) { const fo = P.page.commonObjs.get(s.font); if (fo) { if (fo.name) name = fo.name; flagBold = !!(fo.bold || fo.black); flagItalic = !!fo.italic; } } } catch (_) {}
     const all = name + ' ' + (s.fam || '');
-    return {
-      font: /courier|mono|consol|menlo|typewriter/i.test(all) ? 'cour' : /times|serif|georgia|garamond|book|roman|cambria|palatino|minion|charter/i.test(all) && !/sans/i.test(all) ? 'times' : 'helv',
-      bold: /bold|black|heavy|semib|demib|extrab|[-_ ,]([6-9]00)/i.test(name), italic: /italic|oblique/i.test(name),
-    };
+    const font = /courier|mono|consol|menlo|typewriter/i.test(all) ? 'cour' : /times|serif|georgia|garamond|book|roman|cambria|palatino|minion|charter/i.test(all) && !/sans/i.test(all) ? 'times' : 'helv';
+    let bold = flagBold || /bold|black|heavy|semib|demib|extrab|[-_ ,]([6-9]00)/i.test(name);
+    /* names don't always say it: compare the width with regular and bold */
+    if (!bold && s.str && s.str.length >= 4 && s.w > 0 && font !== 'cour') {
+      try { const reg = Metrics.width({ font, size: s.size, bold: false }, s.str), bld = Metrics.width({ font, size: s.size, bold: true }, s.str); if (bld > reg * 1.02 && Math.abs(s.w - bld) < Math.abs(s.w - reg) * 0.7) bold = true; } catch (_) {}
+    }
+    return { font, bold, italic: flagItalic || /italic|oblique/i.test(name) };
   },
   samplePixels(P, r, inside) {
     const cv = P.canvas; if (!cv || !P.scale) return null;
@@ -12462,7 +12669,7 @@ const Editor = Z.Editor = {
         if (a.fieldType === 'Tx') {
           const v = has ? vals[name] : (a.fieldValue || '');
           const al = a.textAlignment === 1 ? 'center' : a.textAlignment === 2 ? 'right' : 'left';
-          node = h(`<div class="fw ${a.readOnly ? 'ro' : ''} ${has && String(v) ? 'filled' : ''}" data-f="${attr(name)}" style="${pos}">${a.multiLine ? `<textarea style="${fontCss};text-align:${al}" ${a.readOnly ? 'disabled' : ''}></textarea>` : `<input type="text" style="${fontCss};text-align:${al};${a.comb && a.maxLen ? `letter-spacing:calc(${w / a.maxLen * 0.55}px * var(--z));padding-left:calc(${w / a.maxLen * 0.3}px * var(--z))` : ''}" ${a.maxLen ? 'maxlength="' + a.maxLen + '"' : ''} ${a.readOnly ? 'disabled' : ''}>`}</div>`);
+          node = h(`<div class="fw ${a.readOnly ? 'ro' : ''} ${String(v == null ? '' : v) ? 'filled' : ''}" data-f="${attr(name)}" style="${pos}">${a.multiLine ? `<textarea style="${fontCss};text-align:${al}" ${a.readOnly ? 'disabled' : ''}></textarea>` : `<input type="text" style="${fontCss};text-align:${al};${a.comb && a.maxLen ? `letter-spacing:calc(${w / a.maxLen * 0.55}px * var(--z));padding-left:calc(${w / a.maxLen * 0.3}px * var(--z))` : ''}" ${a.maxLen ? 'maxlength="' + a.maxLen + '"' : ''} ${a.readOnly ? 'disabled' : ''}>`}</div>`);
           const inp = node.firstElementChild; inp.value = v == null ? '' : String(v);
           inp.title = a.alternativeText || name;
           inp.addEventListener('focus', () => { this.formBefore = this.snap(); });
@@ -12524,6 +12731,36 @@ const Editor = Z.Editor = {
     this.pages.forEach(P => $$('.l-form [data-f]', P.el).forEach(n => { if (set.has(n.dataset.f)) n.classList.add('auto'); }));
   },
 
+  /* ---------------- help ---------------- */
+  help() {
+    const A = (inner) => `<svg viewBox="0 0 240 92" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="240" height="92" fill="none"/><rect x="62" y="8" width="116" height="76" rx="4" fill="#fff" stroke="#d2d2d7"/>${inner}</svg>`;
+    const L = (y, w, c) => `<rect x="74" y="${y}" width="${w}" height="5" rx="2.5" fill="${c || '#e5e5ea'}"/>`;
+    const lines = L(18, 70) + L(28, 86) + L(38, 60) + L(58, 80) + L(68, 50);
+    const items = [
+      ['Select & move', 'select', 'Click anything you added to move it, resize it from the corners, or use the bar above it to duplicate, save to your library, bring forward or delete. Arrow keys nudge; Shift+arrows move further.', A(lines + '<rect x="96" y="40" width="58" height="22" fill="rgba(10,132,255,.08)" stroke="#0a84ff" stroke-dasharray="3 2"/><circle cx="96" cy="40" r="3" fill="#fff" stroke="#0a84ff"/><circle cx="154" cy="62" r="3" fill="#fff" stroke="#0a84ff"/>'), 'V'],
+      ['Edit existing text', 'edittext', 'Click any line of the PDF and retype it. The original words are removed and your text is written in the closest matching font, size, colour and weight — bold stays bold.', A(L(18, 70) + '<rect x="72" y="26" width="84" height="11" fill="rgba(10,132,255,.1)" stroke="#0a84ff"/><text x="76" y="35" font-size="9" font-family="Helvetica" fill="#111">New wording|</text>' + L(48, 80) + L(58, 60)), 'E'],
+      ['Add text', 'text', 'Click where you want to type. Choose Sans, Serif or Mono, size, bold, italic, underline, alignment and colour from the bar.', A(lines + '<text x="80" y="54" font-size="11" font-family="Helvetica" font-weight="700" fill="#1c3faa">Hello</text>'), 'T'],
+      ['Sign — with name & date', 'sign', 'Draw, type (14 handwriting styles) or photograph your signature. Turn on “Name & date” to place a line like “Name (Jun 15, 2026 10:49 IST)” under it — it moves with the signature.', A(lines + '<path d="M88 60c8-14 14 6 20-6s10 8 18-2 8 4 16-4" fill="none" stroke="#1c3faa" stroke-width="2.2" stroke-linecap="round"/><text x="88" y="74" font-size="6.5" font-family="Helvetica" fill="#1c3faa">Harsha (Oct 13, 2026)</text>'), 'S'],
+      ['Draw & erase', 'draw', 'Freehand pen with colour, width and opacity. Switch to Eraser and rub over a stroke to remove just that part.', A(lines + '<path d="M84 60c12-10 24 8 36-2s20-6 30 2" fill="none" stroke="#d70015" stroke-width="2.5" stroke-linecap="round"/><circle cx="140" cy="58" r="7" fill="rgba(10,132,255,.1)" stroke="#0a84ff"/>'), 'D'],
+      ['Highlight', 'highlight', 'Drag over text to highlight it in yellow, green, pink or blue.', A(L(18, 70) + '<rect x="72" y="25" width="70" height="9" fill="#ffd60a" opacity=".6"/>' + L(27, 66) + L(48, 80) + L(58, 60)), 'H'],
+      ['Shapes', 'shape', 'Boxes, circles, lines and arrows with line colour, fill and width.', A(lines + '<rect x="90" y="44" width="34" height="24" fill="none" stroke="#d70015" stroke-width="2"/><path d="M130 66l22-18" stroke="#1c3faa" stroke-width="2"/><path d="M152 48l-7 1 4 5z" fill="#1c3faa"/>'), 'R'],
+      ['Whiteout', 'white', 'Box or Brush. Covers anything with the paper colour (picked automatically). Use it on a scanned watermark or a mistake.', A(lines + '<rect x="72" y="35" width="70" height="12" fill="#fff" stroke="#c7c7cc" stroke-dasharray="2 2"/>'), 'W'],
+      ['Lift', 'lift', 'Drag a box around a signature, logo or stamp: it becomes a movable picture with the paper removed, and the original is covered.', A(lines + '<rect x="84" y="44" width="40" height="24" fill="none" stroke="#0a84ff" stroke-dasharray="3 2"/><path d="M96 60c5-8 9 3 13-3s6 4 10-1" fill="none" stroke="#111" stroke-width="1.6"/><path d="M130 52h14m-5-5 5 5-5 5" stroke="#0a84ff" stroke-width="1.6" fill="none"/>'), 'L'],
+      ['Images', 'image', 'Add a photo or logo. Paste a picture with Ctrl/⌘+V, or drop one onto the page.', A(lines + '<rect x="88" y="42" width="40" height="28" rx="2" fill="#e8f1fd" stroke="#0a84ff"/><circle cx="98" cy="51" r="4" fill="#0a84ff"/><path d="M90 68l12-10 9 7 8-6 9 9z" fill="#0a84ff" opacity=".5"/>'), 'I'],
+      ['Marks & stamps', 'mark', 'Ticks, crosses, dots and today’s date in the format you choose (with the time if you like). Stamps add APPROVED, PAID, CONFIDENTIAL and more.', A(lines + '<path d="M86 52l6 6 12-12" stroke="#248a3d" stroke-width="2.6" fill="none" stroke-linecap="round"/><rect x="112" y="44" width="46" height="16" rx="3" fill="none" stroke="#d70015" stroke-width="1.6" transform="rotate(-8 135 52)"/><text x="117" y="56" font-size="8" font-weight="700" fill="#d70015" transform="rotate(-8 135 52)">PAID</text>'), 'M'],
+      ['Comments', 'note', 'Pin a note anywhere. Comments stay as real PDF comments others can read.', A(lines + '<path d="M120 38h28a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4h-18l-8 6v-6h-2a4 4 0 0 1-4-4V42a4 4 0 0 1 4-4z" fill="#ffd60a" stroke="#c9a400"/>'), 'C'],
+      ['Redact', 'redact', 'Black out boxes by hand, or More › Find & redact to remove every match of a name or number. Redactions remove the words for real when you download.', A(L(18, 70) + '<rect x="72" y="26" width="52" height="9" fill="#111"/>' + L(48, 80) + '<rect x="100" y="56" width="34" height="9" fill="#111"/>'), 'X'],
+      ['Fill forms', 'form', 'Type straight into fillable boxes; Tab moves to the next one. “Hide form fields” (More) shows your answers on a clean page.', A(L(18, 40) + '<rect x="118" y="15" width="50" height="10" fill="#eef5ff" stroke="#9cc3f7"/><text x="121" y="23" font-size="7" fill="#111">06/29/1991</text>' + L(36, 40) + '<rect x="118" y="33" width="50" height="10" fill="#eef5ff" stroke="#9cc3f7"/><rect x="74" y="54" width="8" height="8" fill="#fff" stroke="#333"/><path d="M75.5 58l2 2 3-4" stroke="#111" stroke-width="1.2" fill="none"/>' + L(56, 60)), ''],
+      ['Smart Autofill', 'autofill', 'Fills a form from a profile, a CAQH printout, a filled form, a spreadsheet or a CV — by meaning. Review every answer first; fixes you make are remembered for that form.', A(L(18, 40) + '<rect x="118" y="15" width="50" height="10" fill="#e8f8ec" stroke="#34c759"/>' + L(36, 40) + '<rect x="118" y="33" width="50" height="10" fill="#e8f8ec" stroke="#34c759"/><path d="M150 60l4-8 4 8-8-5h8z" fill="#af52de"/>'), ''],
+      ['Pages', 'organize', 'Rotate, delete, insert a blank page or duplicate the current page. Your edits stay editable and follow their page. Every page change can be undone.', A('<rect x="40" y="16" width="44" height="60" rx="3" fill="#fff" stroke="#d2d2d7"/><rect x="98" y="16" width="44" height="60" rx="3" fill="#fff" stroke="#0a84ff" stroke-width="1.6"/><rect x="156" y="16" width="44" height="60" rx="3" fill="#fff" stroke="#d2d2d7"/><path d="M120 40a8 8 0 1 1-6 3" stroke="#0a84ff" fill="none" stroke-width="1.6"/>'), ''],
+      ['Undo everything', 'undo', 'Undo and Redo cover every change — text, signatures, form answers, page changes and “write edits in”. Each document keeps its own history while the app is open.', A(lines + '<path d="M96 52a14 14 0 1 1 4 10" stroke="#0a84ff" stroke-width="2" fill="none"/><path d="M92 46l4 6 6-3" stroke="#0a84ff" stroke-width="2" fill="none"/>'), 'Ctrl+Z'],
+      ['Download with preview', 'download', 'Choose PDF, a flattened PDF, Word, images or text. You see every page first — and filled forms get a Form check that points out a short NPI, an email in a fax box and other slips.', A(lines + '<rect x="150" y="56" width="22" height="22" rx="5" fill="#0a84ff"/><path d="M161 61v10m-4-4 4 4 4-4" stroke="#fff" stroke-width="1.8" fill="none"/>'), ''],
+    ];
+    const body = h(`<div><input class="input help-search" placeholder="Search help — e.g. sign, redact, undo" autocomplete="off"><div class="help-grid">${items.map(([t, , d, art, k]) => `<div class="help-card" data-q="${attr((t + ' ' + d).toLowerCase())}"><div class="art">${art}</div><b>${esc(t)}${k ? ` <kbd>${esc(k)}</kbd>` : ''}</b><p>${esc(d)}</p></div>`).join('')}</div>
+      <p class="muted" style="font-size:12.5px;margin-top:14px">Everything happens on this device — nothing is uploaded. Keyboard: <kbd>Ctrl/⌘+Z</kbd> undo · <kbd>Ctrl/⌘+Shift+Z</kbd> redo · <kbd>Ctrl/⌘+C / V</kbd> copy and paste items · <kbd>Delete</kbd> remove · <kbd>Esc</kbd> back to Select.</p></div>`);
+    $('.help-search', body).oninput = (e) => { const q = e.target.value.trim().toLowerCase(); $$('.help-card', body).forEach(c => { c.style.display = !q || c.dataset.q.indexOf(q) >= 0 ? '' : 'none'; }); };
+    sheet({ title: 'How the editor works', body, size: 'xwide', foot: [{ label: 'Done', kind: 'primary', value: null }] });
+  },
   /* ---------------- find ---------------- */
   async openFind() {
     if ($('.find-bar', this.el)) { $('.find-bar input', this.el).select(); return; }
@@ -12557,7 +12794,7 @@ const Editor = Z.Editor = {
       let text = '';
       const map = [];
       P.items.forEach((it, k) => {
-        if (text && !/\s$/.test(text)) { const prev = P.items[k - 1]; if (prev && (Math.abs(prev.base - it.base) > prev.size * 0.4 || it.x - (prev.x + prev.w) > it.size * 0.15)) text += ' '; }
+        if (text && !/\s$/.test(text)) { const prev = P.items[k - 1]; if (prev && (Math.abs(prev.base - it.base) > prev.size * 0.4 || it.x - (prev.x + prev.w) > it.size * 0.15)) { text += ' '; map.push([k - 1, prev.str.length]); } }
         const s = it.str.replace(/\s+/g, ' ');
         for (let c = 0; c < s.length; c++) map.push([k, c]);
         text += s;
@@ -12569,13 +12806,30 @@ const Editor = Z.Editor = {
         const rects = [];
         const byItem = new Map();
         for (let c = at; c < at + needle.length; c++) { const m = map[c]; if (!m) continue; const [k, ci] = m; if (!byItem.has(k)) byItem.set(k, [ci, ci]); else byItem.get(k)[1] = ci; }
-        byItem.forEach(([c0, c1], k) => { const it = P.items[k]; if (!it.upright || !it.str.length) return; const cw = it.w / it.str.length; rects.push([it.x + cw * c0, it.base - it.size * 0.86, cw * (c1 - c0 + 1), it.size * 1.12]); });
+        byItem.forEach(([c0, c1], k) => {
+          const it = P.items[k]; if (!it.upright || !it.str.length) return;
+          const str = it.str.replace(/\s+/g, ' ');
+          const x0 = it.x + this.textX(it, str, c0), x1 = it.x + this.textX(it, str, Math.min(str.length, c1 + 1));
+          const asc = clamp(it.asc || 0.8, 0.6, 1);
+          rects.push([x0, it.base - it.size * asc, Math.max(0.5, x1 - x0), it.size * (asc + 0.24)]);
+        });
         if (rects.length) hits.push({ p: P.i, rects });
         at = low.indexOf(needle, at + Math.max(1, needle.length));
       }
       if (onProg && P.i % 20 === 0) { onProg(P.i + 1, this.pages.length); await yieldUi(); }
     }
     return hits;
+  },
+  /* where character c of a text run starts, measured in a matching font
+     and scaled to the run's real width — proportional, not averaged */
+  textX(it, str, c) {
+    if (c <= 0) return 0;
+    if (c >= str.length) return it.w;
+    const cx = this._mctx || (this._mctx = document.createElement('canvas').getContext('2d'));
+    const fam = /courier|mono/i.test((it.fam || '') + it.font) ? 'Courier New, monospace' : /times|serif/i.test(it.fam || '') && !/sans/i.test(it.fam || '') ? 'Times New Roman, serif' : 'Helvetica, Arial, sans-serif';
+    cx.font = '100px ' + fam;
+    const full = cx.measureText(str).width || 1;
+    return it.w * cx.measureText(str.slice(0, c)).width / full;
   },
   paintFind() {
     const st = this.findState; if (!st) return;
@@ -12605,7 +12859,7 @@ const Editor = Z.Editor = {
     const ok = await confirmBox('Redact ' + plural(hits.length, 'match', 'matches') + '?', 'They’re removed for real when you download.', { ok: 'Redact' });
     if (!ok) return;
     const before = this.snap();
-    hits.forEach(hh => hh.rects.forEach(r => this.edits.objs.push({ id: uid('o'), t: 'redact', p: hh.p, x: r[0] - 1, y: r[1] - 1, w: r[2] + 2, h: r[3] + 2 })));
+    hits.forEach(hh => hh.rects.forEach(r => { const pad = Math.max(1, r[3] * 0.08); this.edits.objs.push({ id: uid('o'), t: 'redact', p: hh.p, x: r[0] - pad, y: r[1] - pad, w: r[2] + pad * 2, h: r[3] + pad * 2 }); }));
     this.push(before); this.commit();
     toast(plural(hits.length, 'match', 'matches') + ' marked for redaction', { type: 'ok' });
   },
@@ -12618,6 +12872,7 @@ const Editor = Z.Editor = {
       case 'undo': this.undo(); break;
       case 'redo': this.redo(); break;
       case 'find': this.openFind(); break;
+      case 'help': this.help(); break;
       case 'download': if (this.textEdit) this.commitText(); exportSheet(this.f, { current: this.cur }); break;
       case 'autofill': Z.Autofill.start(this); break;
       case 'organize': await this.pageOps(btn); break;
@@ -12711,6 +12966,7 @@ const Editor = Z.Editor = {
       { label: 'Save my answers as a profile', icon: 'idcard', act: () => Z.Autofill.saveFromForm(this) },
       { label: 'Find & redact…', icon: 'redact', act: () => this.findRedact() },
       { label: 'Saved elements…', icon: 'library', act: () => this.openLibrary() },
+      { label: 'Help — how everything works', icon: 'info', act: () => this.help() },
       { label: 'Signature name & date…', icon: 'calendar', act: async () => { await Sign.stampSheet(); this.showProps(); } },
       { label: document.body.classList.contains('forms-off') ? 'Show form fields' : 'Hide form fields', icon: 'form', act: () => document.body.classList.toggle('forms-off') },
       { label: this.el.classList.contains('compact') ? 'Show tool names' : 'Compact toolbar', icon: 'sliders', act: () => { const c = !this.el.classList.contains('compact'); this.el.classList.toggle('compact', c); Settings.set('edCompact', c); } },
@@ -12803,7 +13059,7 @@ Object.assign(Z, { blobToDataUrl, stampImage });
    handwriting font, or photograph one on paper (the background is
    removed).  Saved signatures are one tap away next time.
    ================================================================== */
-const SIG_FONTS = [['Great Vibes', 'Great Vibes'], ['Dancing Script', 'Dancing Script'], ['Homemade Apple', 'Homemade Apple'], ['Caveat', 'Caveat']];
+const SIG_FONTS = [['Mrs Saint Delafield', 'Classic'], ['Herr Von Muellerhoff', 'Flowing'], ['La Belle Aurore', 'Pen'], ['Homemade Apple', 'Handwritten'], ['Sacramento', 'Fine'], ['Great Vibes', 'Formal'], ['Allura', 'Elegant'], ['Alex Brush', 'Brush'], ['Meddon', 'Old style'], ['Yellowtail', 'Bold script'], ['Dancing Script', 'Casual'], ['Kristi', 'Quick'], ['Reenie Beanie', 'Marker'], ['Caveat', 'Note']];
 const SIG_INKS = ['#111111', '#1c3faa', '#0b2a6f', '#6b1fb1'];
 function trimCanvas(cv) {
   const cx = cv.getContext('2d');
@@ -13756,6 +14012,30 @@ const Autofill = Z.Autofill = {
       }
     });
   },
+  /* a group of "pick one" boxes (Provider Type, Application Type) gets
+     one tick — the best fit — and the other likely ones are offered for
+     you to confirm */
+  singleChoice(plan) {
+    const groups = new Map();
+    plan.forEach(r => {
+      const f = r.field;
+      if (f.kind !== 'check' || r.val !== true) return;
+      const g = (f.rowHead || (f.labels || [])[1] || (f.ctx || [])[0] || '') + '|' + f.page;
+      if (!groups.has(g)) groups.set(g, []);
+      groups.get(g).push(r);
+    });
+    groups.forEach((rs, g) => {
+      if (rs.length < 2) return;
+      const head = g.split('|')[0];
+      const many = /select all|check all|all that apply|tick all|mark all|one or more/i.test(head);
+      const one = /select one|choose one|one only|only one|\(one\)|pick one/i.test(head) || /provider type|practitioner type|type of provider|application type/i.test(head);
+      if (many || !one) return;
+      const rank = (r) => { const l = (r.field.boxLabel || (r.field.labels || [])[0] || '').toLowerCase(); return /behavioral|primary care|specialist|mid-?level|hospitalist|urgent/.test(l) ? 2 : /mental health|substance/.test(l) ? 1 : 0; };
+      rs.sort((a, b) => (b.conf || 0) + rank(b) - (a.conf || 0) - rank(a));
+      rs.slice(1).forEach(r => { r.on = false; r.conf = Math.min(r.conf || 0.6, 0.6); r.derived = 'also fits — this question looks like “pick one”, so it is off; turn on if the form allows more'; });
+      rs[0].derived = (rs[0].derived ? rs[0].derived + ' · ' : '') + 'best single fit';
+    });
+  },
   applyMemory(plan, m, person) {
     const vals = Object.assign({}, m.constants || {}, (m.values && m.values[person || '_']) || {});
     plan.forEach(r => {
@@ -13969,6 +14249,7 @@ const Autofill = Z.Autofill = {
       memory = await AFMem.get(fp);
       plan = ZPMatch.planForm(target.fields, F, { memory: Object.assign({}, this.contextRules(target.fields), memory.fields) });
       this.medicalRules(plan, F);
+      this.singleChoice(plan);
       this.applyMemory(plan, memory, this.personKey(F));
       this.checkValues(plan, ed);
     } catch (e) { P2.done(); if (isCancel(e)) return; fail(e, 'Autofill'); return; }
