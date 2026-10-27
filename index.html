@@ -8724,7 +8724,47 @@ function dataUrlBytes(u) {
   return { mime: m[1] || '', bytes: b };
 }
 
+/* shrink the text of a form box in the editor until it fits (never grows past the form's size) */
+function fitFormInputs(root) {
+  $$('.fw input[type="text"], .fw textarea', root).forEach(el => {
+    if (!el.dataset.fs) { const m = /calc\(([\d.]+)px/.exec(el.getAttribute('style') || ''); el.dataset.fs = m ? m[1] : '11'; }
+    const fit = () => {
+      let n = parseFloat(el.dataset.fs);
+      el.style.fontSize = 'calc(' + n + 'px * var(--z))';
+      if (!el.value) return;
+      let guard = 40;
+      const over = () => el.tagName === 'TEXTAREA' ? el.scrollHeight > el.clientHeight + 1 : el.scrollWidth > el.clientWidth + 1;
+      while (guard-- > 0 && n > 5 && over()) { n -= 0.5; el.style.fontSize = 'calc(' + n + 'px * var(--z))'; }
+    };
+    if (!el._fitWired) { el._fitWired = true; el.addEventListener('input', fit); }
+    fit();
+  });
+}
 /* ---------- form values ---------- */
+/* the largest font size (up to the form's own) at which the text fits every box of the field */
+function fitFieldFont(f, s, font) {
+  const ws = f.acroField.getWidgets();
+  let da = 12;
+  try { const m = /([\d.]+)\s+Tf/.exec(f.acroField.getDefaultAppearance() || ''); if (m && parseFloat(m[1]) > 0) da = parseFloat(m[1]); } catch (_) {}
+  const ml = (() => { try { return f.isMultiline(); } catch (_) { return false; } })();
+  const lines = (sz, W) => { let n = 1, cur = 0; const sp = font.widthOfTextAtSize(' ', sz); String(s).split(/\n/).forEach((para, pi) => { if (pi) { n++; cur = 0; } para.split(/\s+/).forEach(word => { const ww = font.widthOfTextAtSize(word, sz); if (cur && cur + sp + ww > W) { n++; cur = ww; } else cur += (cur ? sp : 0) + ww; }); }); return n; };
+  let best = da;
+  ws.forEach(w => {
+    let r = w.getRectangle();
+    if (r.width < 0 || r.height < 0) { r = { x: Math.min(r.x, r.x + r.width), y: Math.min(r.y, r.y + r.height), width: Math.abs(r.width), height: Math.abs(r.height) }; try { w.setRectangle(r); } catch (_) {} }
+    const W = r.width - 4, H = r.height - 2;
+    if (W <= 2 || H <= 2) return;
+    const w1 = font.widthOfTextAtSize(String(s).replace(/\n/g, ' '), 1) || 1;
+    const cap = Math.min(da, 14, H * 0.78);
+    let size = Math.min(cap, W / w1);
+    if (ml && size < cap * 0.92) {
+      for (let sz = cap; sz >= 5; sz -= 0.5) { if (lines(sz, W) * sz * 1.17 <= H) { size = Math.max(size, sz); break; } }
+    }
+    best = Math.min(best, Math.max(5, size));
+  });
+  best = Math.round(best * 2) / 2;
+  if (Math.abs(best - da) > 0.25) { try { f.setFontSize(best); } catch (_) {} }
+}
 async function applyFormValues(doc, values, o) {
   const L = PL();
   let form;
@@ -8742,6 +8782,7 @@ async function applyFormValues(doc, values, o) {
         const ml = f.getMaxLength();
         if (ml && s.length > ml) s = s.slice(0, ml);
         f.setText(s);
+        if (s && isWinAnsi(s)) { try { fitFieldFont(f, s, font); } catch (e) { console.warn('[ZenPDF] fit', name, e); } }
         if (s && !isWinAnsi(s)) raster.push(f);
         else { try { f.updateAppearances(font); } catch (_) { raster.push(f); } }
       } else if (f instanceof L.PDFCheckBox) { if (v === true || v === 'true' || v === 'Yes' || v === 'On') f.check(); else f.uncheck(); }
@@ -11243,7 +11284,7 @@ function renderSettings(v) {
     <div class="group-title">Signatures</div><div class="group">
       <button class="cell tap" data-act="sigs"><div class="c-main"><div class="c-title">Saved signatures</div><div class="c-sub">${plural(sigs.length, 'signature')}</div></div><span class="chev">${icon('chev-r', 'sm')}</span></button>
     </div>
-    <div class="group-title">Team form rules</div><div class="group" id="st-team"><div class="cell"><div class="c-main"><div class="c-title">Loading…</div></div></div></div>
+    <div class="group-title" style="display:none">Team form rules</div><div class="group" id="st-team" style="display:none"></div>
     <div class="group-title">Browser downloads</div><div class="group" id="st-inbox"></div>
     <div class="group-title">Storage</div><div class="group">
       <div class="cell"><div class="c-main"><div class="c-title">Keep my workspace</div><div class="c-sub">Files and edits stay on this device between visits</div></div>${switchHtml('st-persist', s.get('persist'))}</div>
@@ -11273,7 +11314,10 @@ function renderSettings(v) {
   const tmBox = $('#st-team', v);
   const drawTm = () => {
     const d = TeamRules.data;
-    if (!d) { tmBox.innerHTML = `<div class="cell"><div class="c-main"><div class="c-title">No team rules</div><div class="c-sub">${esc(TeamRules.error || 'Checking…')} — publish <b>zenpdf-forms.json</b> next to index.html to share how forms are filled.</div></div><button class="btn sm" data-tm="reload">${icon('refresh', 'sm')} Check</button></div>`; }
+    const title = tmBox.previousElementSibling;
+    const show = !!d;
+    tmBox.style.display = show ? '' : 'none'; if (title && title.classList.contains('group-title')) title.style.display = show ? '' : 'none';
+    if (!d) { tmBox.innerHTML = ''; }
     else {
       const off = d.enabled === false;
       tmBox.innerHTML = `<div class="cell"><div class="c-main"><div class="c-title">Use the team’s form rules &amp; memory</div><div class="c-sub">${off ? 'Turned off for everyone by your team' : esc(d.forms.length + ' form' + (d.forms.length === 1 ? '' : 's') + ' · version ' + (d.version || '—') + (TeamRules.error ? ' · offline copy' : ' · up to date'))}</div></div>${switchHtml('st-tm', TeamRules.on()).replace('<input', off ? '<input disabled' : '<input')}</div>`
@@ -11988,7 +12032,7 @@ const Editor = Z.Editor = {
           <button class="btn primary sm" data-a="download" style="margin-left:4px">${icon('download', 'sm')}<span class="hide-m">Download</span></button>
         </div>
         <div class="ed-tabs hide" id="ed-tabs" role="tablist"></div>
-        <div class="ed-tools" id="ed-tools">${TOOLS_ED.map(t => `<button class="tbtn" data-tool="${t.id}" title="${t.label} (${t.key.toUpperCase()})">${icon(t.icon)}${t.label}</button>`).join('')}<div class="tsep"></div><button class="tbtn" data-a="autofill" style="color:var(--c-smart)">${icon('wand')}Autofill</button><button class="tbtn" data-a="organize">${icon('organize')}Pages</button></div>
+        <div class="ed-tools" id="ed-tools">${TOOLS_ED.map(t => `<button class="tbtn" data-tool="${t.id}" title="${t.label} (${t.key.toUpperCase()})">${icon(t.icon)}${t.label}</button>`).join('')}<div class="tsep"></div><button class="tbtn" data-a="autofill" style="color:var(--c-smart)">${icon('wand')}Autofill</button><button class="tbtn" data-a="flatten" title="Flatten — make answers and edits part of the page">${icon('layers')}Flatten</button><button class="tbtn" data-a="organize">${icon('organize')}Pages</button></div>
         <div class="ed-props" id="ed-props"></div>
         <div class="ed-body"><aside class="ed-thumbs ${innerWidth < 1100 ? 'closed' : ''}" id="ed-thumbs"></aside>
           <div class="ed-canvas" id="ed-canvas"><div class="ed-pages" id="ed-pages"></div></div>
@@ -12352,6 +12396,7 @@ const Editor = Z.Editor = {
     this.push(e, keepRedo);
   },
   async redoPages(e) {
+    if (e.op.kind === 'flatten') { await this.flattenNow(e.op.arg, true); return; }
     if (e.op.kind !== 'commit') { await this.structural(e.op.kind, e.op.i, e.op.arg, { redo: true }); return; }
     const f = this.f;
     if (!Docs.hasEdits(f)) { this.updateUndo(); return; }
@@ -13312,7 +13357,8 @@ const Editor = Z.Editor = {
         const name = a.fieldName;
         const has = Object.prototype.hasOwnProperty.call(vals, name);
         const fsz = a.defaultAppearanceData && a.defaultAppearanceData.fontSize ? a.defaultAppearanceData.fontSize : 0;
-        const fontCss = `font-size:calc(${fsz || Math.min(12, Math.max(7, hh * 0.68))}px * var(--z))`;
+        const fbase = Math.max(5, Math.min(fsz || Math.min(12, Math.max(7, hh * 0.68)), Math.max(6, (hh - 2) * 0.78)));
+        const fontCss = `font-size:calc(${fbase}px * var(--z))`;
         let node;
         if (a.fieldType === 'Tx') {
           const v = has ? vals[name] : (a.fieldValue || '');
@@ -13352,6 +13398,7 @@ const Editor = Z.Editor = {
         if (node) frag.appendChild(node);
       }
       layer.appendChild(frag);
+      requestAnimationFrame(() => fitFormInputs(layer));
     } catch (e) { console.warn('[ZenPDF] forms', e); }
   },
   syncField(name, except) {
@@ -13379,6 +13426,49 @@ const Editor = Z.Editor = {
     this.pages.forEach(P => $$('.l-form [data-f]', P.el).forEach(n => { if (set.has(n.dataset.f)) n.classList.add('auto'); }));
   },
 
+  /* ---------------- flatten ---------------- */
+  async flattenMenu() {
+    const f = this.f; if (!f) return;
+    let fields = 0;
+    try { fields = (await loadPdf(await Docs.raw(f))).getForm().getFields().length; } catch (_) {}
+    const objs = (f.edits && f.edits.objs || []).length;
+    const pick = await choose('Flatten', [
+      { label: 'Make everything uneditable', sub: 'Form answers, text, signatures and drawings all become part of the pages. Nothing can be changed by anyone afterwards.', icon: 'lock', tile: 'var(--c-security)', value: 'all', on: true },
+      { label: 'Flatten form fields only', sub: fields ? 'The ' + plural(fields, 'form field') + ' turn into printed text. Your added text and signatures stay movable here.' : 'This PDF has no form boxes', icon: 'form', tile: 'var(--c-to)', value: 'forms', disabled: !fields },
+      { label: 'Write my edits in, keep form fields editable', sub: objs ? 'Your ' + plural(objs, 'item') + ' become part of the pages; the form boxes can still be filled.' : 'Nothing added yet', icon: 'layers', tile: 'var(--accent)', value: 'edits', disabled: !Docs.hasEdits(f) },
+    ], { sub: 'Undo brings back everything as it was.' });
+    if (!pick) return;
+    await this.flattenNow(pick);
+  },
+  async flattenNow(mode, redo) {
+    const f = this.f; if (!f) return;
+    const keep = this.cur;
+    const note = { all: 'Flattened everything', forms: 'Flattened the form fields', edits: 'Wrote edits in' }[mode];
+    try {
+      await withProgress({ title: note.replace(/^./, c => c) + '…' }, async () => {
+        const raw = await Docs.raw(f);
+        if (mode === 'all') {
+          const out = await Z.bake(raw, Docs.hasEdits(f) ? f.edits : { objs: [], form: {}, rev: 1 }, { flatten: true });
+          await Docs.replace(f, out, note);
+        } else if (mode === 'forms') {
+          const out = await Z.bake(raw, { objs: [], form: Object.assign({}, f.edits.form || {}), rev: 1 }, { flatten: true });
+          const objs = JSON.parse(JSON.stringify(f.edits.objs || []));
+          await Docs.replace(f, out, note, { keepEdits: true });
+          f.edits = { objs, form: {}, rev: (f.edits.rev || 0) + 1 };
+          Docs.setEdits(f, f.edits, true);
+        } else {
+          if (!Docs.hasEdits(f)) return;
+          await Docs.commitEdits(f, note);
+        }
+      });
+    } catch (e) { if (!isCancel(e)) fail(e, 'Couldn’t flatten'); return; }
+    const H = this.hist.get(f.id); if (H) H.ver = f.ver;
+    this.pushPages({ op: { kind: 'flatten', arg: mode }, note }, !!redo);
+    this.f = null;
+    await this.open(f, {});
+    setTimeout(() => this.goPage(Math.min(keep, this.pages.length - 1), false), 60);
+    toast('<b>' + note + '</b>', { type: 'ok', sub: mode === 'all' ? 'Nothing in the pages can be edited now' : mode === 'forms' ? 'Form boxes are now printed text' : 'Form boxes still work', action: { label: 'Undo', fn: () => this.undo() } });
+  },
   /* ---------------- tabs & split screen ---------------- */
   tabs() { const t = Settings.get('openTabs'); return Array.isArray(t) ? t.filter(id => Docs.get(id)) : []; },
   drawTabs() {
@@ -13597,6 +13687,7 @@ const Editor = Z.Editor = {
       case 'split': this.toggleSplit(); break;
       case 'download': if (this.textEdit) this.commitText(); exportSheet(this.f, { current: this.cur }); break;
       case 'autofill': Z.Autofill.start(this); break;
+      case 'flatten': this.flattenMenu(); break;
       case 'organize': await this.pageOps(btn); break;
       case 'docs': this.docMenu(btn); break;
       case 'prevdoc': case 'nextdoc': {
@@ -14696,10 +14787,13 @@ const TeamRules = Z.TeamRules = {
       const d = await r.json();
       if (!d || typeof d !== 'object' || !Array.isArray(d.forms)) throw new Error('the team file isn’t in the expected format');
       this.data = d; this.loadedAt = Date.now(); this.error = '';
-      try { await KV.set('team:file', d); } catch (_) {}
+      try { await KV.set('team:file:' + this.url, d); } catch (_) {}
     } catch (e) {
       this.error = errMsg(e);
-      if (!this.data) { try { const c = await KV.get('team:file'); if (c && Array.isArray(c.forms)) { this.data = c; this.loadedAt = Date.now() - 25 * 60000; } } catch (_) {} }
+      /* only a missing network uses the saved copy — a page with no team file has no team rules */
+      const offline = !navigator.onLine || /Failed to fetch|NetworkError|timed out|Load failed/i.test(this.error);
+      if (!this.data && offline) { try { const c = await KV.get('team:file:' + this.url); if (c && Array.isArray(c.forms)) { this.data = c; this.loadedAt = Date.now() - 25 * 60000; } } catch (_) {} }
+      if (!offline) this.data = null;
     }
     Bus.emit('team', {});
     return this.data;
@@ -14793,7 +14887,7 @@ const TeamRules = Z.TeamRules = {
     return '';
   },
   /* fill the plan from the form's rules — they win over guessing */
-  applyToPlan(plan, F, fm, fields) {
+  applyToPlan(plan, F, fm, fields, boxes) {
     const ctx = { keys: (F.platform && F.platform.keys) || {}, client: this.clientFor(F), data: this.data };
     const label = fm.name || 'team rules';
     const byName = new Map(plan.map(r => [r.field.name, r]));
@@ -14816,6 +14910,10 @@ const TeamRules = Z.TeamRules = {
     /* text where the form has no box */
     (fm.place || []).forEach((p, i) => {
       const v = this.render(p.value, ctx); if (!v) return;
+      /* the form has its own box here (newer versions of a form often do) */
+      const pw = p.w || 160, ph = p.h || 14;
+      const hit = ((boxes || {})[p.page] || []).some(b => { const ix = Math.max(0, Math.min(p.x + pw, b.x + b.w) - Math.max(p.x, b.x)), iy = Math.max(0, Math.min(p.y + ph, b.y + b.h) - Math.max(p.y, b.y)); return ix * iy > 0.3 * Math.min(pw * ph, b.w * b.h); });
+      if (hit) return;
       const field = { name: '__team_place_' + i, kind: 'text', flat: true, page: p.page, x: p.x, y: p.y, w: p.w || 160, h: p.h || 14, labels: [p.label || 'Text on page ' + p.page] };
       plan.push({ field, val: v, show: v, on: true, conf: 0.99, from: label, derived: 'placed on the page (no box)', cl: null });
       filled++;
@@ -15519,7 +15617,15 @@ const Autofill = Z.Autofill = {
       this.checkValues(plan, ed);
       const tf = TeamRules.formFor(target.fields);
       if (tf) {
-        this.teamInfo = Object.assign({ form: tf.name || 'Team rules' }, TeamRules.applyToPlan(plan, F, tf, target.fields));
+        const boxes = {};
+        try {
+          for (const pn of Array.from(new Set((tf.place || []).map(p => p.page)))) {
+            if (!ed.pdf || pn > ed.pdf.numPages) continue;
+            const pg = await ed.pdf.getPage(pn), vp = pg.getViewport({ scale: 1 });
+            boxes[pn] = (await pg.getAnnotations()).filter(a => a.subtype === 'Widget').map(a => { const r = vp.convertToViewportRectangle(a.rect); return { x: Math.min(r[0], r[2]), y: Math.min(r[1], r[3]), w: Math.abs(r[2] - r[0]), h: Math.abs(r[3] - r[1]) }; });
+          }
+        } catch (e) { console.warn('[ZenPDF] boxes', e); }
+        this.teamInfo = Object.assign({ form: tf.name || 'Team rules' }, TeamRules.applyToPlan(plan, F, tf, target.fields, boxes));
         if (!F.platform) this.teamInfo.warn = 'This source isn’t a platform export, so only the team’s fixed answers were used. Import the platform Excel for the full fill.';
       } else this.teamInfo = null;
     } catch (e) { P2.done(); if (isCancel(e)) return; fail(e, 'Autofill'); return; }
@@ -15661,6 +15767,7 @@ const Autofill = Z.Autofill = {
     ed.commit();
     ed.syncForms();
     ed.markAuto(names);
+    setTimeout(() => { try { ed.pages.forEach(p => p.el && fitFormInputs(p.el)); } catch (_) {} }, 120);
     return n;
   },
   async saveProfile(name, facts) {
