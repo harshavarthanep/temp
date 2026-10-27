@@ -5163,7 +5163,7 @@ LOG(VER + ' loaded');
    │  3. Enable the "Google Drive API" for the project.                │
    │  4. Paste the Client ID below and set enabled: true.              │
    └──────────────────────────────────────────────────────────────────┘ */
-window.ZENPDF_CONFIG = Object.assign({ googleSync: { enabled: false, clientId: '' }, teamFile: 'zenpdf-forms.json' }, window.ZENPDF_CONFIG || {});
+window.ZENPDF_CONFIG = Object.assign({ googleSync: { enabled: false, clientId: '' }, teamFile: 'zenpdf-forms.json', geoFile: '' }, window.ZENPDF_CONFIG || {});
 </script>
 <script id="zp-app">
 (function () {
@@ -9360,6 +9360,8 @@ async function auditForm(bytes) {
   const L = PL();
   let d;
   try { d = await loadPdf(bytes); } catch (_) { return null; }
+  try { await ZGeo.load(); } catch (_) {}
+  const suggest = [];
   let fields;
   try { fields = d.getForm().getFields(); } catch (_) { return null; }
   if (!fields.length) return null;
@@ -9439,6 +9441,35 @@ async function auditForm(bytes) {
       try { if (f instanceof L.PDFCheckBox ? f.isChecked() : (f.getSelected() || []).length) filled++; } catch (_) {}
     }
   }
+  /* addresses: ZIP, state, county and city should describe the same place */
+  if (ZGeo.byZip) {
+    const pages = d.getPages();
+    const rows = fields.filter(f => f instanceof L.PDFTextField).map(f => {
+      const w = f.acroField.getWidgets()[0]; let page = 0, x = 0, y = 0;
+      try { const pr = w.P(); page = pages.findIndex(p => p.ref === pr) + 1; const r = w.getRectangle(); const H = pages[Math.max(0, page - 1)].getHeight(); x = Math.min(r.x, r.x + r.width); y = H - Math.max(r.y, r.y + r.height); } catch (_) {}
+      let v = ''; try { v = (f.getText() || '').trim(); } catch (_) {}
+      return { field: { name: f.getName(), labels: [labelOf(f)], page, x, y, value: v }, val: v };
+    });
+    const { kind, pick } = Autofill.addrGroups(rows);
+    rows.forEach(r => {
+      const k = kind(r); if (!k) return;
+      if (k === 'zip') { if (r.val && /^\d{5}(-?\d{4})?$/.test(r.val.replace(/\s/g, '')) && !ZGeo.lookup(r.val)) add('warn', r.field.name, 'ZIP ' + r.val + ' isn’t in the US ZIP code list — check the digits'); return; }
+      const z = pick(r); if (!z || !z.val) return;
+      const g = ZGeo.lookup(z.val); if (!g) return;
+      const cur = r.val;
+      if (k === 'state') {
+        if (!cur) { add('info', r.field.name, 'Empty — ZIP ' + g.zip + ' is in ' + g.state); suggest.push({ name: r.field.name, value: g.state }); }
+        else if (cur.toUpperCase() !== g.state && cur.toLowerCase() !== g.stateName.toLowerCase()) add('warn', r.field.name, 'ZIP ' + g.zip + ' is in ' + g.stateName + ' (' + g.state + '), but this says “' + cur + '”');
+      } else if (k === 'county') {
+        if (!cur) { add('info', r.field.name, 'Empty — ZIP ' + g.zip + ' is in ' + g.county); suggest.push({ name: r.field.name, value: g.countyShort }); }
+        else if (/^[A-Z]{2}$/.test(cur)) { add('warn', r.field.name, '“' + cur + '” is a state code, not a county — ZIP ' + g.zip + ' is in ' + g.county); suggest.push({ name: r.field.name, value: g.countyShort }); }
+        else if (ZGeo.short(cur).toLowerCase() !== g.countyShort.toLowerCase()) add(ZGeo.isCounty(g.state, cur) ? 'info' : 'warn', r.field.name, ZGeo.isCounty(g.state, cur) ? '“' + cur + '” — ZIP ' + g.zip + ' is mostly in ' + g.county + ' (some ZIPs cross county lines)' : '“' + cur + '” isn’t a county in ' + g.stateName + ' — ZIP ' + g.zip + ' is in ' + g.county);
+      } else if (k === 'city') {
+        if (!cur) { add('info', r.field.name, 'Empty — ZIP ' + g.zip + ' is ' + g.city); suggest.push({ name: r.field.name, value: g.city }); }
+        else if (!/,/.test(cur) && !ZGeo.sameCity(g, cur)) add('info', r.field.name, '“' + cur + '” — the post office name for ZIP ' + g.zip + ' is ' + g.city);
+      }
+    });
+  }
   /* answers that should agree */
   if (vals.__pan && vals.__gstpan && vals.__pan !== vals.__gstpan) add('err', '', 'The PAN inside the GSTIN (' + vals.__gstpan + ') doesn’t match the PAN (' + vals.__pan + ')');
   if (vals.__pan && vals.__pan[3] === 'P') { const sur = Object.keys(vals).find(k => /surname|last name/i.test(k)); if (sur) { const s0 = String(vals[sur]).trim()[0]; if (s0 && s0.toUpperCase() !== vals.__pan[4]) add('warn', '', 'The 5th letter of the PAN (' + vals.__pan[4] + ') usually matches the first letter of the surname (' + s0.toUpperCase() + ')'); } }
@@ -9448,14 +9479,16 @@ async function auditForm(bytes) {
   const completeness = textTotal ? textFilled / textTotal : filled / Math.max(1, total);
   const score = Math.max(0, Math.round(100 * completeness - errs * 8 - warns * 3));
   issues.sort((a, b) => ({ err: 0, warn: 1, info: 2 }[a.sev] - { err: 0, warn: 1, info: 2 }[b.sev]));
-  return { total, filled, textTotal, textFilled, issues, score, errs, warns };
+  return { total, filled, textTotal, textFilled, issues, score, errs, warns, suggest };
 }
 function auditHtml(a) {
   if (!a) return '';
   const cls = a.score >= 85 ? '' : a.score >= 60 ? 'mid' : 'low';
   const label = a.errs ? plural(a.errs, 'problem') + ' to fix' : a.warns ? plural(a.warns, 'thing') + ' to check' : 'Looks good';
   const canGo = Z.Editor && Z.Editor.el && Z.Editor.el.isConnected;
-  return `<div class="audit"><div class="audit-head"><div class="audit-score">${a.score}%</div><div style="font-size:13px;line-height:1.35"><b>Form check · ${label}</b><div class="muted">${a.textFilled} of ${a.textTotal} text boxes filled · ${a.filled} of ${a.total} fields answered</div></div><div class="audit-bar"><i class="${cls}" style="width:${a.score}%"></i></div></div>
+  const sug = (a.suggest || []).length && canGo ? `<button class="btn sm tinted" data-sugapply style="margin:8px 0 2px">${icon('wand', 'sm')} Fill ${plural(a.suggest.length, 'suggested answer')}</button>` : '';
+  return `<div class="audit" ${sug ? `data-sug="${attr(JSON.stringify(a.suggest))}"` : ''}><div class="audit-head"><div class="audit-score">${a.score}%</div><div style="font-size:13px;line-height:1.35"><b>Form check · ${label}</b><div class="muted">${a.textFilled} of ${a.textTotal} text boxes filled · ${a.filled} of ${a.total} fields answered</div></div><div class="audit-bar"><i class="${cls}" style="width:${a.score}%"></i></div></div>
+    ${sug}
     ${a.issues.length ? `<ul>${a.issues.map(i => `<li class="${canGo && i.name ? 'go' : ''}" ${canGo && i.name ? `data-goto="${attr(i.name)}" title="Go to this field"` : ''}><span class="k ${i.sev}"></span><span>${i.name ? `<b>${esc(i.name.slice(0, 60))}</b> — ` : ''}${esc(i.msg)}</span>${canGo && i.name ? `<span class="go-ic">${icon('chev-r', 'xs')}</span>` : ''}</li>`).join('')}</ul>` : ''}</div>`;
 }
 /* ---------- bring in browser downloads ----------
@@ -9682,6 +9715,17 @@ async function previewDownload(items, o) {
   const pdfs = items.filter(it => kindOf(it.name) === 'pdf');
   if (pdfs.length === 1) bytesOf(pdfs[0]).then(b => auditForm(b.slice())).then(a => { if (a && a.total) { const m = $('.dlp-meta', body); if (m) m.insertAdjacentHTML('afterend', auditHtml(a)); } }).catch(() => {});
   body.addEventListener('click', (e) => {
+    const sb = e.target.closest('[data-sugapply]');
+    if (sb) {
+      const box = sb.closest('[data-sug]'); let list = []; try { list = JSON.parse(box.dataset.sug); } catch (_) {}
+      const ed = Z.Editor; if (!ed || !ed.edits || !list.length) return;
+      const before = ed.snap();
+      list.forEach(x => { ed.edits.form[x.name] = x.value; });
+      ed.push(before); ed.commit(); ed.syncForms();
+      s.close(null);
+      toast('<b>Filled ' + plural(list.length, 'suggested answer') + '</b>', { type: 'ok', sub: 'From the ZIP code list — check them, then download again', action: { label: 'Undo', fn: () => ed.undo() } });
+      return;
+    }
     const g = e.target.closest('[data-goto]'); if (!g) return;
     const name = g.dataset.goto;
     s.close(null);
@@ -11284,6 +11328,7 @@ function renderSettings(v) {
     <div class="group-title">Signatures</div><div class="group">
       <button class="cell tap" data-act="sigs"><div class="c-main"><div class="c-title">Saved signatures</div><div class="c-sub">${plural(sigs.length, 'signature')}</div></div><span class="chev">${icon('chev-r', 'sm')}</span></button>
     </div>
+    <div class="group-title" style="display:none" id="st-geo-t">Address data</div><div class="group" id="st-geo" style="display:none"></div>
     <div class="group-title" style="display:none">Team form rules</div><div class="group" id="st-team" style="display:none"></div>
     <div class="group-title">Browser downloads</div><div class="group" id="st-inbox"></div>
     <div class="group-title">Storage</div><div class="group">
@@ -11329,6 +11374,12 @@ function renderSettings(v) {
   };
   tmBox.addEventListener('click', async (e) => { const b = e.target.closest('[data-tm]'); if (!b) return; if (b.dataset.tm === 'reload') { await TeamRules.load(true); drawTm(); toast(TeamRules.error ? 'Couldn’t update: ' + esc(TeamRules.error) : 'Team rules up to date', { type: TeamRules.error ? 'warn' : 'ok' }); } else await TeamRules.exportTeamFile(); });
   TeamRules.load().then(drawTm).catch(drawTm);
+  const geoBox = $('#st-geo', v);
+  ZGeo.load().then(ok => {
+    if (!ok || !geoBox.isConnected) return;
+    geoBox.style.display = ''; $('#st-geo-t', v).style.display = '';
+    geoBox.innerHTML = `<div class="cell"><span class="tile sm" style="--c:var(--c-to)">${icon('home')}</span><div class="c-main"><div class="c-title">US ZIP, city, county &amp; state list</div><div class="c-sub">${(ZGeo.d.count || ZGeo.byZip.size).toLocaleString()} ZIP codes · built ${esc(ZGeo.d.built || '')} · checks addresses before download and fills missing counties</div></div></div>`;
+  }).catch(() => {});
   const ibBox = $('#st-inbox', v);
   const drawIb = () => {
     const on = !!s.get('autoImport') && !!Z.Inbox.dir;
@@ -14773,6 +14824,57 @@ const Lexicon = Z.Lexicon = {
    application form: how each box is filled from platform data, boxes to
    leave empty, text to place where a form has no box, and fixes learned by
    the team.  Editing that file updates every user — no new index.html.   */
+/* ---------- US ZIP codes → city, county, state ----------
+   zenpdf-geo.json (≈360 KB over the network) is loaded the first time a
+   form needs it and kept on this device.  Without the file everything
+   still works — only the address checks and county suggestions are off. */
+const ZGeo = Z.ZGeo = {
+  byZip: null, d: null, loading: null, error: '', from: '',
+  urls() { const c = window.ZENPDF_CONFIG && window.ZENPDF_CONFIG.geoFile; const out = []; [c, 'zenpdf-geo.json', '../zenpdf-geo.json'].filter(Boolean).forEach(u => { try { out.push(new URL(u, location.href).href); } catch (_) {} }); return Array.from(new Set(out)); },
+  async load() {
+    if (this.byZip) return true;
+    if (this.loading) return this.loading;
+    this.loading = (async () => {
+      let d = null, fresh = false;
+      try { d = await KV.get('geo:data'); } catch (_) {}
+      const stale = !d || d.v !== 1 || !d._at || Date.now() - d._at > 14 * 864e5;
+      if (stale && /^https?:/.test(location.href)) {
+        for (const u of this.urls()) {
+          try { const r = await withTimeout(fetch(u, { cache: 'no-cache' }), 25000, 'ZIP list'); if (!r.ok) continue; const j = await r.json(); if (j && j.v === 1 && j.zips) { d = j; fresh = true; this.from = u; break; } } catch (e) { this.error = errMsg(e); }
+        }
+      }
+      if (!d || !d.zips) { this.error = this.error || 'no zenpdf-geo.json published next to index.html'; return false; }
+      if (fresh) { d._at = Date.now(); KV.set('geo:data', d).catch(() => {}); }
+      this.index(d);
+      Bus.emit('geo', {});
+      return true;
+    })();
+    try { return await this.loading; } finally { this.loading = null; }
+  },
+  index(d) {
+    const m = new Map(), byState = {};
+    const n = (x) => parseInt(x, 36);
+    d.zips.split(';').forEach(row => {
+      const p = row.split(',');
+      const rec = [n(p[1]), n(p[2]), n(p[3]), p[4] ? p[4].split('.').map(n) : null];
+      m.set(p[0], rec);
+      const st = d.states[rec[2]], ct = d.counties[rec[1]];
+      if (ct) (byState[st] = byState[st] || new Set()).add(this.short(ct).toLowerCase());
+    });
+    this.byZip = m; this.d = d; this.byState = byState;
+  },
+  short(c) { return String(c || '').replace(/\s+(County|Parish|Borough|Census Area|City and Borough|Municipality|Municipio)$/i, '').trim(); },
+  lookup(zip) {
+    if (!this.byZip) return null;
+    const z = String(zip || '').replace(/\D/g, '').slice(0, 5);
+    if (z.length !== 5) return null;
+    const r = this.byZip.get(z); if (!r) return null;
+    const d = this.d, st = d.states[r[2]];
+    return { zip: z, city: d.cities[r[0]], county: d.counties[r[1]], countyShort: this.short(d.counties[r[1]]), state: st, stateName: (d.stateNames || {})[st] || st, alts: (r[3] || []).map(i => d.cities[i]) };
+  },
+  isCounty(state, name) { const set = this.byState && this.byState[String(state || '').toUpperCase()]; return !!(set && set.has(this.short(name).toLowerCase())); },
+  sameCity(g, city) { const c = String(city || '').trim().toLowerCase(); return !c || [g.city].concat(g.alts).some(x => String(x).toLowerCase() === c); },
+};
 const TeamRules = Z.TeamRules = {
   data: null, loadedAt: 0, error: '', url: '',
   slug: (t) => String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''),
@@ -14858,7 +14960,12 @@ const TeamRules = Z.TeamRules = {
       case 'ein': { const x = v.replace(/\D/g, ''); return x.length === 9 ? x.slice(0, 2) + '-' + x.slice(2) : v; }
       case 'date': { const dt = ZV.date(v); return dt ? zdFmtDate(dt, arg || 'mdy') : v; }
       case 'credential': { const k = Object.keys(d).find(c => c.toLowerCase() === v.toLowerCase()); return k ? d[k] : v; }
-      case 'county': return /^[A-Z]{2}$/.test(v.trim()) ? '' : v;
+      case 'county': {
+        const bad = !v || /^[A-Z]{2}$/.test(v.trim());
+        if (!bad) return v;
+        if (arg) { const g = ZGeo.lookup(this.value(arg, ctx)); if (g) { ctx.geoUsed = (ctx.geoUsed || 0) + 1; return g.countyShort; } }
+        return '';
+      }
       case 'first': return v.split(/\s*,\s*/)[0] || '';
       case 'has': return new RegExp(arg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(v) ? 'Yes' : 'No';
       case 'in': return arg.split(/\s*,\s*/).some(a => a.toLowerCase() === v.toLowerCase()) ? 'true' : 'false';
@@ -14889,6 +14996,7 @@ const TeamRules = Z.TeamRules = {
   /* fill the plan from the form's rules — they win over guessing */
   applyToPlan(plan, F, fm, fields, boxes) {
     const ctx = { keys: (F.platform && F.platform.keys) || {}, client: this.clientFor(F), data: this.data };
+    this.lastCtx = ctx;
     const label = fm.name || 'team rules';
     const byName = new Map(plan.map(r => [r.field.name, r]));
     let filled = 0, skipped = 0, missing = [];
@@ -15348,6 +15456,42 @@ const Autofill = Z.Autofill = {
       r.conf = Math.min(0.9, 0.6 + 0.1 * w.n); r.on = true; r.from = 'your answer on other forms' + (w.n > 1 ? ' (' + w.n + '×)' : ''); r.derived = 'learned';
     });
   },
+  /* address boxes that belong together: same name ending (…_Billing,
+     …_SL2) or the same row of the page */
+  addrGroups(rows) {
+    const cls = (t) => { t = String(t || '').replace(/_/g, ' '); return /zip|postal/i.test(t) ? 'zip' : /count(y|ies)\b/i.test(t) && !/country/i.test(t) ? 'county' : /\bcity\b/i.test(t) ? 'city' : /\bstate\b/i.test(t) && !/statement|united states/i.test(t) ? 'state' : null; };
+    const kind = (r) => { const byName = cls(r.field.name); if (byName) return byName; const lab = String((r.field.labels && r.field.labels[0]) || ''); return lab.split(/\s+/).length <= 4 ? cls(lab) : null; };
+    const tag = (n) => String(n).replace(/(zip( ?code)?|postal( ?code)?|county|city|state)/ig, '#').replace(/[^a-z0-9#]+/ig, '').toLowerCase();
+    const zips = rows.filter(r => kind(r) === 'zip');
+    const pick = (r) => {
+      const t = tag(r.field.name);
+      let z = zips.find(x => tag(x.field.name) === t);
+      if (!z && r.field.page && r.field.y != null) z = zips.filter(x => x.field.page === r.field.page && x.field.y != null && Math.abs(x.field.y - r.field.y) < 26).sort((a, b) => Math.abs(a.field.x - r.field.x) - Math.abs(b.field.x - r.field.x))[0];
+      return z || null;
+    };
+    return { kind, pick };
+  },
+  geoFill(plan) {
+    if (!ZGeo.byZip) return;
+    const { kind, pick } = this.addrGroups(plan);
+    let n = 0;
+    plan.forEach(r => {
+      const k = kind(r); if (!k || k === 'zip' || r.teamSkip) return;
+      const z = pick(r); if (!z) return;
+      const zv = z.val != null && z.val !== '' ? z.val : (z.field.value || '');
+      const g = ZGeo.lookup(zv); if (!g) return;
+      const cur = r.val == null ? '' : String(r.val).trim();
+      const want = k === 'county' ? g.countyShort : k === 'city' ? g.city : g.state;
+      const wrong = k === 'county' ? (cur && (/^[A-Z]{2}$/.test(cur) || !ZGeo.isCounty(g.state, cur))) : false;
+      if (cur && !wrong) return;
+      if (r.field.kind === 'check' || r.field.kind === 'radio') return;
+      r.val = want; r.show = want; r.on = true; r.conf = Math.max(r.conf || 0, 0.9);
+      r.from = 'ZIP ' + g.zip + ' (' + g.city + ', ' + g.state + ')'; r.derived = wrong ? 'replaced “' + cur + '” — not a county of ' + g.state : 'from the ZIP code list';
+      n++;
+    });
+    if (n && this.teamInfo) this.teamInfo.geo = n;
+    this.geoCount = n;
+  },
   applyMemory(plan, m, person) {
     const vals = Object.assign({}, m.constants || {}, (m.values && m.values[person || '_']) || {});
     /* the answer chosen most often wins over the most recent one */
@@ -15615,6 +15759,7 @@ const Autofill = Z.Autofill = {
       this.applyMemory(plan, memory, this.personKey(F));
       try { await this.applyLexicon(plan, F, this.personKey(F), target.fields, memory); } catch (e) { console.warn('[ZenPDF] lexicon', e); }
       this.checkValues(plan, ed);
+      try { await ZGeo.load(); } catch (_) {}
       const tf = TeamRules.formFor(target.fields);
       if (tf) {
         const boxes = {};
@@ -15628,6 +15773,7 @@ const Autofill = Z.Autofill = {
         this.teamInfo = Object.assign({ form: tf.name || 'Team rules' }, TeamRules.applyToPlan(plan, F, tf, target.fields, boxes));
         if (!F.platform) this.teamInfo.warn = 'This source isn’t a platform export, so only the team’s fixed answers were used. Import the platform Excel for the full fill.';
       } else this.teamInfo = null;
+      try { this.geoFill(plan, target.fields); } catch (e) { console.warn('[ZenPDF] geo', e); }
     } catch (e) { P2.done(); if (isCancel(e)) return; fail(e, 'Autofill'); return; }
     P2.done();
     const res = await this.review(plan, F, target, src);
@@ -15687,7 +15833,7 @@ const Autofill = Z.Autofill = {
       <div class="af-sum"><span class="badge green">${rows.length} of ${plan.length} ready</span>${rows.filter(r => r.conf < 0.7).length ? `<span class="badge orange">${rows.filter(r => r.conf < 0.7).length} to check</span>` : ''}<span class="badge gray">${esc(src.name || 'source')}</span></div>
       ${rows.length ? '' : `<div class="note warn">${icon('alert')}<div>Nothing in that source matches this form. Try another profile or document.</div></div>`}
       ${gk.map(g => `<div class="af-group"><b>${esc(GROUP_NAMES[g] || 'Other')}</b>${groups.get(g).map(i => { const r = rows[i]; const lab = (r.field.kind === 'check' && r.field.boxLabel) || r.field.labels && r.field.labels[0] || r.field.question || r.field.tip || r.field.name; return `<div class="af-row ${state[i].on ? '' : 'off'}" data-row="${i}"><label class="switch sm"><input type="checkbox" data-on="${i}" ${state[i].on ? 'checked' : ''}><i></i></label><div class="lab ell">${esc(String(lab).slice(0, 60))}<small title="${attr(r.from + (r.derived ? ' · ' + r.derived : ''))}">${r.cl && r.cl.concept && r.cl.concept !== '__direct' ? esc(this.label(r.cl.concept)) + ' · ' : ''}${esc((r.derived || r.from || '').replace(/^"|"$/g, '').slice(0, 60))}${target.flat ? ' · page ' + r.field.page : ''}</small></div><div class="val">${valInput(r, i)}</div>${pill(r.conf || 0)}</div>`; }).join('')}</div>`).join('')}
-      ${Autofill.teamInfo ? `<div class="note" style="margin:0 0 10px">${icon('sparkles')}<div><b>${esc(Autofill.teamInfo.form)}</b> — ${Autofill.teamInfo.filled} answers from the team’s rules${Autofill.teamInfo.skipped ? ', ' + Autofill.teamInfo.skipped + ' left empty on purpose' : ''}${Autofill.teamInfo.missing.length ? ', ' + Autofill.teamInfo.missing.length + ' with no value in the data' : ''}.${Autofill.teamInfo.warn ? '<br>' + esc(Autofill.teamInfo.warn) : ''}${(Autofill.teamInfo.notes || []).length ? '<ul style="margin:6px 0 0 16px;padding:0">' + Autofill.teamInfo.notes.map(n => '<li>' + esc(n) + '</li>').join('') + '</ul>' : ''}</div></div>` : ''}
+      ${Autofill.teamInfo ? `<div class="note" style="margin:0 0 10px">${icon('sparkles')}<div><b>${esc(Autofill.teamInfo.form)}</b> — ${Autofill.teamInfo.filled} answers from the team’s rules${Autofill.teamInfo.skipped ? ', ' + Autofill.teamInfo.skipped + ' left empty on purpose' : ''}${Autofill.teamInfo.missing.length ? ', ' + Autofill.teamInfo.missing.length + ' with no value in the data' : ''}${Autofill.geoCount ? ', ' + Autofill.geoCount + ' county/city/state boxes checked against the ZIP list' : ''}.${Autofill.teamInfo.warn ? '<br>' + esc(Autofill.teamInfo.warn) : ''}${(Autofill.teamInfo.notes || []).length ? '<ul style="margin:6px 0 0 16px;padding:0">' + Autofill.teamInfo.notes.map(n => '<li>' + esc(n) + '</li>').join('') + '</ul>' : ''}</div></div>` : ''}
       ${missing.length ? `<details style="margin-top:6px" class="af-missing"><summary class="muted" style="cursor:pointer;font-size:13px">${missing.length} field${missing.length === 1 ? '' : 's'} left empty — tap to fill them in yourself (Autofill remembers)</summary><div class="af-mlist">${missing.slice(0, 80).map((r, i) => { const lab = r.field.labels && r.field.labels[0] || r.field.question || r.field.tip || r.field.name; return `<label class="af-mrow"><span class="ell">${esc(String(lab).slice(0, 70))}</span>${r.field.kind === 'check' ? `<input type="checkbox" data-m="${i}">` : `<input class="input sm" data-m="${i}" placeholder="${r.field.kind === 'radio' ? 'Option' : 'Type the answer'}">`}</label>`; }).join('')}</div><div class="muted" style="font-size:12.5px;margin-top:8px;line-height:1.6">${missing.slice(0, 80).map(r => esc((r.field.labels && r.field.labels[0]) || r.field.question || r.field.name)).join(' · ')}</div></details>` : ''}
       ${!src.profile && rows.length >= 3 ? `<div class="cell" style="padding:12px 0 0;margin-top:10px;border-top:.5px solid var(--line)"><div class="c-main"><div class="c-title">Save these answers as a profile</div><div class="c-sub">Reuse them on any other form, matched by meaning</div></div>${switchHtml('af-save', false)}</div><input class="input hide" id="af-pname" placeholder="Profile name" style="margin-top:8px" value="${attr((F.raw && F.raw('provider_full_name') && String(F.raw('provider_full_name').v)) || baseName(src.name || 'My details'))}">` : ''}
     </div>`);

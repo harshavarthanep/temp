@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-27b",
+  "version": "2026-10-27c",
   "enabled": true,
   "defaultOn": true,
   "about": "Team form rules for ZenPDF. Put this file next to index.html on GitHub Pages. Edit it on GitHub to change how forms are filled for everyone - no new index.html needed. enabled:false switches it off for all users; defaultOn sets the starting switch in each user's Settings.",
@@ -61,7 +61,7 @@
     {
       "id": "upmc-ccbh-practitioner-screening",
       "name": "UPMC / CCBH Practitioner Screening Form",
-      "updated": "2026-10-27b",
+      "updated": "2026-10-27c",
       "match": {
         "fields": [
           "ParentCompany_Name",
@@ -83,7 +83,7 @@
         "Notion: complete Section V (competencies) and tick every age range, preschool to adult.",
         "UPMC networks, Managed Care/Clinical Director, Credentialing Contact, Corporate Compliance Officer and EFT contact are left empty on purpose.",
         "Kyle pre-signs for the provider - signatures and the page 14 attestation box are left for signing.",
-        "Billing and mailing county come straight from the platform. For Blackbird they currently hold state codes (ME, PA) - fix the county in the platform if CCBH needs the real county."
+        "County: the platform's county is used when it is a real county; if it holds a state code (ME, PA) or is empty, the county is looked up from the ZIP code (zenpdf-geo.json)."
       ],
       "fields": {
         "Checklist- Info Form": true,
@@ -186,7 +186,7 @@
         "City_Admin": "{primary_practicelocation.mailing_city}",
         "State_Admin": "{primary_practicelocation.mailing_state}",
         "Zip_Admin": "{primary_practicelocation.mailing_zip_code}",
-        "County_Admin": "{primary_practicelocation.practice_location_county|county}",
+        "County_Admin": "{primary_practicelocation.practice_location_county|county:primary_practicelocation.mailing_zip_code}",
         "Phone_Admin": "{primary_practicelocation.phone_number}",
         "Fax_Admin": "{primary_practicelocation.fax_number}",
         "ContactName_Billing": "{taxentity.contact_name}, {taxentity.contact_title}",
@@ -195,14 +195,14 @@
         "City_Billing": "{taxentity.billing_city}",
         "State_Billing": "{taxentity.billing_state}",
         "Zip_Billing": "{taxentity.billing_zip_code}",
-        "County_Billing": "{taxentity.billing_address_county}",
+        "County_Billing": "{taxentity.billing_address_county|county:taxentity.billing_zip_code}",
         "Phone_Billing": "{primary_practicelocation.phone_number}",
         "Fax_Billing": "{primary_practicelocation.fax_number}",
         "Street Address_Mailing": "{taxentity.mailing_street_address_1} {taxentity.mailing_street_address_2}",
         "City_Mailing": "{taxentity.mailing_city}",
         "State_Mailing": "{taxentity.mailing_state}",
         "Zip_Mailing": "{taxentity.mailing_zip_code}",
-        "County_Mailing": "{taxentity.mailing_address_county}",
+        "County_Mailing": "{taxentity.mailing_address_county|county:taxentity.mailing_zip_code}",
         "Phone_Mailing": "{primary_practicelocation.phone_number}",
         "Fax_Mailing": "{primary_practicelocation.fax_number}",
         "EFT Contact Name and Title": "skip",
@@ -212,7 +212,7 @@
         "City_SL1": "{primary_practicelocation.mailing_city}",
         "State_SL1": "{primary_practicelocation.mailing_state}",
         "Zip_SL1": "{primary_practicelocation.mailing_zip_code}",
-        "County_SL1": "{primary_practicelocation.practice_location_county|county}",
+        "County_SL1": "{primary_practicelocation.practice_location_county|county:primary_practicelocation.mailing_zip_code}",
         "Handicap": "Yes",
         "ADA": "Choice1",
         "Public Transportation": "Choice1",
@@ -223,7 +223,7 @@
         "City_SL2": "{additional_practicelocation[1].mailing_city}",
         "State_SL2": "{additional_practicelocation[1].mailing_state}",
         "Zip_SL2": "{additional_practicelocation[1].mailing_zip_code}",
-        "County_SL2": "{additional_practicelocation[1].practice_location_county|county}",
+        "County_SL2": "{additional_practicelocation[1].practice_location_county|county:additional_practicelocation[1].mailing_zip_code}",
         "Handicap_2": {
           "when": "{additional_practicelocation[1].name}",
           "value": "Yes"
@@ -249,7 +249,7 @@
         "City_SL3": "{additional_practicelocation[2].mailing_city}",
         "State_SL3": "{additional_practicelocation[2].mailing_state}",
         "Zip_SL3": "{additional_practicelocation[2].mailing_zip_code}",
-        "County_3": "{additional_practicelocation[2].practice_location_county|county}",
+        "County_3": "{additional_practicelocation[2].practice_location_county|county:additional_practicelocation[2].mailing_zip_code}",
         "Handicap_3": {
           "when": "{additional_practicelocation[2].name}",
           "value": "Yes"
@@ -275,7 +275,7 @@
         "City_SL4": "{additional_practicelocation[3].mailing_city}",
         "State_SL4": "{additional_practicelocation[3].mailing_state}",
         "Zip_SL4": "{additional_practicelocation[3].mailing_zip_code}",
-        "County_4": "{additional_practicelocation[3].practice_location_county|county}",
+        "County_4": "{additional_practicelocation[3].practice_location_county|county:additional_practicelocation[3].mailing_zip_code}",
         "Handicap_4": {
           "when": "{additional_practicelocation[3].name}",
           "value": "Yes"
